@@ -1,0 +1,9 @@
+Django==5.2.*
+psycopg[binary]==3.2.*
+django-htmx==1.21.*
+resend==2.*
+qrcode==7.*
+gunicorn==23.*
+whitenoise==6.*
+python-decouple==3.*
+dj-database-url==2.*

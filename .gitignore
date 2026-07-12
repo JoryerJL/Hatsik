@@ -1,25 +1,66 @@
-# OS
-.DS_Store
-Thumbs.db
+# ==============================================================
+# Hatsik .gitignore
+# ==============================================================
 
-# Agent/tool caches
-.atl/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+*.whl
 
-# Environment
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Environment variables (NEVER commit secrets)
 .env
 .env.*
 !.env.example
 
-# Dependencies
-node_modules/
+# Django
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
 
-# Build
-dist/
-.next/
-out/
+# Tailwind CSS (generated artifact)
+static/css/main.css
+
+# Tailwind CLI binary (download with `make tailwind-install`)
+tailwindcss
 
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Agent/tool caches
+.atl/
+
+# Misc
+*.log
+*.pot
+*.pyc
