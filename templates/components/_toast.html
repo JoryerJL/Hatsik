@@ -1,0 +1,22 @@
+{% comment %}
+Toast component — ephemeral feedback message with auto-dismiss.
+
+Usage:
+  {% include "components/_toast.html" with message=message %}
+
+Expects a Django messages framework message object with:
+  - message.tags: "success" | "warning" | "error" | "info"
+  - message: The message text
+{% endcomment %}
+
+<div class="flex items-center gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-button)] shadow-lg text-sm font-medium
+    {% if 'success' in message.tags %}bg-[var(--color-success-soft)] text-green-800 border border-green-200{% endif %}
+    {% if 'warning' in message.tags %}bg-[var(--color-warning-soft)] text-amber-800 border border-amber-200{% endif %}
+    {% if 'error' in message.tags %}bg-[var(--color-error-soft)] text-red-800 border border-red-200{% endif %}
+    {% if 'info' in message.tags %}bg-[var(--color-info-soft)] text-blue-800 border border-blue-200{% endif %}"
+    role="alert">
+    <span>{{ message }}</span>
+    <button type="button" onclick="this.parentElement.remove()" class="ml-auto text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]">
+        &times;
+    </button>
+</div>

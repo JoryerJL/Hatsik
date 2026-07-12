@@ -1,0 +1,49 @@
+{% comment %}
+Modal/Dialog component — HTMX-powered confirmation dialog.
+
+Usage:
+  {% include "components/_modal.html" with id="confirm-close" title="Close Event?" body="This cannot be undone." confirm_text="Close" confirm_url="/events/1/close/" %}
+
+Params:
+  - id: Unique modal ID (required)
+  - title: Modal heading (required)
+  - body: Modal description text (required)
+  - confirm_text: Confirm button label (default: "Confirm")
+  - confirm_url: URL for the confirm action (HTMX POST)
+  - cancel_text: Cancel button label (default: "Cancel")
+  - variant: Confirm button variant (default: "destructive")
+{% endcomment %}
+
+{% with confirm_text=confirm_text|default:"Confirm" cancel_text=cancel_text|default:"Cancel" variant=variant|default:"destructive" %}
+
+<div id="{{ id }}"
+     class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/50"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="{{ id }}-title">
+
+    <div class="bg-[var(--color-surface)] rounded-[var(--radius-card)] shadow-xl p-[var(--space-5)] max-w-md w-full mx-[var(--space-4)]">
+        <h2 id="{{ id }}-title" class="font-[var(--font-heading)] text-lg font-bold text-[var(--color-neutral-900)] mb-[var(--space-2)]">
+            {{ title }}
+        </h2>
+        <p class="text-[var(--color-neutral-600)] text-sm mb-[var(--space-5)]">
+            {{ body }}
+        </p>
+        <div class="flex justify-end gap-[var(--space-3)]">
+            {% include "components/_button.html" with text=cancel_text variant="secondary" extra_classes="modal-close" %}
+
+            {% if confirm_url %}
+            <button type="button"
+                    hx-post="{{ confirm_url }}"
+                    hx-target="body"
+                    class="inline-flex items-center justify-center px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-button)] font-semibold text-sm transition-colors duration-150 cursor-pointer
+                    {% if variant == 'destructive' %}bg-[var(--color-error)] text-white hover:bg-red-600{% endif %}
+                    {% if variant == 'primary' %}bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]{% endif %}">
+                {{ confirm_text }}
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endwith %}

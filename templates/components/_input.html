@@ -1,0 +1,41 @@
+{% comment %}
+Input component — form field with label, error state, and focus ring.
+
+Usage:
+  {% include "components/_input.html" with name="email" label="Email" type="email" placeholder="you@example.com" %}
+  {% include "components/_input.html" with name="password" label="Password" type="password" error="Required field" %}
+
+Params:
+  - name: Input name attribute (required)
+  - label: Display label (required)
+  - type: Input type (default: "text")
+  - placeholder: Placeholder text (optional)
+  - value: Current value (optional)
+  - error: Error message to display (optional)
+  - required: "true" to mark as required (optional)
+{% endcomment %}
+
+{% with type=type|default:"text" %}
+
+<div class="flex flex-col gap-[var(--space-1)] {{ extra_classes }}">
+    <label for="id_{{ name }}" class="text-sm font-medium text-[var(--color-neutral-700)]">
+        {{ label }}
+        {% if required == "true" %}<span class="text-[var(--color-error)]">*</span>{% endif %}
+    </label>
+    <input
+        type="{{ type }}"
+        name="{{ name }}"
+        id="id_{{ name }}"
+        {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+        {% if value %}value="{{ value }}"{% endif %}
+        {% if required == "true" %}required{% endif %}
+        class="w-full px-[var(--space-3)] py-[var(--space-2)] rounded-[var(--radius-input)] border
+            {% if error %}border-[var(--color-error)] ring-2 ring-[var(--color-error-soft)]{% else %}border-[var(--color-neutral-300)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-soft)]{% endif %}
+            text-sm text-[var(--color-neutral-900)] placeholder-[var(--color-neutral-400)]
+            outline-none transition-all duration-150">
+    {% if error %}
+    <p class="text-xs text-[var(--color-error)]">{{ error }}</p>
+    {% endif %}
+</div>
+
+{% endwith %}
