@@ -21,6 +21,7 @@ Do not activate for mid-phase work or individual commits (use `atomic-commits` s
 - ALWAYS follow `atomic-commits` skill for every commit made.
 - ALWAYS generate an HTML phase report at `docs/html/phase-{N}-report.html`.
 - The HTML report uses the cognitive-doc-design template with Mermaid diagrams.
+- ALL documentation content MUST be written in Spanish (titles, descriptions, labels, callouts, checklist items, diagram captions). Only code snippets, commit messages, and technical identifiers remain in English.
 - Open the HTML file in the browser after generating it.
 - Ask the user BEFORE committing if there are unstaged changes to review.
 
