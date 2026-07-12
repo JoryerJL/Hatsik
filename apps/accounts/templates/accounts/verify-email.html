@@ -1,0 +1,48 @@
+{% extends "auth-base.html" %}
+{% load static %}
+
+{% block title %}Verificación Pendiente — Hatsik{% endblock %}
+
+{% block content %}
+<div class="bg-[var(--color-surface-elevated)] rounded-[var(--radius-card)] shadow-sm p-[var(--space-6)] md:p-10 text-center">
+    <!-- Logo -->
+    <div class="mb-[var(--space-5)]">
+        <img src="{% static 'img/logo.png' %}" alt="Hatsik" class="h-8 mx-auto">
+    </div>
+
+    <!-- Email icon -->
+    <div class="mb-[var(--space-5)]">
+        <span class="material-symbols-rounded text-[var(--color-primary)]" style="font-size: 56px; font-variation-settings: 'FILL' 1;">mark_email_read</span>
+    </div>
+
+    <!-- Header -->
+    <h1 class="font-[var(--font-heading)] text-2xl font-bold text-[var(--color-neutral-900)] mb-[var(--space-2)]">
+        ¡Casi listo!
+    </h1>
+    <p class="text-sm text-[var(--color-neutral-500)] mb-[var(--space-5)]">
+        Hemos enviado un enlace de verificación a tu correo electrónico. Por favor, revisá tu bandeja de entrada (y la carpeta de spam).
+    </p>
+
+    <!-- Email display -->
+    <div class="inline-flex items-center gap-2 px-[var(--space-4)] py-[var(--space-2)] bg-[var(--color-surface)] border border-[var(--color-neutral-200)] rounded-[var(--radius-input)] mb-[var(--space-5)]">
+        <span class="material-symbols-rounded text-[var(--color-neutral-400)]" style="font-size: 18px;">alternate_email</span>
+        <span class="text-sm text-[var(--color-neutral-700)]">{{ user.email }}</span>
+    </div>
+
+    <!-- Resend section -->
+    <div id="resend-section" class="mb-[var(--space-4)]">
+        {% include "accounts/partials/_resend_button.html" %}
+    </div>
+
+    <!-- Logout -->
+    <div class="pt-[var(--space-4)] border-t border-[var(--color-neutral-200)]">
+        <form method="post" action="{% url 'accounts:logout' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="inline-flex items-center gap-1 text-sm text-[var(--color-neutral-500)] hover:text-[var(--color-neutral-700)]">
+                <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
+                ¿Ingresaste el correo equivocado? Cerrar sesión
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

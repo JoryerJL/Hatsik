@@ -1,0 +1,122 @@
+{% extends "auth-base.html" %}
+{% load static %}
+
+{% block title %}Iniciar Sesión — Hatsik{% endblock %}
+
+{% block content %}
+<div class="bg-[var(--color-surface-elevated)] rounded-[var(--radius-card)] shadow-sm p-[var(--space-6)] md:p-10">
+    <!-- Logo -->
+    <div class="text-center mb-[var(--space-6)]">
+        <img src="{% static 'img/logo.png' %}" alt="Hatsik" class="h-8 mx-auto">
+    </div>
+
+    <!-- Header -->
+    <div class="text-center mb-[var(--space-6)]">
+        <h1 class="font-[var(--font-heading)] text-2xl font-bold text-[var(--color-neutral-900)] mb-[var(--space-1)]">
+            Bienvenido a Hatsik
+        </h1>
+        <p class="text-sm text-[var(--color-neutral-500)]">
+            Logística colaborativa hecha fácil.
+        </p>
+    </div>
+
+    <!-- Form errors -->
+    {% if form.non_field_errors %}
+    <div class="mb-[var(--space-4)] p-[var(--space-3)] bg-[var(--color-error-soft)] rounded-[var(--radius-sm)] text-sm text-[var(--color-error)]">
+        {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Login form -->
+    <form method="post" action="{% url 'accounts:login' %}{% if next %}?next={{ next }}{% endif %}" class="flex flex-col gap-[var(--space-4)]">
+        {% csrf_token %}
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+
+        <!-- Email field with icon -->
+        <div class="flex flex-col gap-[var(--space-1)]">
+            <label for="id_email" class="text-sm font-medium text-[var(--color-neutral-700)]">Correo electrónico</label>
+            <div class="relative">
+                <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-neutral-400)]">mail</span>
+                <input type="email" name="email" id="id_email"
+                    placeholder="nombre@ejemplo.com"
+                    value="{{ form.email.value|default:'' }}"
+                    required
+                    class="w-full pl-10 pr-[var(--space-3)] py-[var(--space-3)] rounded-[var(--radius-input)] border
+                        {% if form.email.errors %}border-[var(--color-error)] ring-2 ring-[var(--color-error-soft)]{% else %}border-[var(--color-neutral-300)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-soft)]{% endif %}
+                        text-sm text-[var(--color-neutral-900)] placeholder-[var(--color-neutral-400)]
+                        outline-none transition-all duration-150 bg-[var(--color-surface)]">
+            </div>
+            {% if form.email.errors %}<p class="text-xs text-[var(--color-error)]">{{ form.email.errors.0 }}</p>{% endif %}
+        </div>
+
+        <!-- Password field with icon + visibility toggle -->
+        <div class="flex flex-col gap-[var(--space-1)]">
+            <label for="id_password" class="text-sm font-medium text-[var(--color-neutral-700)]">Contraseña</label>
+            <div class="relative">
+                <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-neutral-400)]">lock</span>
+                <input type="password" name="password" id="id_password"
+                    placeholder="••••••••"
+                    required
+                    class="w-full pl-10 pr-10 py-[var(--space-3)] rounded-[var(--radius-input)] border
+                        {% if form.password.errors %}border-[var(--color-error)] ring-2 ring-[var(--color-error-soft)]{% else %}border-[var(--color-neutral-300)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-soft)]{% endif %}
+                        text-sm text-[var(--color-neutral-900)] placeholder-[var(--color-neutral-400)]
+                        outline-none transition-all duration-150 bg-[var(--color-surface)]">
+                <button type="button" onclick="togglePassword('id_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer" aria-label="Mostrar contraseña">
+                    <span class="material-symbols-rounded">visibility</span>
+                </button>
+            </div>
+            {% if form.password.errors %}<p class="text-xs text-[var(--color-error)]">{{ form.password.errors.0 }}</p>{% endif %}
+        </div>
+
+        <!-- Forgot password link -->
+        <div class="text-right">
+            <a href="{% url 'accounts:password_reset_request' %}" class="text-sm text-[var(--color-primary)] font-medium hover:underline">
+                ¿Olvidaste tu contraseña?
+            </a>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit"
+            class="w-full flex items-center justify-center gap-2 px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-button)] font-semibold text-sm bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] transition-colors duration-150 cursor-pointer">
+            Entrar
+            <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span>
+        </button>
+    </form>
+
+    <!-- Register link -->
+    <p class="mt-[var(--space-6)] text-center text-sm text-[var(--color-neutral-500)]">
+        ¿Aún no tenés cuenta?
+        <a href="{% url 'accounts:register' %}" class="text-[var(--color-primary)] font-semibold hover:underline">
+            Crear cuenta
+        </a>
+    </p>
+
+    <!-- Decorative footer -->
+    <div class="mt-[var(--space-5)] pt-[var(--space-4)] border-t border-[var(--color-neutral-200)] text-center">
+        <p class="text-xs text-[var(--color-neutral-400)] flex items-center justify-center gap-1">
+            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--color-primary);">favorite</span>
+            Organizá con cariño
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('.material-symbols-rounded');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility_off';
+    } else {
+        input.type = 'password';
+        icon.textContent = 'visibility';
+    }
+}
+</script>
+{% endblock %}
