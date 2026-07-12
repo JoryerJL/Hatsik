@@ -2,10 +2,21 @@
 Transactional email utilities using Resend SDK.
 
 Wraps Resend API calls so the email provider is swappable in the future.
+In local development (DEBUG=True or no RESEND_API_KEY), emails are printed
+to the console instead of being sent via Resend.
 """
+
+import logging
 
 import resend
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
+
+def _is_local_dev():
+    """Check if we should skip real email sending (no API key configured)."""
+    return not settings.RESEND_API_KEY
 
 
 def _get_resend_client():
@@ -23,8 +34,21 @@ def send_verification_email(user, token: str, verification_url: str) -> dict:
         verification_url: Full URL the user clicks to verify.
 
     Returns:
-        Resend API response dict.
+        Resend API response dict or local dev log dict.
     """
+    if _is_local_dev():
+        logger.info(
+            "\n"
+            "=" * 60 + "\n"
+            "📧 VERIFICATION EMAIL (local dev)\n"
+            "=" * 60 + "\n"
+            f"To: {user.email}\n"
+            f"Subject: Verificá tu cuenta de Hatsik\n"
+            f"Link: {verification_url}\n"
+            "=" * 60
+        )
+        return {"id": "local-dev", "to": user.email}
+
     _get_resend_client()
 
     html_body = f"""
@@ -57,9 +81,9 @@ def send_verification_email(user, token: str, verification_url: str) -> dict:
 
     return resend.Emails.send(
         {
-            "from": "Hatsik <noreply@hatsik.com>",
+            "from": f"Hatsik <noreply@{settings.RESEND_FROM_DOMAIN}>",
             "to": [user.email],
-            "subject": "Verify your Hatsik account",
+            "subject": "Verificá tu cuenta de Hatsik",
             "html": html_body,
             "text": text_body,
         }
@@ -76,8 +100,21 @@ def send_password_reset_email(user, token: str, reset_url: str) -> dict:
         reset_url: Full URL the user clicks to reset password.
 
     Returns:
-        Resend API response dict.
+        Resend API response dict or local dev log dict.
     """
+    if _is_local_dev():
+        logger.info(
+            "\n"
+            "=" * 60 + "\n"
+            "📧 PASSWORD RESET EMAIL (local dev)\n"
+            "=" * 60 + "\n"
+            f"To: {user.email}\n"
+            f"Subject: Restablecé tu contraseña de Hatsik\n"
+            f"Link: {reset_url}\n"
+            "=" * 60
+        )
+        return {"id": "local-dev", "to": user.email}
+
     _get_resend_client()
 
     html_body = f"""
@@ -110,9 +147,9 @@ def send_password_reset_email(user, token: str, reset_url: str) -> dict:
 
     return resend.Emails.send(
         {
-            "from": "Hatsik <noreply@hatsik.com>",
+            "from": f"Hatsik <noreply@{settings.RESEND_FROM_DOMAIN}>",
             "to": [user.email],
-            "subject": "Reset your Hatsik password",
+            "subject": "Restablecé tu contraseña de Hatsik",
             "html": html_body,
             "text": text_body,
         }

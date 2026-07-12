@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phase 2 — Auth Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface-2: #222637;
+      --border: #2d3148; --text: #e2e8f0; --text-muted: #94a3b8;
+      --accent: #E8432D; --accent-2: #F26B54;
+      --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+      --radius: 8px; --radius-lg: 12px;
+      --font-sans: "Plus Jakarta Sans", -apple-system, sans-serif;
+      --font-heading: "Nunito", -apple-system, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; line-height: 1.7; padding: 48px 40px; max-width: 900px; margin: 0 auto; }
+    h1 { font-family: var(--font-heading); font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    h2 { font-family: var(--font-heading); font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    h3 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; }
+    p { margin-bottom: 12px; }
+    .chip { display: inline-block; background: var(--surface-2); border: 1px solid var(--border); color: var(--accent-2); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; }
+    .meta { color: var(--text-muted); font-size: 13px; margin-bottom: 32px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+    th, td { padding: 8px 12px; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--surface-2); font-weight: 600; }
+    .mermaid { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin: 16px 0; }
+    .checklist { list-style: none; }
+    .checklist li { padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .checklist input { width: 16px; height: 16px; accent-color: var(--success); }
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 16px 0; }
+    .metric { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
+    .metric-value { font-size: 24px; font-weight: 800; color: var(--accent-2); }
+    .metric-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <span class="chip">Reporte de Fase</span>
+  <h1>Fase 2 — Autenticación</h1>
+  <p class="meta">
+    Completada: 2026-07-12 · Branch: <code>phase-2/auth</code> · Estado: ✅ Completa
+  </p>
+
+  <h2>Objetivo</h2>
+  <p>Un usuario puede registrarse, verificar su email, iniciar sesión, cerrar sesión y recuperar su contraseña. Cero acceso anónimo a la aplicación.</p>
+
+  <h2>Arquitectura del módulo</h2>
+  <div class="mermaid">
+    graph TD
+      R[Register] -->|crea user + token| DB[(PostgreSQL)]
+      R -->|envía email| RE[Resend API]
+      V[Verify Email] -->|valida token hash| DB
+      L[Login] -->|authenticate| DB
+      L -->|crea sesión| S[Session Cookie]
+      LO[Logout] -->|flush session| S
+      PR[Password Reset] -->|genera token| DB
+      PR -->|envía email| RE
+      MW[EmailVerificationMiddleware] -->|intercepta requests| V
+
+      style R fill:#E8432D,color:#fff
+      style MW fill:#3b82f6,color:#fff
+      style DB fill:#22c55e,color:#fff
+  </div>
+
+  <h2>Lo que se construyó</h2>
+  <table>
+    <tr><th>Componente</th><th>Archivos</th><th>Descripción</th></tr>
+    <tr><td>Forms</td><td><code>accounts/forms.py</code></td><td>RegisterForm, LoginForm, PasswordResetRequest, PasswordResetConfirm</td></tr>
+    <tr><td>Views</td><td><code>accounts/views.py</code></td><td>8 views: register, login, logout, verify, resend, password reset (request + confirm)</td></tr>
+    <tr><td>Middleware</td><td><code>accounts/middleware.py</code></td><td>EmailVerificationMiddleware — bloquea usuarios no verificados</td></tr>
+    <tr><td>Validators</td><td><code>accounts/validators.py</code></td><td>LetterAndNumberValidator (1 letra + 1 número)</td></tr>
+    <tr><td>URLs</td><td><code>accounts/urls.py</code></td><td>8 endpoints con namespace "accounts"</td></tr>
+    <tr><td>Templates</td><td><code>accounts/templates/</code></td><td>5 páginas + 1 partial HTMX, matching Stitch design</td></tr>
+    <tr><td>Auth Base</td><td><code>templates/auth-base.html</code></td><td>Layout fullscreen sin nav para pantallas de auth</td></tr>
+    <tr><td>Email</td><td><code>accounts/emails.py</code></td><td>Resend SDK con bypass para dev sin API key</td></tr>
+    <tr><td>Tests</td><td><code>accounts/tests/</code></td><td>67 tests (validators, forms, views, middleware)</td></tr>
+  </table>
+
+  <h2>Commits</h2>
+  <table>
+    <tr><th>Tipo</th><th>Scope</th><th>Mensaje</th></tr>
+    <tr><td>feat</td><td>accounts</td><td>add auth forms, views, and URL configuration</td></tr>
+    <tr><td>feat</td><td>accounts</td><td>add auth templates matching Stitch design</td></tr>
+    <tr><td>build</td><td>—</td><td>add pytest infrastructure and session/cache settings</td></tr>
+    <tr><td>feat</td><td>accounts</td><td>add email sending with Resend and dev bypass</td></tr>
+    <tr><td>test</td><td>accounts</td><td>add unit and integration tests for auth</td></tr>
+    <tr><td>docs</td><td>phase-2</td><td>add spec artifacts and phase-cycle skill update</td></tr>
+    <tr><td>docs</td><td>phase-2</td><td>add HTML testing guide</td></tr>
+    <tr><td>docs</td><td>phase-2</td><td>add HTML phase completion report</td></tr>
+  </table>
+
+  <h2>Verificación — Done Criteria</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" checked> El usuario puede registrarse, recibir email de verificación, hacer clic en el enlace y acceder a la app.</li>
+    <li><input type="checkbox" checked> El usuario no verificado está bloqueado de todas las funcionalidades y ve la pantalla de Verificación Pendiente.</li>
+    <li><input type="checkbox" checked> Reenviar verificación respeta rate limit de 60 segundos.</li>
+    <li><input type="checkbox" checked> El usuario puede iniciar sesión con cuenta verificada.</li>
+    <li><input type="checkbox" checked> Login de cuenta no verificada redirige a pantalla de verificación.</li>
+    <li><input type="checkbox" checked> Credenciales inválidas muestran error genérico (no revela existencia del email).</li>
+    <li><input type="checkbox" checked> Recuperación de contraseña envía email y permite restablecer.</li>
+    <li><input type="checkbox" checked> Tokens expirados muestran error apropiado.</li>
+    <li><input type="checkbox" checked> Las 4 pantallas Stitch están implementadas con los tokens del design system Warm Kitchen Board.</li>
+  </ul>
+
+  <h2>Métricas</h2>
+  <div class="metric-grid">
+    <div class="metric"><div class="metric-value">67</div><div class="metric-label">Tests passing</div></div>
+    <div class="metric"><div class="metric-value">8</div><div class="metric-label">Commits</div></div>
+    <div class="metric"><div class="metric-value">28</div><div class="metric-label">Archivos creados</div></div>
+    <div class="metric"><div class="metric-value">~3,300</div><div class="metric-label">Líneas agregadas</div></div>
+    <div class="metric"><div class="metric-value">0</div><div class="metric-label">Deps nuevas (prod)</div></div>
+    <div class="metric"><div class="metric-value">4</div><div class="metric-label">Pantallas Stitch</div></div>
+  </div>
+
+  <h2>Siguiente fase</h2>
+  <p><strong>Fase 3 — Events & Dashboard:</strong> Un usuario verificado puede crear eventos, ver su dashboard, gestionar el ciclo de vida del evento (cerrar, reabrir, cancelar), compartir link y QR, y gestionar co-admins.</p>
+  <div class="mermaid">
+    graph LR
+      P1[Fase 1: Foundation ✅] --> P2[Fase 2: Auth ✅]
+      P2 --> P3[Fase 3: Events]
+      P3 --> P4[Fase 4: Event Access]
+      P4 --> P5[Fase 5: Items + Moderation]
+      P5 --> P6[Fase 6: Assignments]
+      style P2 fill:#22c55e,color:#fff
+      style P3 fill:#f59e0b,color:#fff
+  </div>
+
+  <h2>Pendientes / Notas</h2>
+  <table>
+    <tr><th>Tema</th><th>Estado</th><th>Nota</th></tr>
+    <tr><td>OAuth Google</td><td>Post-MVP</td><td>Diseño Stitch lo muestra pero es out-of-scope</td></tr>
+    <tr><td>Dominio hatsik.com</td><td>Pendiente</td><td>Emails enviados desde jjjl.dev mientras se verifica hatsik.com en Resend</td></tr>
+    <tr><td>Token expirado (manual test)</td><td>Verificado via tests</td><td>TTL de 5s para testing manual requiere cambio temporal en código</td></tr>
+  </table>
+
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'dark' });</script>
+</body>
+</html>

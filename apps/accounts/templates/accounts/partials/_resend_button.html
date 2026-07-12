@@ -1,0 +1,33 @@
+{% comment %}
+Resend verification email button — HTMX partial.
+Swapped into #resend-section after resend action.
+
+Context:
+  - rate_limited: True if user must wait
+  - sent: True if email was just sent
+{% endcomment %}
+
+{% if sent %}
+<p class="text-sm text-[var(--color-success)] flex items-center justify-center gap-1 mb-[var(--space-2)]">
+    <span class="material-symbols-rounded" style="font-size: 16px;">check_circle</span>
+    ¡Email de verificación enviado!
+</p>
+{% endif %}
+
+{% if rate_limited %}
+<p class="text-sm text-[var(--color-neutral-500)] flex items-center justify-center gap-1">
+    <span class="material-symbols-rounded" style="font-size: 16px;">schedule</span>
+    Podés reenviar en 60 segundos.
+</p>
+{% else %}
+<form hx-post="{% url 'accounts:resend_verification' %}"
+      hx-target="#resend-section"
+      hx-swap="innerHTML">
+    {% csrf_token %}
+    <button type="submit"
+            class="inline-flex items-center gap-1 text-sm text-[var(--color-primary)] font-medium hover:underline cursor-pointer">
+        <span class="material-symbols-rounded" style="font-size: 16px;">refresh</span>
+        Reenviar correo
+    </button>
+</form>
+{% endif %}

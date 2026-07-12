@@ -61,6 +61,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.accounts.middleware.EmailVerificationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
@@ -116,6 +117,10 @@ DATABASES = {
 
 AUTH_USER_MODEL = "accounts.User"
 
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/events/"
+LOGOUT_REDIRECT_URL = "/login/"
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
@@ -126,7 +131,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {"NAME": "apps.accounts.validators.LetterAndNumberValidator"},
 ]
+
+# ==============================================================
+# Sessions
+# ==============================================================
+
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+
+# ==============================================================
+# Cache (rate limiting)
+# ==============================================================
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "hatsik-rate-limit",
+    }
+}
 
 # ==============================================================
 # Internationalization
@@ -162,6 +187,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ==============================================================
 
 RESEND_API_KEY = config("RESEND_API_KEY", default="")
+RESEND_FROM_DOMAIN = config("RESEND_FROM_DOMAIN", default="jjjl.dev")
 
 # ==============================================================
 # Internal Endpoints

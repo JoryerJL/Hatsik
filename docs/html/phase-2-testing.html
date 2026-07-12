@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fase 2 — Guía de Testing Manual</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface-2: #222637;
+      --border: #2d3148; --text: #e2e8f0; --text-muted: #94a3b8;
+      --accent: #E8432D; --accent-2: #F26B54;
+      --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+      --radius: 8px; --radius-lg: 12px;
+      --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: "Fira Code", "JetBrains Mono", monospace;
+      --font-heading: "Nunito", -apple-system, sans-serif;
+      --sidebar-w: 260px; --content-max: 860px;
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9;
+      --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; line-height: 1.7; display: flex; min-height: 100vh; }
+
+    #sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; background: var(--surface); border-right: 1px solid var(--border); padding: 24px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+    #sidebar .logo { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+    #sidebar .doc-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    #toc { list-style: none; }
+    #toc li { margin: 2px 0; }
+    #toc a { display: block; padding: 5px 10px; border-radius: var(--radius); font-size: 13px; color: var(--text-muted); text-decoration: none; transition: all 0.15s; }
+    #toc a:hover, #toc a.active { background: var(--surface-2); color: var(--text); }
+    #toc a.active { color: var(--accent-2); }
+
+    .meta-badges { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    #main { margin-left: var(--sidebar-w); flex: 1; padding: 48px 40px; max-width: calc(var(--sidebar-w) + var(--content-max)); }
+
+    .doc-header { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .doc-type-chip { display: inline-block; background: var(--surface-2); border: 1px solid var(--border); color: var(--accent-2); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; }
+    .doc-header h1 { font-family: var(--font-heading); font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    .doc-header p { color: var(--text-muted); font-size: 14px; }
+
+    section { margin-bottom: 48px; }
+    h2 { font-family: var(--font-heading); font-size: 20px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    h3 { font-family: var(--font-heading); font-size: 16px; font-weight: 700; margin: 24px 0 12px; }
+
+    .test-flow { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; }
+    .test-flow h3 { margin-top: 0; color: var(--accent-2); }
+    .preconditions { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; padding: 8px 12px; background: var(--surface-2); border-radius: var(--radius); }
+    .steps { padding-left: 20px; margin-bottom: 16px; }
+    .steps li { margin-bottom: 8px; font-size: 14px; }
+    .steps li strong { color: var(--success); }
+    .steps code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; }
+
+    .checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+    .checkbox-row label { font-size: 13px; font-weight: 600; cursor: pointer; }
+
+    .callout { background: var(--surface-2); border-left: 3px solid var(--warning); padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; margin: 16px 0; font-size: 13px; }
+    .callout.info { border-left-color: #3b82f6; }
+    .callout.danger { border-left-color: var(--danger); }
+
+    .checklist-final { list-style: none; }
+    .checklist-final li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .checklist-final input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--success); cursor: pointer; flex-shrink: 0; }
+
+    .theme-toggle { position: fixed; top: 16px; right: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--text-muted); z-index: 200; }
+    .theme-toggle:hover { color: var(--text); }
+
+    .mermaid { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin: 16px 0; }
+
+    @media (max-width: 768px) {
+      #sidebar { display: none; }
+      #main { margin-left: 0; padding: 24px 16px; }
+    }
+    @media print {
+      #sidebar, .theme-toggle { display: none; }
+      #main { margin-left: 0; max-width: 100%; }
+      .test-flow { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Theme toggle -->
+<button class="theme-toggle" onclick="toggleTheme()">🌓 Tema</button>
+
+<!-- Sidebar -->
+<aside id="sidebar">
+  <div class="logo">Hatsik</div>
+  <div class="doc-title">Fase 2 — Guía de Testing Manual</div>
+  <ul id="toc">
+    <li><a href="#requisitos">Requisitos previos</a></li>
+    <li><a href="#flujo-registro">Registro de usuario</a></li>
+    <li><a href="#flujo-verificacion">Verificación de email</a></li>
+    <li><a href="#flujo-login">Inicio de sesión</a></li>
+    <li><a href="#flujo-logout">Cierre de sesión</a></li>
+    <li><a href="#flujo-reset">Recuperar contraseña</a></li>
+    <li><a href="#flujo-middleware">Protección de rutas</a></li>
+    <li><a href="#casos-limite">Casos límite</a></li>
+    <li><a href="#checklist">Checklist final</a></li>
+  </ul>
+  <div class="meta-badges">
+    <span class="badge"><span class="badge-dot"></span>Fase 2 — Auth</span>
+    <span class="badge"><span class="badge-dot" style="background:var(--success)"></span>67 tests automatizados</span>
+    <span class="badge"><span class="badge-dot" style="background:var(--warning)"></span>QA manual pendiente</span>
+  </div>
+</aside>
+
+<!-- Main content -->
+<main id="main">
+  <div class="doc-header">
+    <span class="doc-type-chip">Testing Manual</span>
+    <h1>Fase 2 — Autenticación</h1>
+    <p>Guía paso a paso para verificar manualmente todos los flujos de autenticación implementados.</p>
+  </div>
+
+  <!-- Diagrama de flujos -->
+  <section>
+    <h2>Mapa de flujos</h2>
+    <div class="mermaid">
+      graph TD
+        A[Usuario anónimo] -->|"/register/"| B[Registro]
+        B -->|Éxito| C[Verificación pendiente]
+        C -->|Click enlace email| D[Email verificado]
+        D -->|Redirect| E[Dashboard /events/]
+        A -->|"/login/"| F[Login]
+        F -->|Verificado| E
+        F -->|No verificado| C
+        A -->|"/password-reset/"| G[Solicitar reset]
+        G -->|Email con enlace| H[Nueva contraseña]
+        H -->|Éxito| F
+        C -->|Reenviar| C
+        style A fill:#E8432D,color:#fff
+        style E fill:#22c55e,color:#fff
+    </div>
+  </section>
+
+  <!-- Requisitos previos -->
+  <section id="requisitos">
+    <h2>Requisitos previos</h2>
+    <div class="test-flow">
+      <h3>🛠️ Preparar el entorno</h3>
+      <ol class="steps">
+        <li>Asegurarse de tener el virtualenv activo: <code>source .venv/bin/activate</code></li>
+        <li>Verificar que PostgreSQL esté corriendo (local o Neon)</li>
+        <li>Correr migraciones: <code>python manage.py migrate</code></li>
+        <li>Iniciar el servidor de desarrollo: <code>python manage.py runserver</code></li>
+        <li>Abrir el navegador en <code>http://localhost:8000</code></li>
+        <li>Verificar que la consola muestra emails (configurado con <code>EMAIL_BACKEND = console</code> en local)</li>
+      </ol>
+      <div class="callout info">
+        💡 En desarrollo local, los emails se imprimen en la terminal donde corre <code>runserver</code>. No se envían realmente.
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Registro -->
+  <section id="flujo-registro">
+    <h2>🔐 Registro de usuario</h2>
+
+    <div class="test-flow">
+      <h3>Registro exitoso (happy path)</h3>
+      <p class="preconditions">Precondiciones: No estar logueado. Servidor corriendo.</p>
+      <ol class="steps">
+        <li>Navegar a <code>http://localhost:8000/register/</code></li>
+        <li>Verificar que se muestra el formulario con campos: Nombre, Correo, Contraseña, Confirmar contraseña</li>
+        <li>Completar: Nombre = "Test User", Email = "test@correo.com", Contraseña = "segura123", Confirmar = "segura123"</li>
+        <li>Click en <strong>"Crear cuenta"</strong></li>
+        <li><strong>Esperado:</strong> Redirige a pantalla de verificación pendiente con mensaje "Revisá tu correo"</li>
+        <li>Verificar en la terminal que se imprimió el email de verificación con un enlace</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-register-ok" data-test="register-ok">
+        <label for="test-register-ok">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Registro con email duplicado</h3>
+      <p class="preconditions">Precondiciones: Ya existe un usuario con "test@correo.com" (creado en el test anterior).</p>
+      <ol class="steps">
+        <li>Cerrar sesión si estás logueado (o usar otra ventana de incógnito)</li>
+        <li>Navegar a <code>http://localhost:8000/register/</code></li>
+        <li>Completar con el mismo email: "test@correo.com"</li>
+        <li>Click en "Crear cuenta"</li>
+        <li><strong>Esperado:</strong> Muestra error genérico "No se pudo crear la cuenta" — NO revela que el email ya existe</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-register-dup" data-test="register-dup">
+        <label for="test-register-dup">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Registro con contraseña inválida</h3>
+      <p class="preconditions">Precondiciones: No estar logueado.</p>
+      <ol class="steps">
+        <li>Navegar a <code>http://localhost:8000/register/</code></li>
+        <li>Completar con contraseña "abc" (muy corta, sin número)</li>
+        <li>Click en "Crear cuenta"</li>
+        <li><strong>Esperado:</strong> Muestra errores de validación (mínimo 8 caracteres, debe tener al menos una letra y un número)</li>
+        <li>Probar con contraseña "12345678" (solo números)</li>
+        <li><strong>Esperado:</strong> Error de que necesita al menos una letra</li>
+        <li>Probar con contraseñas que no coinciden</li>
+        <li><strong>Esperado:</strong> Error "Las contraseñas no coinciden"</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-register-invalid" data-test="register-invalid">
+        <label for="test-register-invalid">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Registro — usuario logueado es redirigido</h3>
+      <p class="preconditions">Precondiciones: Estar logueado con un usuario verificado.</p>
+      <ol class="steps">
+        <li>Iniciar sesión con un usuario verificado</li>
+        <li>Navegar manualmente a <code>http://localhost:8000/register/</code></li>
+        <li><strong>Esperado:</strong> Redirige automáticamente a /events/ (no muestra el form de registro)</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-register-redirect" data-test="register-redirect">
+        <label for="test-register-redirect">Verificado ✓</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Verificación -->
+  <section id="flujo-verificacion">
+    <h2>📧 Verificación de email</h2>
+
+    <div class="test-flow">
+      <h3>Verificación exitosa</h3>
+      <p class="preconditions">Precondiciones: Registrarse con un email nuevo. Tener el enlace de verificación de la terminal.</p>
+      <ol class="steps">
+        <li>Registrar un usuario nuevo (email: "verify@test.com")</li>
+        <li>Copiar el enlace de verificación que aparece en la terminal</li>
+        <li>Pegar el enlace en el navegador</li>
+        <li><strong>Esperado:</strong> Muestra mensaje "¡Email verificado! Bienvenido a Hatsik." y redirige</li>
+        <li>Verificar que ahora podés acceder a /events/ sin ser bloqueado</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-verify-ok" data-test="verify-ok">
+        <label for="test-verify-ok">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Token ya utilizado</h3>
+      <p class="preconditions">Precondiciones: Haber usado el enlace de verificación del test anterior.</p>
+      <ol class="steps">
+        <li>Pegar el mismo enlace de verificación otra vez en el navegador</li>
+        <li><strong>Esperado:</strong> Mensaje "Este enlace ya fue utilizado. Iniciá sesión."</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-verify-consumed" data-test="verify-consumed">
+        <label for="test-verify-consumed">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Token inválido</h3>
+      <ol class="steps">
+        <li>Navegar a <code>http://localhost:8000/verify-email/token-falso-12345/</code></li>
+        <li><strong>Esperado:</strong> Mensaje "Enlace de verificación inválido." — redirige a login</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-verify-invalid" data-test="verify-invalid">
+        <label for="test-verify-invalid">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Reenviar email de verificación</h3>
+      <p class="preconditions">Precondiciones: Estar logueado con un usuario NO verificado.</p>
+      <ol class="steps">
+        <li>Registrar un usuario nuevo (no verificar)</li>
+        <li>En la pantalla de verificación pendiente, click en "Reenviar email de verificación"</li>
+        <li><strong>Esperado:</strong> Mensaje "¡Email de verificación enviado!" y nuevo email en la terminal</li>
+        <li>Intentar click de nuevo inmediatamente</li>
+        <li><strong>Esperado:</strong> Mensaje "Podés reenviar en 60 segundos" (rate limit)</li>
+        <li>Esperar 60 segundos y volver a intentar</li>
+        <li><strong>Esperado:</strong> Funciona de nuevo</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-verify-resend" data-test="verify-resend">
+        <label for="test-verify-resend">Verificado ✓</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Login -->
+  <section id="flujo-login">
+    <h2>🔑 Inicio de sesión</h2>
+
+    <div class="test-flow">
+      <h3>Login con usuario verificado</h3>
+      <p class="preconditions">Precondiciones: Tener un usuario verificado creado. No estar logueado.</p>
+      <ol class="steps">
+        <li>Navegar a <code>http://localhost:8000/login/</code></li>
+        <li>Verificar que se muestra el formulario con campos: Correo electrónico, Contraseña</li>
+        <li>Ingresar credenciales válidas del usuario verificado</li>
+        <li>Click en <strong>"Iniciar sesión"</strong></li>
+        <li><strong>Esperado:</strong> Redirige a <code>/events/</code></li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-login-ok" data-test="login-ok">
+        <label for="test-login-ok">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Login con usuario NO verificado</h3>
+      <p class="preconditions">Precondiciones: Tener un usuario registrado pero sin verificar.</p>
+      <ol class="steps">
+        <li>Navegar a <code>http://localhost:8000/login/</code></li>
+        <li>Ingresar credenciales del usuario no verificado</li>
+        <li>Click en "Iniciar sesión"</li>
+        <li><strong>Esperado:</strong> Redirige a <code>/verify-email/</code> (pantalla de verificación pendiente)</li>
+        <li>Verificar que NO puede acceder a <code>/events/</code> — el middleware lo bloquea</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-login-unverified" data-test="login-unverified">
+        <label for="test-login-unverified">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Login con credenciales inválidas</h3>
+      <ol class="steps">
+        <li>Navegar a <code>http://localhost:8000/login/</code></li>
+        <li>Ingresar email correcto pero contraseña incorrecta</li>
+        <li>Click en "Iniciar sesión"</li>
+        <li><strong>Esperado:</strong> Error genérico "Correo o contraseña incorrectos" — NO indica cuál campo es incorrecto</li>
+        <li>Ingresar un email que no existe en el sistema</li>
+        <li><strong>Esperado:</strong> Mismo error genérico (no revela si el email existe)</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-login-invalid" data-test="login-invalid">
+        <label for="test-login-invalid">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Parámetro ?next= preservado</h3>
+      <ol class="steps">
+        <li>Sin estar logueado, navegar a <code>http://localhost:8000/login/?next=/events/123/</code></li>
+        <li>Ingresar credenciales válidas de un usuario verificado</li>
+        <li><strong>Esperado:</strong> Después del login redirige a <code>/events/123/</code> (no a /events/)</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-login-next" data-test="login-next">
+        <label for="test-login-next">Verificado ✓</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Logout -->
+  <section id="flujo-logout">
+    <h2>🚪 Cierre de sesión</h2>
+
+    <div class="test-flow">
+      <h3>Logout exitoso</h3>
+      <p class="preconditions">Precondiciones: Estar logueado.</p>
+      <ol class="steps">
+        <li>Desde cualquier pantalla autenticada, realizar logout (botón o POST a /logout/)</li>
+        <li><strong>Esperado:</strong> Redirige a <code>/login/</code></li>
+        <li>Intentar navegar a <code>/events/</code></li>
+        <li><strong>Esperado:</strong> Redirige a login (sesión destruida)</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-logout-ok" data-test="logout-ok">
+        <label for="test-logout-ok">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Logout requiere POST</h3>
+      <ol class="steps">
+        <li>Estar logueado</li>
+        <li>Navegar con GET a <code>http://localhost:8000/logout/</code></li>
+        <li><strong>Esperado:</strong> Error 405 (Method Not Allowed) — no se puede hacer logout con GET</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-logout-post" data-test="logout-post">
+        <label for="test-logout-post">Verificado ✓</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Password Reset -->
+  <section id="flujo-reset">
+    <h2>🔄 Recuperar contraseña</h2>
+
+    <div class="test-flow">
+      <h3>Solicitar reset — email existente</h3>
+      <p class="preconditions">Precondiciones: Tener un usuario registrado. No necesita estar logueado.</p>
+      <ol class="steps">
+        <li>Navegar a <code>http://localhost:8000/password-reset/</code></li>
+        <li>Ingresar el email del usuario existente</li>
+        <li>Click en "Enviar enlace"</li>
+        <li><strong>Esperado:</strong> Mensaje genérico "Si este correo existe en nuestro sistema, enviamos un enlace..."</li>
+        <li>Verificar en la terminal que se imprimió el email con enlace de reset</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-reset-request" data-test="reset-request">
+        <label for="test-reset-request">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Solicitar reset — email que NO existe</h3>
+      <ol class="steps">
+        <li>Navegar a <code>http://localhost:8000/password-reset/</code></li>
+        <li>Ingresar un email que no existe: "noexiste@fake.com"</li>
+        <li>Click en "Enviar enlace"</li>
+        <li><strong>Esperado:</strong> MISMO mensaje genérico (no revela que el email no existe)</li>
+        <li>Verificar en la terminal que NO se imprimió ningún email</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-reset-noexist" data-test="reset-noexist">
+        <label for="test-reset-noexist">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Restablecer contraseña con token válido</h3>
+      <p class="preconditions">Precondiciones: Haber solicitado un reset y tener el enlace de la terminal.</p>
+      <ol class="steps">
+        <li>Copiar el enlace de reset de la terminal</li>
+        <li>Pegarlo en el navegador</li>
+        <li><strong>Esperado:</strong> Formulario para nueva contraseña</li>
+        <li>Ingresar nueva contraseña: "nuevapass1" en ambos campos</li>
+        <li>Click en "Restablecer contraseña"</li>
+        <li><strong>Esperado:</strong> Mensaje de éxito y redirige a login</li>
+        <li>Iniciar sesión con la nueva contraseña</li>
+        <li><strong>Esperado:</strong> Login exitoso</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-reset-ok" data-test="reset-ok">
+        <label for="test-reset-ok">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Rate limit en solicitud de reset</h3>
+      <ol class="steps">
+        <li>Solicitar reset para un email</li>
+        <li>Inmediatamente solicitar de nuevo para el mismo email</li>
+        <li><strong>Esperado:</strong> Muestra el mismo mensaje genérico (pero NO envía segundo email — verificar en terminal)</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-reset-rate" data-test="reset-rate">
+        <label for="test-reset-rate">Verificado ✓</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Middleware / Protección de rutas -->
+  <section id="flujo-middleware">
+    <h2>🛡️ Protección de rutas</h2>
+
+    <div class="test-flow">
+      <h3>Usuario anónimo bloqueado</h3>
+      <ol class="steps">
+        <li>Sin estar logueado, navegar a <code>http://localhost:8000/events/</code></li>
+        <li><strong>Esperado:</strong> Redirige a <code>/login/?next=/events/</code></li>
+        <li>Probar con cualquier otra ruta protegida</li>
+        <li><strong>Esperado:</strong> Siempre redirige a login</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-middleware-anon" data-test="middleware-anon">
+        <label for="test-middleware-anon">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Usuario no verificado contenido</h3>
+      <p class="preconditions">Precondiciones: Logueado con usuario no verificado.</p>
+      <ol class="steps">
+        <li>Iniciar sesión con un usuario que NO verificó su email</li>
+        <li>Intentar navegar a <code>/events/</code></li>
+        <li><strong>Esperado:</strong> Redirige a <code>/verify-email/</code></li>
+        <li>Intentar navegar a cualquier otra ruta protegida</li>
+        <li><strong>Esperado:</strong> Siempre redirige a verificación — NO puede hacer nada más</li>
+        <li>Verificar que SÍ puede acceder a: /verify-email/, /logout/, /password-reset/</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-middleware-unverified" data-test="middleware-unverified">
+        <label for="test-middleware-unverified">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Usuario verificado pasa libremente</h3>
+      <p class="preconditions">Precondiciones: Logueado con usuario verificado.</p>
+      <ol class="steps">
+        <li>Iniciar sesión con un usuario verificado</li>
+        <li>Navegar a cualquier ruta (/events/, etc.)</li>
+        <li><strong>Esperado:</strong> Accede sin problemas (puede dar 404 si la vista no existe aún, pero NO redirige a verify-email)</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-middleware-verified" data-test="middleware-verified">
+        <label for="test-middleware-verified">Verificado ✓</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Casos límite -->
+  <section id="casos-limite">
+    <h2>⚠️ Casos límite</h2>
+
+    <div class="test-flow">
+      <h3>Token de verificación expirado</h3>
+      <div class="callout danger">
+        Para probar este caso, necesitás modificar temporalmente el TTL del token en <code>views.py</code>
+        cambiando <code>VERIFICATION_TOKEN_TTL = timedelta(hours=24)</code> a <code>timedelta(seconds=5)</code>,
+        registrar un usuario, esperar 5 segundos, y usar el enlace.
+      </div>
+      <ol class="steps">
+        <li>Modificar el TTL temporalmente (ver callout arriba)</li>
+        <li>Registrar un usuario nuevo</li>
+        <li>Esperar a que expire el token</li>
+        <li>Hacer clic en el enlace de verificación</li>
+        <li><strong>Esperado:</strong> Mensaje "Este enlace de verificación expiró. Solicitá uno nuevo."</li>
+        <li>Revertir el cambio de TTL</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-edge-expired" data-test="edge-expired">
+        <label for="test-edge-expired">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Email normalizado (mayúsculas/minúsculas)</h3>
+      <ol class="steps">
+        <li>Registrar con email "TEST@Example.COM"</li>
+        <li><strong>Esperado:</strong> Se guarda como "test@example.com"</li>
+        <li>Intentar login con "TEST@Example.COM"</li>
+        <li><strong>Esperado:</strong> Funciona (se normaliza antes de buscar)</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-edge-email-norm" data-test="edge-email-norm">
+        <label for="test-edge-email-norm">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>Múltiples pestañas / sesión concurrente</h3>
+      <ol class="steps">
+        <li>Abrir dos pestañas: una en /login/ y otra en /register/</li>
+        <li>Registrar en una pestaña</li>
+        <li>En la otra pestaña intentar ir a /events/</li>
+        <li><strong>Esperado:</strong> Redirige a /verify-email/ (la sesión se creó en el registro)</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-edge-tabs" data-test="edge-tabs">
+        <label for="test-edge-tabs">Verificado ✓</label>
+      </div>
+    </div>
+
+    <div class="test-flow">
+      <h3>CSRF protection</h3>
+      <ol class="steps">
+        <li>Abrir DevTools → Network</li>
+        <li>Enviar un form de login/registro</li>
+        <li>Verificar que el request incluye el token <code>csrfmiddlewaretoken</code></li>
+        <li>Intentar hacer un POST desde curl sin el token CSRF:</li>
+        <li><code>curl -X POST http://localhost:8000/login/ -d "email=x&password=y"</code></li>
+        <li><strong>Esperado:</strong> Error 403 Forbidden (CSRF verification failed)</li>
+      </ol>
+      <div class="checkbox-row">
+        <input type="checkbox" id="test-edge-csrf" data-test="edge-csrf">
+        <label for="test-edge-csrf">Verificado ✓</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Checklist final -->
+  <section id="checklist">
+    <h2>✅ Checklist final — Done Criteria del ROADMAP</h2>
+    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+      Estos son los criterios de aceptación definidos en <code>docs/ROADMAP.md</code> para la Fase 2.
+    </p>
+    <ul class="checklist-final">
+      <li><input type="checkbox" id="dc-1" data-test="dc-1"> El usuario puede registrarse, recibir email de verificación, hacer clic en el enlace y acceder a la app.</li>
+      <li><input type="checkbox" id="dc-2" data-test="dc-2"> El usuario no verificado está bloqueado de todas las funcionalidades y ve la pantalla de Verificación Pendiente.</li>
+      <li><input type="checkbox" id="dc-3" data-test="dc-3"> Reenviar verificación respeta rate limit de 60 segundos.</li>
+      <li><input type="checkbox" id="dc-4" data-test="dc-4"> El usuario puede iniciar sesión con cuenta verificada.</li>
+      <li><input type="checkbox" id="dc-5" data-test="dc-5"> Login de cuenta no verificada redirige a pantalla de verificación.</li>
+      <li><input type="checkbox" id="dc-6" data-test="dc-6"> Credenciales inválidas muestran error genérico (no revela existencia del email).</li>
+      <li><input type="checkbox" id="dc-7" data-test="dc-7"> Recuperación de contraseña envía email y permite restablecer.</li>
+      <li><input type="checkbox" id="dc-8" data-test="dc-8"> Tokens expirados muestran error apropiado.</li>
+      <li><input type="checkbox" id="dc-9" data-test="dc-9"> Las 4 pantallas Stitch (Registro, Verificación, Login, Recuperar Contraseña) están implementadas con los tokens del design system.</li>
+    </ul>
+  </section>
+
+</main>
+
+<!-- Scripts -->
+<script>
+  // Mermaid init
+  mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+  // Theme toggle
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('hatsik-testing-theme', next);
+    mermaid.initialize({ startOnLoad: false, theme: next === 'dark' ? 'dark' : 'default' });
+  }
+
+  // Restore theme
+  const savedTheme = localStorage.getItem('hatsik-testing-theme');
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
+  // Persist checkboxes in localStorage
+  const STORAGE_KEY = 'hatsik-phase2-testing-checks';
+
+  function loadChecks() {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    document.querySelectorAll('input[type="checkbox"][data-test]').forEach(cb => {
+      cb.checked = !!saved[cb.dataset.test];
+    });
+  }
+
+  function saveChecks() {
+    const state = {};
+    document.querySelectorAll('input[type="checkbox"][data-test]').forEach(cb => {
+      state[cb.dataset.test] = cb.checked;
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadChecks();
+    document.querySelectorAll('input[type="checkbox"][data-test]').forEach(cb => {
+      cb.addEventListener('change', saveChecks);
+    });
+  });
+
+  // TOC active state on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = document.querySelectorAll('#toc a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`#toc a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -80% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
