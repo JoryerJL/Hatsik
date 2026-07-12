@@ -1,0 +1,15 @@
+{% comment %}
+Card component — wrapper with rounded corners, border, and shadow.
+
+Usage:
+  {% include "components/_card.html" with content_template="events/_event_detail.html" %}
+
+Or use as a wrapping block (include with slot pattern):
+  <div>{% include "components/_card.html" %}</div>
+{% endcomment %}
+
+<div class="bg-[var(--color-surface)] border border-[var(--color-neutral-200)] rounded-[var(--radius-card)] shadow-sm p-[var(--space-4)] {{ extra_classes }}">
+    {% block card_content %}
+        {{ slot }}
+    {% endblock %}
+</div>

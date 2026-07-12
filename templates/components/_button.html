@@ -1,0 +1,39 @@
+{% comment %}
+Button component.
+
+Usage:
+  {% include "components/_button.html" with text="Click me" variant="primary" %}
+  {% include "components/_button.html" with text="Cancel" variant="secondary" href="/back/" %}
+  {% include "components/_button.html" with text="Delete" variant="destructive" type="submit" %}
+
+Params:
+  - text: Button label (required)
+  - variant: "primary" | "secondary" | "destructive" (default: "primary")
+  - href: If set, renders as <a> instead of <button>
+  - type: Button type attribute (default: "button")
+  - extra_classes: Additional CSS classes
+{% endcomment %}
+
+{% with variant=variant|default:"primary" type=type|default:"button" %}
+
+{% if href %}
+<a href="{{ href }}"
+   class="inline-flex items-center justify-center px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-button)] font-semibold text-sm transition-colors duration-150
+   {% if variant == 'primary' %}bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]{% endif %}
+   {% if variant == 'secondary' %}bg-[var(--color-neutral-100)] text-[var(--color-neutral-800)] hover:bg-[var(--color-neutral-200)] border border-[var(--color-neutral-300)]{% endif %}
+   {% if variant == 'destructive' %}bg-[var(--color-error)] text-white hover:bg-red-600{% endif %}
+   {{ extra_classes }}">
+    {{ text }}
+</a>
+{% else %}
+<button type="{{ type }}"
+   class="inline-flex items-center justify-center px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-button)] font-semibold text-sm transition-colors duration-150 cursor-pointer
+   {% if variant == 'primary' %}bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]{% endif %}
+   {% if variant == 'secondary' %}bg-[var(--color-neutral-100)] text-[var(--color-neutral-800)] hover:bg-[var(--color-neutral-200)] border border-[var(--color-neutral-300)]{% endif %}
+   {% if variant == 'destructive' %}bg-[var(--color-error)] text-white hover:bg-red-600{% endif %}
+   {{ extra_classes }}">
+    {{ text }}
+</button>
+{% endif %}
+
+{% endwith %}

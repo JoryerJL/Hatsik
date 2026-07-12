@@ -1,0 +1,26 @@
+{% comment %}
+Badge/Chip component — pill-shaped status indicator.
+
+Usage:
+  {% include "components/_badge.html" with text="Active" status="success" %}
+  {% include "components/_badge.html" with text="Pending" status="warning" %}
+  {% include "components/_badge.html" with text="Closed" status="neutral" %}
+
+Params:
+  - text: Badge label (required)
+  - status: "success" | "warning" | "error" | "info" | "neutral" (default: "neutral")
+{% endcomment %}
+
+{% with status=status|default:"neutral" %}
+
+<span class="inline-flex items-center px-[var(--space-3)] py-1 rounded-[var(--radius-pill)] text-xs font-semibold
+    {% if status == 'success' %}bg-[var(--color-success-soft)] text-green-800{% endif %}
+    {% if status == 'warning' %}bg-[var(--color-warning-soft)] text-amber-800{% endif %}
+    {% if status == 'error' %}bg-[var(--color-error-soft)] text-red-800{% endif %}
+    {% if status == 'info' %}bg-[var(--color-info-soft)] text-blue-800{% endif %}
+    {% if status == 'neutral' %}bg-[var(--color-neutral-100)] text-[var(--color-neutral-600)]{% endif %}
+    {{ extra_classes }}">
+    {{ text }}
+</span>
+
+{% endwith %}

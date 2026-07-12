@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hatsik{% endblock %}</title>
+
+    <!-- Google Fonts: Nunito (headings) + Plus Jakarta Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS (compiled) -->
+    <link rel="stylesheet" href="{% load static %}{% static 'css/main.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="font-[var(--font-body)] bg-[var(--color-surface)] text-[var(--color-neutral-900)] min-h-screen">
+
+    <!-- Navigation -->
+    <header class="sticky top-0 z-50 bg-[var(--color-surface)] border-b border-[var(--color-neutral-200)]">
+        <nav class="max-w-7xl mx-auto px-[var(--space-4)] py-[var(--space-3)] flex items-center justify-between">
+            <a href="/" class="font-[var(--font-heading)] text-xl font-bold text-[var(--color-primary)]">
+                Hatsik
+            </a>
+            <div class="flex items-center gap-[var(--space-3)]">
+                {% block nav_actions %}{% endblock %}
+            </div>
+        </nav>
+    </header>
+
+    <!-- Messages / Toasts -->
+    {% if messages %}
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2">
+        {% for message in messages %}
+            {% include "components/_toast.html" with message=message %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-[var(--space-4)] py-[var(--space-5)]">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- HTMX -->
+    <script src="{% static 'js/htmx.min.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

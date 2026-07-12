@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Dev — Component Gallery{% endblock %}
+
+{% block content %}
+<div class="space-y-[var(--space-6)]">
+    <h1 class="font-[var(--font-heading)] text-2xl font-bold">Component Gallery</h1>
+
+    <!-- Buttons -->
+    <section>
+        <h2 class="font-[var(--font-heading)] text-lg font-semibold mb-[var(--space-3)]">Buttons</h2>
+        <div class="flex flex-wrap gap-[var(--space-3)]">
+            {% include "components/_button.html" with text="Primary" variant="primary" %}
+            {% include "components/_button.html" with text="Secondary" variant="secondary" %}
+            {% include "components/_button.html" with text="Destructive" variant="destructive" %}
+        </div>
+    </section>
+
+    <!-- Badges -->
+    <section>
+        <h2 class="font-[var(--font-heading)] text-lg font-semibold mb-[var(--space-3)]">Badges</h2>
+        <div class="flex flex-wrap gap-[var(--space-3)]">
+            {% include "components/_badge.html" with text="Active" status="success" %}
+            {% include "components/_badge.html" with text="Pending" status="warning" %}
+            {% include "components/_badge.html" with text="Closed" status="error" %}
+            {% include "components/_badge.html" with text="Info" status="info" %}
+            {% include "components/_badge.html" with text="Neutral" status="neutral" %}
+        </div>
+    </section>
+
+    <!-- Card -->
+    <section>
+        <h2 class="font-[var(--font-heading)] text-lg font-semibold mb-[var(--space-3)]">Card</h2>
+        <div class="max-w-sm">
+            <div class="bg-[var(--color-surface)] border border-[var(--color-neutral-200)] rounded-[var(--radius-card)] shadow-sm p-[var(--space-4)]">
+                <h3 class="font-[var(--font-heading)] font-bold text-base">Asado de cumpleaños</h3>
+                <p class="text-sm text-[var(--color-neutral-500)] mt-1">15 de Agosto, 2026</p>
+                <div class="mt-[var(--space-3)]">
+                    {% include "components/_badge.html" with text="Active" status="success" %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inputs -->
+    <section>
+        <h2 class="font-[var(--font-heading)] text-lg font-semibold mb-[var(--space-3)]">Inputs</h2>
+        <div class="max-w-sm space-y-[var(--space-3)]">
+            {% include "components/_input.html" with name="event_name" label="Event Name" placeholder="e.g. Birthday BBQ" required="true" %}
+            {% include "components/_input.html" with name="email" label="Email" type="email" placeholder="you@example.com" %}
+            {% include "components/_input.html" with name="broken" label="With Error" error="This field is required" %}
+        </div>
+    </section>
+
+    <!-- HTMX Test -->
+    <section>
+        <h2 class="font-[var(--font-heading)] text-lg font-semibold mb-[var(--space-3)]">HTMX Test</h2>
+        <button hx-get="/dev/htmx-test/"
+                hx-target="#htmx-result"
+                hx-swap="innerHTML"
+                class="px-[var(--space-4)] py-[var(--space-2)] bg-[var(--color-info)] text-white rounded-[var(--radius-button)] text-sm font-semibold cursor-pointer">
+            Test hx-get →
+        </button>
+        <div id="htmx-result" class="mt-[var(--space-3)] p-[var(--space-3)] border border-dashed border-[var(--color-neutral-300)] rounded-[var(--radius-input)] min-h-[40px] text-sm text-[var(--color-neutral-500)]">
+            Click the button to test HTMX...
+        </div>
+    </section>
+</div>
+{% endblock %}
