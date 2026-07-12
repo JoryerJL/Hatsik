@@ -1,0 +1,25 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Agent/tool caches
+.atl/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build
+dist/
+.next/
+out/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
