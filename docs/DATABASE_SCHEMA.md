@@ -221,10 +221,10 @@ erDiagram
 | Estado del ítem | No se almacena en `event_items`. Se deriva desde cantidad total, asignaciones activas y marcas de compra. |
 | Ítem binario | Si `quantity_total` es `NULL`, el ítem es binario. `unit` también debe ser `NULL`. |
 | Ítem cuantificado | Si `quantity_total` tiene valor, `unit` es obligatoria y `quantity_assigned` también. |
-| Cota de asignaciones | La suma de `quantity_assigned` activas no puede superar `quantity_total`. |
+| Cota de asignaciones | La suma de `quantity_assigned` de asignaciones activas (`cancelled_at IS NULL`) no puede superar `quantity_total`. Un usuario puede re-asignarse al mismo ítem después de cancelar (se crea nueva fila; el partial unique lo permite). |
 | Compra de asignación | Una asignación comprada queda inmutable en el MVP. |
-| Historia de participación | No se borra la fila de `event_participations`; se actualiza `access_status` y sus timestamps terminales. |
-| Reingreso tras salir | Un usuario que salió o fue removido puede volver a solicitar acceso según las reglas del producto. |
+| Historia de participación | No se borra la fila de `event_participations`; se actualiza `access_status` y sus timestamps terminales. Una sola fila por par (event, user) — el reingreso muta la fila existente de `left`/`removed` a `pending`, reseteando `requested_at` al momento actual. Los timestamps anteriores (`left_at`, `removed_at`, `responded_at`) se preservan como último estado conocido. Historial multi-entrada queda fuera del MVP. |
+| Reingreso tras salir | Un usuario que salió o fue removido puede volver a solicitar acceso. La aplicación actualiza `access_status = pending` y `requested_at = NOW()` en la fila existente. No se crea nueva fila. |
 | Rechazo de solicitud | Una solicitud rechazada no habilita reintento automático por el mismo usuario, salvo corrección manual de Owner/co-admin. |
 | Owner del evento | Al crear un evento, se debe crear también la participación inicial del Owner con `role = owner` y `access_status = accepted`. |
 | QR | Se genera desde `public_share_token` en la capa de aplicación; no se persiste como archivo o blob. |
@@ -238,11 +238,11 @@ erDiagram
 | `email_verification_tokens_token_hash_key` | `email_verification_tokens(token_hash)` | UNIQUE | Unicidad del token emitido. |
 | `password_reset_tokens_token_hash_key` | `password_reset_tokens(token_hash)` | UNIQUE | Unicidad del token emitido. |
 | `events_public_share_token_key` | `events(public_share_token)` | UNIQUE | Link compartible opaco y estable. |
-| `event_participations_event_user_key` | `event_participations(event_id, user_id)` | UNIQUE | Una sola relación activa/histórica por par usuario-evento. |
+| `event_participations_event_user_key` | `event_participations(event_id, user_id)` | UNIQUE | Una sola fila por par usuario-evento. La fila es **mutable**: el reingreso actualiza `access_status` de `left`/`removed` a `pending` in-place (no se crea nueva fila). El historial detallado de entradas/salidas queda fuera del MVP. |
 | `event_participations_event_status_idx` | `event_participations(event_id, access_status)` | INDEX | Bandeja de solicitudes y filtros por estado. |
 | `event_participations_user_idx` | `event_participations(user_id)` | INDEX | Dashboard del usuario. |
 | `event_items_event_idx` | `event_items(event_id)` | INDEX | Listado de ítems por evento. |
-| `item_assignments_item_user_key` | `item_assignments(item_id, user_id)` | UNIQUE | Un usuario no repite asignación para el mismo ítem en MVP. |
+| `item_assignments_item_user_key` | `item_assignments(item_id, user_id)` | UNIQUE (partial: `WHERE cancelled_at IS NULL`) | Un usuario no repite asignación **activa** para el mismo ítem. Permite re-asignarse después de cancelar. |
 | `item_assignments_item_idx` | `item_assignments(item_id)` | INDEX | Cálculos de cobertura y compra. |
 | `item_assignments_user_idx` | `item_assignments(user_id)` | INDEX | Vista de asignaciones del usuario. |
 | `item_suggestions_event_status_idx` | `item_suggestions(event_id, status)` | INDEX | Cola de moderación. |
