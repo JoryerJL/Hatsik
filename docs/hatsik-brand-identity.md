@@ -176,9 +176,9 @@ El logo de Hatsik debe evocar **dos personas compartiendo** — consistente con 
 
 ## 7. Tipo de web / app
 
-### Aplicación web responsiva
+### Aplicación web responsiva (mobile-first)
 
-Hatsik es una aplicación web responsiva para desktop, tablet y pantallas pequeñas. La experiencia se define como web adaptativa y el layout se reorganiza según el ancho disponible sin perder jerarquía.
+Hatsik es una aplicación web responsiva diseñada **mobile-first**. El caso de uso principal es en celular: compartir listas en eventos, ver qué falta, marcar ítems como comprados en el momento. Los layouts se definen para pantalla pequeña y escalan hacia desktop con breakpoints progresivos.
 
 ### Estructura de navegación
 

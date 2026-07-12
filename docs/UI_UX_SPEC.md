@@ -18,7 +18,7 @@ Este documento se deriva de:
 
 | Principio | Decisión |
 |---|---|
-| Aplicación web responsiva | Hatsik se diseña como web app adaptable. |
+| Mobile-first responsive | Hatsik se diseña mobile-first. El caso de uso principal es en celular (compartir listas, marcar ítems en el momento). Los layouts se definen para pantalla pequeña y escalan con breakpoints `md:` y `lg:`. |
 | Navegación principal simple | MVP con una sola barra superior adaptativa; no sidebar ni navegación inferior. |
 | Máxima escaneabilidad | Estados, roles y progresos siempre visibles de un vistazo. |
 | Sin ruido innecesario | Notificaciones ocultas por completo en MVP. |
