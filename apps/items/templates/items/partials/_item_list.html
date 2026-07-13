@@ -1,0 +1,42 @@
+{% load items_tags %}
+
+<section>
+    <div class="flex items-center justify-between mb-[var(--space-lg)]">
+        <h2 class="font-heading text-xl font-bold text-on-surface">Lista de ítems</h2>
+        {% if is_owner %}
+        <a href="{% url 'items:add' pk=event.pk %}"
+           class="flex items-center gap-[var(--space-xs)] text-primary font-bold text-sm hover:opacity-80 transition-opacity">
+            <span class="material-symbols-outlined">add_circle</span>
+            Añadir ítem
+        </a>
+        {% endif %}
+    </div>
+
+    {% if items %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-md)]">
+        {% for item in items %}
+        {% include "items/partials/_item_row.html" with item=item is_owner=is_owner event=event %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty state -->
+    <div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)] text-center">
+        <span class="material-symbols-outlined text-4xl text-gray-muted mb-[var(--space-sm)]">inventory_2</span>
+        <p class="text-sm font-semibold text-on-surface-variant">Aún no hay ítems</p>
+        <p class="text-xs text-gray-muted mt-1">
+            {% if is_owner %}Agregá el primer ítem para organizar las compras del evento.{% else %}El organizador aún no ha agregado ítems.{% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Suggest button for participants -->
+    {% if not is_owner %}
+    <div class="mt-[var(--space-lg)]">
+        <a href="{% url 'moderation:suggest' pk=event.pk %}"
+           class="inline-flex items-center gap-[var(--space-xs)] px-4 py-2 bg-surface-container-low border border-gray-border rounded-xl text-sm font-semibold text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-lg">lightbulb</span>
+            Sugerir ítem
+        </a>
+    </div>
+    {% endif %}
+</section>
