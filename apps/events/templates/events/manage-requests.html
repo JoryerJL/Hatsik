@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gestión de Solicitudes — {{ event.name }} — Hatsik{% endblock %}
+
+{% block sidebar_mis_eventos_class %}bg-[var(--color-coral-soft)] text-[var(--color-primary)] font-bold{% endblock %}
+{% block topbar_mis_eventos_class %}text-[var(--color-primary)] font-bold border-b-2 border-[var(--color-primary)]{% endblock %}
+
+{% block content %}
+<!-- Hero Header (compact) -->
+<div class="mb-[var(--space-xl)]">
+    <div class="relative h-48 md:h-56 rounded-xl overflow-hidden mb-[var(--space-lg)]">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&h=300&fit=crop&q=80" alt="Event cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-[var(--space-lg)]">
+            <a href="{% url 'events:detail' pk=event.pk %}" class="inline-flex items-center gap-1 text-white/80 text-xs hover:text-white mb-[var(--space-xs)] transition-colors">
+                <span class="material-symbols-outlined text-base">arrow_back</span> Volver al evento
+            </a>
+            <h1 class="text-white font-heading text-2xl md:text-3xl font-bold">{{ event.name }}</h1>
+            <p class="text-white/90 text-sm">Gestión de solicitudes</p>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-[var(--space-xl)] items-start">
+
+    <!-- Left Column: Requests -->
+    <div class="lg:col-span-8 space-y-[var(--space-xl)]">
+
+        <!-- Pending Requests Section -->
+        <section class="bg-surface-container-low border border-gray-border rounded-xl p-[var(--space-lg)]">
+            <div class="flex items-center justify-between mb-[var(--space-lg)]">
+                <div class="flex items-center gap-[var(--space-md)]">
+                    <h2 class="font-heading text-xl font-bold text-on-surface">Solicitudes pendientes</h2>
+                    {% if pending_requests %}
+                    <span class="bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ pending_requests|length }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if pending_requests %}
+            <div class="space-y-[var(--space-md)]" id="pending-list">
+                {% for p in pending_requests %}
+                <div id="request-row-{{ p.pk }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-[var(--space-md)] p-[var(--space-md)] bg-surface-container-lowest rounded-lg border border-gray-border/50">
+                    <div class="flex items-center gap-[var(--space-md)]">
+                        <div class="w-10 h-10 rounded-full bg-coral-soft border border-gray-border flex items-center justify-center shrink-0">
+                            <span class="text-sm font-bold text-primary">{{ p.user.display_name|make_list|first|upper }}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-on-surface">{{ p.user.display_name }}</p>
+                            <p class="text-xs text-gray-muted">{{ p.user.email }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-[var(--space-sm)]">
+                        <form method="post" action="{% url 'events:approve_request' pk=event.pk participation_id=p.pk %}"
+                              hx-post="{% url 'events:approve_request' pk=event.pk participation_id=p.pk %}"
+                              hx-target="#request-row-{{ p.pk }}" hx-swap="outerHTML">
+                            {% csrf_token %}
+                            <button type="submit" class="px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg active:scale-95 transition-transform">Aceptar</button>
+                        </form>
+                        <form method="post" action="{% url 'events:reject_request' pk=event.pk participation_id=p.pk %}"
+                              hx-post="{% url 'events:reject_request' pk=event.pk participation_id=p.pk %}"
+                              hx-target="#request-row-{{ p.pk }}" hx-swap="outerHTML"
+                              hx-confirm="¿Seguro que querés rechazar a {{ p.user.display_name }}?">
+                            {% csrf_token %}
+                            <button type="submit" class="px-4 py-2 bg-surface-container text-on-surface-variant font-bold text-xs rounded-lg hover:bg-error/10 hover:text-error active:scale-95 transition-all">Rechazar</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-[var(--space-xl)]">
+                <span class="material-symbols-outlined text-gray-muted text-4xl mb-[var(--space-sm)] block">check_circle</span>
+                <p class="text-sm text-gray-muted">No hay solicitudes pendientes.</p>
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- Rejected Requests Section (for correction) -->
+        {% if rejected_requests %}
+        <section class="bg-surface-container-low border border-gray-border rounded-xl p-[var(--space-lg)]">
+            <div class="flex items-center gap-[var(--space-md)] mb-[var(--space-lg)]">
+                <h2 class="font-heading text-xl font-bold text-on-surface">Rechazadas</h2>
+                <span class="text-xs text-gray-muted">(podés corregir un error)</span>
+            </div>
+
+            <div class="space-y-[var(--space-md)]">
+                {% for p in rejected_requests %}
+                <div id="rejected-row-{{ p.pk }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-[var(--space-md)] p-[var(--space-md)] bg-surface-container-lowest rounded-lg border border-gray-border/50 opacity-80">
+                    <div class="flex items-center gap-[var(--space-md)]">
+                        <div class="w-10 h-10 rounded-full bg-error-container border border-gray-border flex items-center justify-center shrink-0">
+                            <span class="text-sm font-bold text-error">{{ p.user.display_name|make_list|first|upper }}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-on-surface">{{ p.user.display_name }}</p>
+                            <p class="text-xs text-gray-muted">{{ p.user.email }}</p>
+                        </div>
+                    </div>
+                    <form method="post" action="{% url 'events:correct_rejection' pk=event.pk participation_id=p.pk %}"
+                          hx-post="{% url 'events:correct_rejection' pk=event.pk participation_id=p.pk %}"
+                          hx-target="#rejected-row-{{ p.pk }}" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <button type="submit" class="px-4 py-2 bg-state-covered text-on-surface font-bold text-xs rounded-lg active:scale-95 transition-transform">Corregir → Aceptar</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Event Info Sidebar -->
+    <div class="lg:col-span-4">
+        <div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)] lg:sticky lg:top-24">
+            <h3 class="font-heading text-xl font-bold text-on-surface mb-[var(--space-lg)]">Resumen</h3>
+            <div class="space-y-[var(--space-md)]">
+                <div class="flex items-center gap-[var(--space-md)]">
+                    <span class="material-symbols-outlined text-secondary">calendar_month</span>
+                    <p class="text-sm font-semibold">{{ event.event_date|date:"d M Y" }}</p>
+                </div>
+                <div class="flex items-center gap-[var(--space-md)]">
+                    <span class="material-symbols-outlined text-secondary">group</span>
+                    <div>
+                        <p class="text-sm font-semibold">{{ pending_requests|length }} pendiente{{ pending_requests|length|pluralize:"s" }}</p>
+                        <p class="text-xs text-gray-muted">esperando aprobación</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-[var(--space-lg)] pt-[var(--space-lg)] border-t border-gray-border">
+                <a href="{% url 'events:detail' pk=event.pk %}"
+                   class="w-full bg-primary text-white font-bold py-3 rounded-xl flex items-center justify-center gap-[var(--space-md)] active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Volver al evento
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

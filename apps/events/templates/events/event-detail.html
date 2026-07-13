@@ -9,93 +9,145 @@
 {% block content %}
 <!-- Hero Header -->
 <div class="mb-[var(--space-xl)]">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[var(--space-sm)]">
-        <div>
+    <div class="relative h-64 md:h-80 rounded-xl overflow-hidden mb-[var(--space-lg)]">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&h=400&fit=crop&q=80" alt="Event cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-[var(--space-lg)]">
             <!-- Status Badge -->
             {% if event.status == "active" %}
-            <span class="inline-flex items-center gap-1 px-3 py-1 text-[12px] leading-[16px] font-semibold rounded-full bg-green-100 text-green-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                Activo
-            </span>
+            <span class="inline-block px-3 py-1 bg-primary text-on-primary text-xs font-semibold rounded-full w-fit mb-[var(--space-xs)]">Activo</span>
             {% elif event.status == "closed" %}
-            <span class="inline-flex items-center gap-1 px-3 py-1 text-[12px] leading-[16px] font-semibold rounded-full bg-amber-100 text-amber-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                Cerrado
-            </span>
+            <span class="inline-block px-3 py-1 bg-amber-600 text-white text-xs font-semibold rounded-full w-fit mb-[var(--space-xs)]">Cerrado</span>
             {% elif event.status == "cancelled" %}
-            <span class="inline-flex items-center gap-1 px-3 py-1 text-[12px] leading-[16px] font-semibold rounded-full bg-red-100 text-red-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                Cancelado
-            </span>
+            <span class="inline-block px-3 py-1 bg-red-700 text-white text-xs font-semibold rounded-full w-fit mb-[var(--space-xs)]">Cancelado</span>
             {% endif %}
-
-            <!-- Event Name -->
-            <h1 class="font-[var(--font-heading)] text-[24px] leading-[32px] font-bold text-[var(--color-on-surface)] mt-[var(--space-xs)] lg:text-[28px] lg:leading-[36px]">
-                {{ event.name }}
-            </h1>
-
-            <!-- Date -->
-            <p class="flex items-center gap-[var(--space-xs)] text-[14px] leading-[20px] text-[var(--color-on-surface-variant)] mt-[var(--space-xs)]">
-                <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+            <h1 class="text-white font-heading text-2xl md:text-3xl font-bold">{{ event.name }}</h1>
+            <p class="text-white/90 text-sm flex items-center gap-[var(--space-xs)]">
+                <span class="material-symbols-outlined text-lg">calendar_month</span>
                 {{ event.event_date|date:"d M Y" }}
             </p>
-
-            <!-- Description -->
-            {% if event.description %}
-            <p class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)] mt-[var(--space-sm)]">
-                {{ event.description }}
-            </p>
-            {% endif %}
         </div>
+    </div>
 
-        <!-- Edit Button (Owner only) -->
-        {% if is_owner %}
-        <a href="{% url 'events:edit' pk=event.pk %}"
-           class="inline-flex items-center gap-1 self-start px-4 py-2 text-[15px] leading-[20px] font-semibold text-[var(--color-on-surface-variant)] border border-[var(--color-gray-border)] rounded-xl hover:bg-[var(--color-surface-container)] transition-colors">
-            <span class="material-symbols-outlined text-[18px]">edit</span>
-            Editar
-        </a>
-        {% endif %}
+    <!-- Progress Card -->
+    <div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)] flex flex-col md:flex-row md:items-center gap-[var(--space-lg)]">
+        <div class="flex-1">
+            <div class="flex justify-between items-end mb-[var(--space-xs)]">
+                <span class="text-sm font-semibold text-on-surface-variant">Progreso del evento</span>
+                <span class="font-heading text-xl font-bold text-primary">0%</span>
+            </div>
+            <div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+                <div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: 0%"></div>
+            </div>
+        </div>
+        <div class="flex items-center gap-[var(--space-md)] border-l-0 md:border-l border-gray-border md:pl-[var(--space-lg)]">
+            <div class="flex -space-x-3">
+                {% for p in participants|slice:":3" %}
+                <div class="w-10 h-10 rounded-full border-2 border-white bg-coral-soft flex items-center justify-center">
+                    <span class="text-xs font-bold text-primary">{{ p.user.display_name|make_list|first|upper }}</span>
+                </div>
+                {% endfor %}
+                {% if participants|length > 3 %}
+                <div class="w-10 h-10 rounded-full bg-surface-container-high border-2 border-white flex items-center justify-center text-xs font-bold text-on-surface-variant">+{{ participants|length|add:"-3" }}</div>
+                {% endif %}
+            </div>
+            <span class="text-sm font-semibold text-on-surface-variant">{{ participants|length }} confirmado{{ participants|length|pluralize:"s" }}</span>
+        </div>
     </div>
 </div>
 
 <!-- 2-Column Grid Layout -->
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-[var(--space-xl)] items-start">
 
-    <!-- Left Column: Items List -->
+    <!-- Left Column -->
     <div class="lg:col-span-8 space-y-[var(--space-xl)]">
+
+        <!-- Pending Requests Section (Owner/Co-admin only) -->
+        {% if is_admin and pending_count > 0 %}
+        <section class="bg-surface-container-low border border-gray-border rounded-xl p-[var(--space-lg)]">
+            <div class="flex items-center justify-between mb-[var(--space-lg)]">
+                <div class="flex items-center gap-[var(--space-md)]">
+                    <h2 class="font-heading text-xl font-bold text-on-surface">Solicitudes pendientes</h2>
+                    <span class="bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ pending_count }}</span>
+                </div>
+            </div>
+
+            <div class="space-y-[var(--space-md)]">
+                {% for req in pending_requests %}
+                <div id="request-row-{{ req.pk }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-[var(--space-md)] p-[var(--space-md)] bg-surface-container-lowest rounded-lg border border-gray-border/50">
+                    <div class="flex items-center gap-[var(--space-md)]">
+                        <div class="w-10 h-10 rounded-full bg-coral-soft border border-gray-border flex items-center justify-center shrink-0">
+                            <span class="text-sm font-bold text-primary">{{ req.user.display_name|make_list|first|upper }}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-on-surface">{{ req.user.display_name }}</p>
+                            <p class="text-xs text-gray-muted">{{ req.user.email }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-[var(--space-sm)]">
+                        <form method="post" action="{% url 'events:approve_request' pk=event.pk participation_id=req.pk %}"
+                              hx-post="{% url 'events:approve_request' pk=event.pk participation_id=req.pk %}"
+                              hx-target="#request-row-{{ req.pk }}" hx-swap="outerHTML">
+                            {% csrf_token %}
+                            <button type="submit" class="px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg active:scale-95 transition-transform">Aceptar</button>
+                        </form>
+                        <form method="post" action="{% url 'events:reject_request' pk=event.pk participation_id=req.pk %}"
+                              hx-post="{% url 'events:reject_request' pk=event.pk participation_id=req.pk %}"
+                              hx-target="#request-row-{{ req.pk }}" hx-swap="outerHTML"
+                              hx-confirm="¿Seguro que querés rechazar a {{ req.user.display_name }}?">
+                            {% csrf_token %}
+                            <button type="submit" class="px-4 py-2 bg-surface-container text-on-surface-variant font-bold text-xs rounded-lg hover:bg-error/10 hover:text-error active:scale-95 transition-all">Rechazar</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
         <!-- Items Section (Phase 5 placeholder) -->
         <section>
             <div class="flex items-center justify-between mb-[var(--space-lg)]">
-                <h2 class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold text-[var(--color-on-surface)]">Lista de ítems</h2>
+                <h2 class="font-heading text-xl font-bold text-on-surface">Lista de ítems</h2>
             </div>
-            <div class="bg-[var(--color-surface-container-lowest)] border border-[var(--color-gray-border)] rounded-xl p-[var(--space-lg)]">
-                <div class="flex items-center gap-[var(--space-md)] py-[var(--space-lg)] text-[14px] leading-[20px] text-[var(--color-gray-muted)]">
-                    <span class="material-symbols-outlined text-[24px] text-[var(--color-gray-muted)]">hourglass_empty</span>
-                    <div>
-                        <p class="font-semibold text-[var(--color-on-surface-variant)]">Próximamente</p>
-                        <p class="text-[12px] leading-[16px]">La lista de ítems estará disponible en la siguiente fase.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-md)]">
+                <div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)] relative overflow-hidden">
+                    <div class="flex items-center gap-[var(--space-md)] py-[var(--space-lg)] text-sm text-gray-muted">
+                        <span class="material-symbols-outlined text-2xl text-gray-muted">hourglass_empty</span>
+                        <div>
+                            <p class="font-semibold text-on-surface-variant">Próximamente</p>
+                            <p class="text-xs">La lista de ítems estará disponible en la siguiente fase.</p>
+                        </div>
                     </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-state-unassigned"></div>
                 </div>
             </div>
         </section>
 
         <!-- Event Details Mini Card -->
         <section>
-            <div class="bg-[var(--color-coral-soft)]/30 border border-[var(--color-secondary)]/20 rounded-xl p-[var(--space-lg)]">
-                <h4 class="text-[15px] leading-[20px] font-semibold text-[var(--color-secondary)] mb-[var(--space-md)]">Detalles del evento</h4>
+            <div class="bg-coral-soft/30 border border-secondary/20 rounded-xl p-[var(--space-lg)]">
+                <h4 class="text-sm font-semibold text-secondary mb-[var(--space-md)]">Detalles del Evento</h4>
                 <div class="space-y-[var(--space-md)]">
                     <div class="flex items-start gap-[var(--space-md)]">
-                        <span class="material-symbols-outlined text-[var(--color-secondary)]">calendar_month</span>
+                        <span class="material-symbols-outlined text-secondary">calendar_month</span>
                         <div>
-                            <p class="text-[15px] leading-[20px] font-semibold text-[var(--color-on-surface)]">{{ event.event_date|date:"l, d \d\e F" }}</p>
-                            <p class="text-[12px] leading-[16px] text-[var(--color-gray-muted)]">{{ event.event_date|date:"Y" }}</p>
+                            <p class="text-sm font-semibold">{{ event.event_date|date:"l, d \d\e F" }}</p>
+                            <p class="text-xs text-gray-muted">{{ event.event_date|date:"Y" }}</p>
                         </div>
                     </div>
                     {% if event.description %}
                     <div class="flex items-start gap-[var(--space-md)]">
-                        <span class="material-symbols-outlined text-[var(--color-secondary)]">info</span>
-                        <p class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)]">{{ event.description }}</p>
+                        <span class="material-symbols-outlined text-secondary">info</span>
+                        <p class="text-sm text-on-surface-variant">{{ event.description }}</p>
+                    </div>
+                    {% endif %}
+                    {% if event.assignment_deadline_at %}
+                    <div class="flex items-start gap-[var(--space-md)]">
+                        <span class="material-symbols-outlined text-secondary">timer</span>
+                        <div>
+                            <p class="text-sm font-semibold">Cierre automático</p>
+                            <p class="text-xs text-gray-muted">{{ event.assignment_deadline_at|date:"d M Y, H:i" }}</p>
+                        </div>
                     </div>
                     {% endif %}
                 </div>
@@ -106,66 +158,68 @@
     <!-- Right Column: Participants Sidebar -->
     <div class="lg:col-span-4 space-y-[var(--space-xl)]">
         <!-- Participants Card -->
-        <div class="bg-[var(--color-surface-container-lowest)] border border-[var(--color-gray-border)] rounded-xl p-[var(--space-lg)] lg:sticky lg:top-[100px]">
+        <div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)] lg:sticky lg:top-24">
             <div class="flex items-center justify-between mb-[var(--space-lg)]">
-                <h3 class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold text-[var(--color-on-surface)]">Participantes</h3>
-                <span class="bg-[var(--color-surface-container-high)] text-[var(--color-on-surface-variant)] px-2 py-1 rounded-full text-[12px] leading-[16px] font-bold">{{ participants|length }}</span>
+                <h3 class="font-heading text-xl font-bold text-on-surface">Participantes</h3>
+                <span class="bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-full text-xs font-bold">{{ participants|length }}</span>
             </div>
 
             <!-- Participant List -->
-            <div class="space-y-[var(--space-sm)] max-h-[400px] overflow-y-auto pr-[var(--space-xs)]" id="participant-list">
+            <div class="space-y-[var(--space-sm)] max-h-96 overflow-y-auto pr-[var(--space-xs)] custom-scrollbar">
                 {% for p in participants %}
-                <div class="flex items-center justify-between p-[var(--space-sm)] hover:bg-[var(--color-surface-container-low)] rounded-lg transition-colors" id="participant-{{ p.pk }}">
+                <div class="flex items-center justify-between p-[var(--space-sm)] hover:bg-surface-container-low rounded-lg transition-colors" id="participant-{{ p.pk }}">
                     <div class="flex items-center gap-[var(--space-md)]">
-                        <!-- Avatar Circle -->
-                        <div class="w-10 h-10 rounded-full bg-[var(--color-coral-soft)] border {% if p.role == 'owner' %}border-[var(--color-primary)]{% else %}border-[var(--color-gray-border)]{% endif %} flex items-center justify-center flex-shrink-0">
-                            <span class="text-[14px] font-bold text-[var(--color-primary)]">
-                                {{ p.user.display_name|make_list|first|upper }}
-                            </span>
+                        <div class="w-10 h-10 rounded-full {% if p.role == 'owner' %}border-primary{% else %}border-gray-border{% endif %} border bg-coral-soft flex items-center justify-center shrink-0">
+                            <span class="text-sm font-bold text-primary">{{ p.user.display_name|make_list|first|upper }}</span>
                         </div>
                         <div>
-                            <p class="text-[15px] leading-[20px] font-semibold text-[var(--color-on-surface)]">{{ p.user.display_name }}</p>
-                            <span class="text-[12px] leading-[16px] {% if p.role == 'owner' %}text-[var(--color-primary)]{% else %}text-[var(--color-gray-muted)]{% endif %}">
-                                {% if p.role == "owner" %}Organizador{% elif p.role == "co_admin" %}Co-admin{% else %}Participante{% endif %}
+                            <p class="text-sm font-semibold text-on-surface">{{ p.user.display_name }}</p>
+                            <span class="text-xs {% if p.role == 'owner' %}text-primary{% else %}text-gray-muted{% endif %}">
+                                {% if p.role == "owner" %}Organizador{% elif p.role == "co_admin" %}Co-admin{% else %}Confirmado{% endif %}
                             </span>
                         </div>
                     </div>
 
-                    <!-- Role Badge for co_admin -->
                     {% if p.role == "co_admin" %}
-                    <span class="bg-[var(--color-coral-soft)] text-[var(--color-secondary)] text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tight">Co-admin</span>
+                    <span class="bg-coral-soft text-secondary text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tight">Co-admin</span>
                     {% endif %}
 
                     <!-- Action Buttons (Owner only, not on self) -->
                     {% if is_owner and p.role != "owner" %}
                     <div class="flex items-center gap-1 ml-1">
                         {% if p.role == "participant" %}
-                        <button hx-post="{% url 'events:promote_participant' pk=event.pk participation_id=p.pk %}"
-                                hx-target="#participant-{{ p.pk }}"
-                                hx-swap="outerHTML"
-                                hx-confirm="¿Promover a {{ p.user.display_name }} a Co-admin?"
-                                class="p-1.5 text-[var(--color-gray-muted)] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                title="Promover a Co-admin">
-                            <span class="material-symbols-outlined text-[18px]">arrow_upward</span>
-                        </button>
+                        <form method="post" action="{% url 'events:promote_participant' pk=event.pk participation_id=p.pk %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    hx-post="{% url 'events:promote_participant' pk=event.pk participation_id=p.pk %}"
+                                    hx-confirm="¿Promover a {{ p.user.display_name }} a Co-admin?"
+                                    class="p-1.5 text-gray-muted hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Promover a Co-admin">
+                                <span class="material-symbols-outlined text-lg">arrow_upward</span>
+                            </button>
+                        </form>
                         {% elif p.role == "co_admin" %}
-                        <button hx-post="{% url 'events:demote_participant' pk=event.pk participation_id=p.pk %}"
-                                hx-target="#participant-{{ p.pk }}"
-                                hx-swap="outerHTML"
-                                hx-confirm="¿Quitar rol de Co-admin a {{ p.user.display_name }}?"
-                                class="p-1.5 text-[var(--color-gray-muted)] hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                                title="Quitar Co-admin">
-                            <span class="material-symbols-outlined text-[18px]">arrow_downward</span>
-                        </button>
+                        <form method="post" action="{% url 'events:demote_participant' pk=event.pk participation_id=p.pk %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    hx-post="{% url 'events:demote_participant' pk=event.pk participation_id=p.pk %}"
+                                    hx-confirm="¿Quitar rol de Co-admin a {{ p.user.display_name }}?"
+                                    class="p-1.5 text-gray-muted hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                                    title="Quitar Co-admin">
+                                <span class="material-symbols-outlined text-lg">arrow_downward</span>
+                            </button>
+                        </form>
                         {% endif %}
-                        <button hx-post="{% url 'events:remove_participant' pk=event.pk participation_id=p.pk %}"
-                                hx-target="#participant-{{ p.pk }}"
-                                hx-swap="outerHTML"
-                                hx-confirm="¿Remover a {{ p.user.display_name }} del evento?"
-                                class="p-1.5 text-[var(--color-gray-muted)] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Remover participante">
-                            <span class="material-symbols-outlined text-[18px]">person_remove</span>
-                        </button>
+                        <form method="post" action="{% url 'events:remove_participant' pk=event.pk participation_id=p.pk %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    hx-post="{% url 'events:remove_participant' pk=event.pk participation_id=p.pk %}"
+                                    hx-confirm="¿Remover a {{ p.user.display_name }} del evento?"
+                                    class="p-1.5 text-gray-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Remover participante">
+                                <span class="material-symbols-outlined text-lg">person_remove</span>
+                            </button>
+                        </form>
                     </div>
                     {% endif %}
                 </div>
@@ -173,26 +227,45 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="mt-[var(--space-lg)] pt-[var(--space-lg)] border-t border-[var(--color-gray-border)]">
+            <div class="mt-[var(--space-lg)] pt-[var(--space-lg)] border-t border-gray-border">
                 {% if participation.role == "owner" or participation.role == "co_admin" %}
                 <a href="{% url 'events:share' pk=event.pk %}"
-                   class="w-full bg-[var(--color-primary-container)] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-[var(--space-md)] hover:opacity-90 transition-opacity">
+                   class="w-full bg-secondary-container text-white font-bold py-3 rounded-xl flex items-center justify-center gap-[var(--space-md)] active:scale-95 transition-transform">
                     <span class="material-symbols-outlined">share</span>
                     Invitar amigos
                 </a>
+                {% endif %}
+
+                <!-- Leave Event (non-owner participants) -->
+                {% if not is_owner %}
+                <form method="post" action="{% url 'events:leave_event' pk=event.pk %}"
+                      class="{% if participation.role == 'owner' or participation.role == 'co_admin' %}mt-[var(--space-md)]{% endif %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            hx-post="{% url 'events:leave_event' pk=event.pk %}"
+                            hx-confirm="¿Seguro que querés abandonar este evento?"
+                            class="w-full bg-surface-container-low text-error font-bold py-3 rounded-xl hover:bg-error-container/20 transition-colors text-sm">
+                        No puedo asistir
+                    </button>
+                </form>
                 {% endif %}
 
                 <!-- Lifecycle Buttons (Owner only) -->
                 {% if is_owner %}
                 <div class="mt-[var(--space-md)] space-y-[var(--space-sm)]">
                     {% if event.status == "active" %}
+                    <a href="{% url 'events:edit' pk=event.pk %}"
+                       class="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-on-surface-variant border border-gray-border rounded-xl hover:bg-surface-container transition-colors">
+                        <span class="material-symbols-outlined text-lg">edit</span>
+                        Editar evento
+                    </a>
                     <form method="post" action="{% url 'events:close' pk=event.pk %}">
                         {% csrf_token %}
                         <button type="submit"
                                 hx-post="{% url 'events:close' pk=event.pk %}"
                                 hx-confirm="¿Estás seguro de que querés cerrar este evento?"
-                                class="w-full flex items-center justify-center gap-2 py-2.5 text-[14px] leading-[20px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition-colors">
-                            <span class="material-symbols-outlined text-[18px]">lock</span>
+                                class="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition-colors">
+                            <span class="material-symbols-outlined text-lg">lock</span>
                             Cerrar evento
                         </button>
                     </form>
@@ -201,8 +274,8 @@
                         <button type="submit"
                                 hx-post="{% url 'events:cancel' pk=event.pk %}"
                                 hx-confirm="¿Estás seguro de que querés cancelar este evento? Esta acción no se puede deshacer."
-                                class="w-full flex items-center justify-center gap-2 py-2.5 text-[14px] leading-[20px] font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors">
-                            <span class="material-symbols-outlined text-[18px]">cancel</span>
+                                class="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors">
+                            <span class="material-symbols-outlined text-lg">cancel</span>
                             Cancelar evento
                         </button>
                     </form>
@@ -212,14 +285,14 @@
                         <button type="submit"
                                 hx-post="{% url 'events:reopen' pk=event.pk %}"
                                 hx-confirm="¿Querés reabrir este evento?"
-                                class="w-full flex items-center justify-center gap-2 py-2.5 text-[14px] leading-[20px] font-semibold text-green-700 bg-green-50 border border-green-200 rounded-xl hover:bg-green-100 transition-colors">
-                            <span class="material-symbols-outlined text-[18px]">lock_open</span>
+                                class="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-green-700 bg-green-50 border border-green-200 rounded-xl hover:bg-green-100 transition-colors">
+                            <span class="material-symbols-outlined text-lg">lock_open</span>
                             Reabrir evento
                         </button>
                     </form>
                     {% elif event.status == "cancelled" %}
-                    <p class="text-[12px] leading-[16px] text-[var(--color-gray-muted)] flex items-center gap-[var(--space-xs)] py-2">
-                        <span class="material-symbols-outlined text-[16px] text-[var(--color-error)]">info</span>
+                    <p class="text-xs text-gray-muted flex items-center gap-[var(--space-xs)] py-2">
+                        <span class="material-symbols-outlined text-base text-error">info</span>
                         Este evento ha sido cancelado.
                     </p>
                     {% endif %}
@@ -229,4 +302,10 @@
         </div>
     </div>
 </div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+</style>
 {% endblock %}
