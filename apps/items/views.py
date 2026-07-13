@@ -3,6 +3,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from apps.events.decorators import event_owner_required
 from apps.items.forms import AddItemForm, EditItemForm
@@ -15,7 +16,7 @@ from apps.items.services import ItemError, add_item, delete_item, edit_item
 def add_item_view(request, event):
     """Add a new item to an event's shopping list.
 
-    GET: Render the add item form.
+    GET: Render the add item modal fragment.
     POST: Validate and create the item.
     """
     if request.method == "POST":
@@ -29,6 +30,12 @@ def add_item_view(request, event):
                     quantity_total=form.cleaned_data.get("quantity_total"),
                     unit=form.cleaned_data.get("unit") or None,
                 )
+                if request.headers.get("HX-Request"):
+                    response = HttpResponse("")
+                    response["HX-Redirect"] = reverse(
+                        "events:detail", kwargs={"pk": event.pk}
+                    )
+                    return response
                 return redirect("events:detail", pk=event.pk)
             except ItemError as e:
                 form.add_error(None, str(e))
@@ -47,7 +54,7 @@ def add_item_view(request, event):
 def edit_item_view(request, event, item_pk):
     """Edit an existing item.
 
-    GET: Render the edit form (pre-filled).
+    GET: Render the edit item modal fragment (pre-filled).
     POST: Validate and update the item.
     """
     item = get_object_or_404(EventItem, pk=item_pk, event=event)
@@ -68,6 +75,12 @@ def edit_item_view(request, event, item_pk):
                     quantity_total=form.cleaned_data.get("quantity_total"),
                     unit=form.cleaned_data.get("unit") or None,
                 )
+                if request.headers.get("HX-Request"):
+                    response = HttpResponse("")
+                    response["HX-Redirect"] = reverse(
+                        "events:detail", kwargs={"pk": event.pk}
+                    )
+                    return response
                 return redirect("events:detail", pk=event.pk)
             except ItemError as e:
                 form.add_error(None, str(e))

@@ -4,11 +4,12 @@
     <div class="flex items-center justify-between mb-[var(--space-lg)]">
         <h2 class="font-heading text-xl font-bold text-on-surface">Lista de ítems</h2>
         {% if is_owner %}
-        <a href="{% url 'items:add' pk=event.pk %}"
-           class="flex items-center gap-[var(--space-xs)] text-primary font-bold text-sm hover:opacity-80 transition-opacity">
+        <button hx-get="{% url 'items:add' pk=event.pk %}"
+                hx-target="#modal-container" hx-swap="innerHTML"
+                class="flex items-center gap-[var(--space-xs)] text-primary font-bold text-sm hover:opacity-80 transition-opacity">
             <span class="material-symbols-outlined">add_circle</span>
             Añadir ítem
-        </a>
+        </button>
         {% endif %}
     </div>
 
@@ -32,11 +33,12 @@
     <!-- Suggest button for participants -->
     {% if not is_owner %}
     <div class="mt-[var(--space-lg)]">
-        <a href="{% url 'moderation:suggest' pk=event.pk %}"
-           class="inline-flex items-center gap-[var(--space-xs)] px-4 py-2 bg-surface-container-low border border-gray-border rounded-xl text-sm font-semibold text-on-surface hover:bg-surface-container transition-colors">
+        <button hx-get="{% url 'moderation:suggest' pk=event.pk %}"
+                hx-target="#modal-container" hx-swap="innerHTML"
+                class="inline-flex items-center gap-[var(--space-xs)] px-4 py-2 bg-surface-container-low border border-gray-border rounded-xl text-sm font-semibold text-on-surface hover:bg-surface-container transition-colors">
             <span class="material-symbols-outlined text-lg">lightbulb</span>
             Sugerir ítem
-        </a>
+        </button>
     </div>
     {% endif %}
 </section>

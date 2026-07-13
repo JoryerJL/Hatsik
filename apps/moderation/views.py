@@ -3,6 +3,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from apps.events.decorators import event_admin_required, participant_required
 from apps.moderation.forms import (
@@ -27,7 +28,7 @@ from apps.moderation.services import (
 def suggest_item_view(request, event, participation):
     """Suggest a new item for an event.
 
-    GET: Render the suggestion form.
+    GET: Render the suggestion modal fragment.
     POST: Validate and create the suggestion.
     """
     if request.method == "POST":
@@ -41,6 +42,12 @@ def suggest_item_view(request, event, participation):
                     quantity_total=form.cleaned_data.get("quantity_total"),
                     unit=form.cleaned_data.get("unit") or None,
                 )
+                if request.headers.get("HX-Request"):
+                    response = HttpResponse("")
+                    response["HX-Redirect"] = reverse(
+                        "events:detail", kwargs={"pk": event.pk}
+                    )
+                    return response
                 return redirect("events:detail", pk=event.pk)
             except ModerationError as e:
                 form.add_error(None, str(e))
@@ -59,7 +66,7 @@ def suggest_item_view(request, event, participation):
 def edit_suggestion_view(request, event, participation, suggestion_pk):
     """Edit an own pending suggestion.
 
-    GET: Render the edit form (pre-filled).
+    GET: Render the edit suggestion modal fragment (pre-filled).
     POST: Validate and update the suggestion.
     """
     suggestion = get_object_or_404(
@@ -81,6 +88,12 @@ def edit_suggestion_view(request, event, participation, suggestion_pk):
                     quantity_total=form.cleaned_data.get("quantity_total"),
                     unit=form.cleaned_data.get("unit") or None,
                 )
+                if request.headers.get("HX-Request"):
+                    response = HttpResponse("")
+                    response["HX-Redirect"] = reverse(
+                        "events:detail", kwargs={"pk": event.pk}
+                    )
+                    return response
                 return redirect("events:detail", pk=event.pk)
             except ModerationError as e:
                 form.add_error(None, str(e))
@@ -134,7 +147,7 @@ def delete_suggestion_view(request, event, participation, suggestion_pk):
 def approve_suggestion_view(request, event, suggestion_pk):
     """Approve a pending suggestion (admin only).
 
-    GET: Render the approve form pre-filled from suggestion.
+    GET: Render the approve modal fragment pre-filled from suggestion.
     POST: Validate and approve, creating an official item.
     """
     suggestion = get_object_or_404(
@@ -155,6 +168,12 @@ def approve_suggestion_view(request, event, suggestion_pk):
                     quantity_total=form.cleaned_data.get("quantity_total"),
                     unit=form.cleaned_data.get("unit") or None,
                 )
+                if request.headers.get("HX-Request"):
+                    response = HttpResponse("")
+                    response["HX-Redirect"] = reverse(
+                        "events:detail", kwargs={"pk": event.pk}
+                    )
+                    return response
                 return redirect("events:detail", pk=event.pk)
             except ModerationError as e:
                 form.add_error(None, str(e))

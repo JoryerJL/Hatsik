@@ -19,10 +19,11 @@
                 <span class="text-xs text-gray-muted">Sugerido por {{ suggestion.suggested_by_user.display_name }}</span>
             </div>
             <div class="flex items-center gap-[var(--space-sm)]">
-                <a href="{% url 'moderation:approve' pk=event.pk suggestion_pk=suggestion.pk %}"
-                   class="px-3 py-1.5 bg-primary text-white font-bold text-xs rounded-lg active:scale-95 transition-transform">
+                <button hx-get="{% url 'moderation:approve' pk=event.pk suggestion_pk=suggestion.pk %}"
+                        hx-target="#modal-container" hx-swap="innerHTML"
+                        class="px-3 py-1.5 bg-primary text-white font-bold text-xs rounded-lg active:scale-95 transition-transform">
                     Aprobar
-                </a>
+                </button>
                 <form method="post" action="{% url 'moderation:reject' pk=event.pk suggestion_pk=suggestion.pk %}"
                       hx-post="{% url 'moderation:reject' pk=event.pk suggestion_pk=suggestion.pk %}"
                       hx-target="#suggestion-row-{{ suggestion.pk }}"

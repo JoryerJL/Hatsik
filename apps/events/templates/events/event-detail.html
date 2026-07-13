@@ -134,11 +134,12 @@
                     </div>
                     {% if suggestion.status == "pending_approval" %}
                     <div class="flex items-center gap-[var(--space-sm)]">
-                        <a href="{% url 'moderation:edit' pk=event.pk suggestion_pk=suggestion.pk %}"
-                           class="p-1.5 text-gray-muted hover:text-primary hover:bg-coral-soft rounded-lg transition-colors"
-                           title="Editar sugerencia">
+                        <button hx-get="{% url 'moderation:edit' pk=event.pk suggestion_pk=suggestion.pk %}"
+                                hx-target="#modal-container" hx-swap="innerHTML"
+                                class="p-1.5 text-gray-muted hover:text-primary hover:bg-coral-soft rounded-lg transition-colors"
+                                title="Editar sugerencia">
                             <span class="material-symbols-outlined text-lg">edit</span>
-                        </a>
+                        </button>
                         <form method="post" action="{% url 'moderation:delete' pk=event.pk suggestion_pk=suggestion.pk %}"
                               hx-post="{% url 'moderation:delete' pk=event.pk suggestion_pk=suggestion.pk %}"
                               hx-target="#my-suggestion-{{ suggestion.pk }}"
@@ -349,4 +350,7 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
 </style>
+
+<!-- Modal container for HTMX -->
+<div id="modal-container"></div>
 {% endblock %}

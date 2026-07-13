@@ -1,86 +1,69 @@
-{% extends "base.html" %}
-
-{% block title %}Editar sugerencia — {{ event.name }} — Hatsik{% endblock %}
-
-{% block sidebar_mis_eventos_class %}bg-[var(--color-coral-soft)] text-[var(--color-primary)] font-bold{% endblock %}
-{% block topbar_mis_eventos_class %}text-[var(--color-primary)] font-bold border-b-2 border-[var(--color-primary)]{% endblock %}
-
-{% block content %}
-<!-- Hero Header -->
-<div class="mb-[var(--space-xl)]">
-    <div class="relative h-48 md:h-64 rounded-xl overflow-hidden mb-[var(--space-lg)]">
-        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&h=400&fit=crop&q=80" alt="Event cover">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-[var(--space-lg)]">
-            <h1 class="text-white font-heading text-2xl md:text-3xl font-bold">{{ event.name }}</h1>
+<div id="modal-overlay" class="fixed inset-0 z-[60] flex items-center justify-center p-[var(--space-lg)]">
+    <div class="absolute inset-0 bg-on-surface/40 backdrop-blur-sm"
+         hx-on:click="document.getElementById('modal-container').innerHTML=''"></div>
+    <div class="relative w-full max-w-md bg-surface-container-lowest rounded-xl shadow-2xl overflow-hidden">
+        <div class="p-[var(--space-lg)] border-b border-gray-border flex items-center justify-between">
+            <div class="flex items-center gap-[var(--space-sm)]">
+                <span class="material-symbols-outlined text-primary">edit_note</span>
+                <h2 class="font-heading text-xl font-bold text-on-surface">Editar sugerencia</h2>
+            </div>
+            <button type="button" class="text-on-surface-variant hover:text-on-surface"
+                    onclick="document.getElementById('modal-container').innerHTML=''">
+                <span class="material-symbols-outlined">close</span>
+            </button>
         </div>
-    </div>
-</div>
-
-<!-- Form Card -->
-<div class="max-w-md mx-auto lg:mx-0">
-    <div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)]">
-        <div class="flex items-center gap-[var(--space-sm)] mb-[var(--space-lg)]">
-            <span class="material-symbols-outlined text-primary">edit_note</span>
-            <h2 class="font-heading text-xl font-bold text-on-surface">Editar sugerencia</h2>
-        </div>
-
-        <form method="post" class="space-y-[var(--space-lg)]">
+        <form method="post" action="{% url 'moderation:edit' pk=event.pk suggestion_pk=suggestion.pk %}"
+              hx-post="{% url 'moderation:edit' pk=event.pk suggestion_pk=suggestion.pk %}"
+              hx-target="#modal-container" hx-swap="innerHTML">
             {% csrf_token %}
-
-            {% if form.non_field_errors %}
-            <div class="bg-error-container/20 border border-error/30 rounded-xl p-[var(--space-md)]">
-                {% for error in form.non_field_errors %}
-                <p class="text-error text-sm">{{ error }}</p>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            <!-- Item Name -->
-            <div class="space-y-[var(--space-xs)]">
-                <label for="id_name" class="block text-sm font-semibold text-on-surface-variant">Nombre</label>
-                <input type="text" name="name" id="id_name"
-                       value="{{ form.name.value|default:'' }}"
-                       placeholder="Nombre del ítem sugerido"
-                       class="w-full px-[var(--space-md)] py-[var(--space-sm)] rounded-lg border border-gray-border focus:ring-primary focus:border-primary bg-surface-container-lowest text-sm"
-                       autofocus>
-                {% if form.name.errors %}
-                <p class="text-error text-xs mt-1">{{ form.name.errors.0 }}</p>
+            <div class="p-[var(--space-lg)] space-y-[var(--space-lg)]">
+                {% if form.non_field_errors %}
+                <div class="bg-error-container/20 border border-error/30 rounded-lg p-[var(--space-md)]">
+                    {% for error in form.non_field_errors %}
+                    <p class="text-error text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
                 {% endif %}
-            </div>
 
-            <div class="grid grid-cols-2 gap-[var(--space-md)]">
-                <!-- Quantity -->
                 <div class="space-y-[var(--space-xs)]">
-                    <label for="id_quantity_total" class="block text-sm font-semibold text-on-surface-variant">Cantidad</label>
-                    <input type="number" name="quantity_total" id="id_quantity_total"
-                           value="{{ form.quantity_total.value|default:'' }}"
-                           placeholder="Opcional"
-                           min="0.01" step="0.01"
-                           class="w-full px-[var(--space-md)] py-[var(--space-sm)] rounded-lg border border-gray-border focus:ring-primary focus:border-primary bg-surface-container-lowest text-sm">
-                    {% if form.quantity_total.errors %}
-                    <p class="text-error text-xs mt-1">{{ form.quantity_total.errors.0 }}</p>
-                    {% endif %}
+                    <label class="block text-sm font-semibold text-on-surface-variant" for="id_name">Nombre</label>
+                    <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}"
+                           class="w-full px-[var(--space-md)] py-[var(--space-sm)] rounded-lg border border-gray-border focus:ring-primary focus:border-primary bg-surface-container-lowest text-sm"
+                           placeholder="Nombre del ítem sugerido" autofocus>
+                    {% if form.name.errors %}<p class="text-error text-xs mt-1">{{ form.name.errors.0 }}</p>{% endif %}
                 </div>
-                <!-- Unit -->
-                <div class="space-y-[var(--space-xs)]">
-                    <label for="id_unit" class="block text-sm font-semibold text-on-surface-variant">Unidad</label>
-                    {{ form.unit }}
-                    {% if form.unit.errors %}
-                    <p class="text-error text-xs mt-1">{{ form.unit.errors.0 }}</p>
-                    {% endif %}
+
+                <div class="grid grid-cols-2 gap-[var(--space-md)]">
+                    <div class="space-y-[var(--space-xs)]">
+                        <label class="block text-sm font-semibold text-on-surface-variant" for="id_quantity_total">Cantidad</label>
+                        <input type="number" name="quantity_total" id="id_quantity_total" value="{{ form.quantity_total.value|default:'' }}"
+                               class="w-full px-[var(--space-md)] py-[var(--space-sm)] rounded-lg border border-gray-border focus:ring-primary focus:border-primary bg-surface-container-lowest text-sm"
+                               min="0.01" step="0.01" placeholder="Opcional">
+                        {% if form.quantity_total.errors %}<p class="text-error text-xs mt-1">{{ form.quantity_total.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="space-y-[var(--space-xs)]">
+                        <label class="block text-sm font-semibold text-on-surface-variant" for="id_unit">Unidad</label>
+                        <select name="unit" id="id_unit"
+                                class="w-full px-[var(--space-md)] py-[var(--space-sm)] rounded-lg border border-gray-border focus:ring-primary focus:border-primary bg-surface-container-lowest text-sm">
+                            {% for value, label in form.fields.unit.choices %}
+                            <option value="{{ value }}" {% if form.unit.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.unit.errors %}<p class="text-error text-xs mt-1">{{ form.unit.errors.0 }}</p>{% endif %}
+                    </div>
                 </div>
             </div>
-
-            <!-- Actions -->
-            <div class="flex gap-[var(--space-md)] pt-[var(--space-md)]">
-                <button type="submit" class="flex-1 px-[var(--space-md)] py-3 rounded-xl bg-primary text-on-primary font-bold text-sm active:scale-95 transition-transform">
+            <div class="p-[var(--space-lg)] bg-surface-container-low flex gap-[var(--space-md)]">
+                <button type="button"
+                        class="flex-1 px-[var(--space-md)] py-3 rounded-xl border border-gray-border text-on-surface font-bold text-sm hover:bg-surface-container transition-colors"
+                        onclick="document.getElementById('modal-container').innerHTML=''">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="flex-1 px-[var(--space-md)] py-3 rounded-xl bg-primary text-on-primary font-bold text-sm hover:brightness-90 transition-all">
                     Guardar cambios
                 </button>
-                <a href="{% url 'events:detail' pk=event.pk %}" class="flex-1 px-[var(--space-md)] py-3 rounded-xl border border-outline text-on-surface font-bold text-sm text-center hover:bg-surface-container transition-colors">
-                    Cancelar
-                </a>
             </div>
         </form>
     </div>
 </div>
-{% endblock %}
