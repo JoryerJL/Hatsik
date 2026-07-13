@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Invitar Amigos — {{ event.name }} — Hatsik{% endblock %}
+
+{% block sidebar_mis_eventos_class %}bg-[var(--color-coral-soft)] text-[var(--color-primary)] font-bold{% endblock %}
+{% block topbar_mis_eventos_class %}text-[var(--color-primary)] font-bold border-b-2 border-[var(--color-primary)]{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <!-- Modal-style Card -->
+    <div class="bg-[var(--color-surface-container-lowest)] rounded-[16px] border border-[var(--color-gray-border)] shadow-sm overflow-hidden">
+
+        <!-- Header -->
+        <div class="pt-[var(--space-xl)] px-[var(--space-xl)] pb-[var(--space-lg)] text-center">
+            <h1 class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold text-[var(--color-on-surface)]">
+                Invitar amigos
+            </h1>
+            <p class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)] mt-[var(--space-sm)]">
+                Cualquier persona con el link o QR podrá solicitar unirse al evento.
+            </p>
+        </div>
+
+        <!-- Content -->
+        <div class="px-[var(--space-xl)] pb-[var(--space-xl)] space-y-[var(--space-xl)]">
+
+            <!-- Share Link Section -->
+            <div class="space-y-[var(--space-sm)]">
+                <label class="text-[15px] leading-[20px] font-semibold text-[var(--color-on-surface-variant)] block">
+                    Enlace del evento
+                </label>
+                <div class="flex flex-col gap-[var(--space-sm)] sm:flex-row">
+                    <input
+                        type="text"
+                        id="share-link-input"
+                        value="{{ share_url }}"
+                        readonly
+                        class="flex-1 bg-[var(--color-surface-container-low)] border border-[var(--color-gray-border)] rounded-[12px] px-[var(--space-lg)] py-[var(--space-md)] text-[14px] leading-[20px] text-[var(--color-on-surface)] outline-none focus:border-[var(--color-on-surface-variant)]"
+                    >
+                    <button
+                        type="button"
+                        id="copy-link-btn"
+                        onclick="copyShareLink()"
+                        class="bg-[var(--color-primary)] text-[var(--color-on-primary)] font-semibold text-[15px] leading-[20px] px-[var(--space-xl)] py-[var(--space-md)] rounded-[12px] hover:bg-[var(--color-primary-hover)] active:scale-95 transition-all whitespace-nowrap"
+                    >
+                        Copiar link
+                    </button>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="flex items-center gap-[var(--space-md)]">
+                <div class="h-px flex-grow bg-[var(--color-gray-border)]"></div>
+                <span class="text-[12px] leading-[16px] text-[var(--color-gray-muted)] uppercase tracking-widest">o</span>
+                <div class="h-px flex-grow bg-[var(--color-gray-border)]"></div>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="flex flex-col items-center gap-[var(--space-lg)]">
+                <div class="p-[var(--space-lg)] bg-[var(--color-surface-container-low)] border border-[var(--color-gray-border)] rounded-[16px]">
+                    <div class="w-48 h-48 bg-white p-[var(--space-xs)] flex items-center justify-center rounded-lg">
+                        <img
+                            src="{% url 'events:share_qr' pk=event.pk %}"
+                            alt="Código QR del evento"
+                            class="w-full h-full"
+                        >
+                    </div>
+                </div>
+                <a
+                    href="{% url 'events:share_qr' pk=event.pk %}"
+                    download="hatsik-event-{{ event.pk }}.png"
+                    class="inline-flex items-center gap-[var(--space-sm)] text-[var(--color-primary)] font-semibold text-[15px] leading-[20px] px-[var(--space-lg)] py-[var(--space-sm)] rounded-full hover:bg-[var(--color-coral-soft)] transition-colors"
+                >
+                    <span class="material-symbols-outlined text-lg">download</span>
+                    Descargar QR (PNG)
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-[var(--space-xl)] py-[var(--space-xl)] bg-[var(--color-surface-container-lowest)] border-t border-[var(--color-gray-border)]">
+            <a
+                href="{% url 'events:detail' pk=event.pk %}"
+                class="block w-full py-[var(--space-md)] bg-[var(--color-coral-soft)] text-[var(--color-primary)] font-semibold text-[15px] leading-[20px] text-center rounded-[12px] hover:opacity-90 active:scale-[0.98] transition-all"
+            >
+                Listo
+            </a>
+        </div>
+    </div>
+
+    <!-- Back link -->
+    <div class="mt-[var(--space-lg)] text-center">
+        <a
+            href="{% url 'events:detail' pk=event.pk %}"
+            class="inline-flex items-center gap-1 text-[14px] leading-[20px] text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors"
+        >
+            <span class="material-symbols-outlined text-base">arrow_back</span>
+            Volver al evento
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyShareLink() {
+    const input = document.getElementById('share-link-input');
+    navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('copy-link-btn');
+        btn.textContent = '¡Copiado!';
+        btn.classList.remove('bg-[var(--color-primary)]');
+        btn.classList.add('bg-[var(--color-state-bought)]');
+        setTimeout(() => {
+            btn.textContent = 'Copiar link';
+            btn.classList.remove('bg-[var(--color-state-bought)]');
+            btn.classList.add('bg-[var(--color-primary)]');
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

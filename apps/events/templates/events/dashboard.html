@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Eventos — Hatsik{% endblock %}
+
+{% block sidebar_mis_eventos_class %}bg-[var(--color-surface-container-highest)] text-[var(--color-on-surface)]{% endblock %}
+{% block topbar_mis_eventos_class %}text-[var(--color-primary)] font-bold border-b-2 border-[var(--color-primary)]{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<section class="mb-[var(--space-xl)]">
+    <h1 class="font-[var(--font-heading)] text-[24px] md:text-[28px] leading-[36px] font-bold text-[var(--color-on-surface)] mb-[var(--space-xs)]">Mis eventos</h1>
+    <p class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)]">Gestiona y organiza tus reuniones colaborativas.</p>
+</section>
+
+<!-- Bento Grid Dashboard -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-[var(--space-gutter)]">
+    <!-- Primary Action Card (4 cols) -->
+    <div class="md:col-span-4 flex flex-col">
+        <a href="{% url 'events:create' %}" class="bg-[var(--color-primary)] rounded-xl p-[var(--space-xl)] h-full flex flex-col justify-between text-[var(--color-on-primary)] transition-transform hover:scale-[1.01] duration-300 relative overflow-hidden group min-h-[240px]">
+            <div class="absolute -right-8 -top-8 text-[var(--color-on-primary)] opacity-10 group-hover:scale-110 transition-transform duration-500">
+                <span class="material-symbols-outlined text-[160px]">restaurant</span>
+            </div>
+            <div>
+                <span class="material-symbols-outlined text-4xl mb-[var(--space-md)]">add_circle</span>
+                <h2 class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold leading-tight mb-[var(--space-sm)]">¿Nuevo plan en mente?</h2>
+                <p class="text-[14px] leading-[20px] opacity-90">Divide los gastos, comparte la lista y haz que suceda sin complicaciones.</p>
+            </div>
+            <span class="mt-[var(--space-xl)] bg-[var(--color-surface-container-lowest)] text-[var(--color-primary)] font-bold py-[var(--space-md)] px-[var(--space-lg)] rounded-lg text-[15px] font-semibold self-start hover:bg-[var(--color-surface)] transition-colors shadow-sm">
+                Crear evento
+            </span>
+        </a>
+    </div>
+
+    <!-- Event Cards Grid (8 cols) -->
+    <div class="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-[var(--space-gutter)]">
+        {% for item in events_data %}
+        <!-- Event Card -->
+        <a href="{% url 'events:detail' pk=item.event.pk %}" class="bg-[var(--color-surface-container-lowest)] border border-[var(--color-gray-border)] rounded-xl p-[var(--space-lg)] relative flex flex-col justify-between hover:shadow-md transition-shadow duration-300 min-h-[200px]">
+            <div>
+                <div class="flex justify-between items-start mb-[var(--space-md)]">
+                    {% if item.role == 'owner' %}
+                    <span class="bg-[var(--color-coral-soft)] text-[var(--color-secondary)] text-[11px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Owner</span>
+                    {% elif item.role == 'co_admin' %}
+                    <span class="bg-[var(--color-state-partial-bought)]/20 text-[var(--color-tertiary)] text-[11px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Co-admin</span>
+                    {% else %}
+                    <span class="bg-[var(--color-surface-container-high)] text-[var(--color-on-surface-variant)] text-[11px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Participante</span>
+                    {% endif %}
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm {% if item.event.status == 'active' %}text-[var(--color-state-bought)]{% elif item.event.status == 'closed' %}text-[var(--color-gray-muted)]{% else %}text-[var(--color-error)]{% endif %}" style="font-variation-settings: 'FILL' 1;">fiber_manual_record</span>
+                        <span class="text-[12px] leading-[16px] text-[var(--color-on-surface-variant)] font-bold">{% if item.event.status == 'active' %}Activo{% elif item.event.status == 'closed' %}Cerrado{% else %}Cancelado{% endif %}</span>
+                    </span>
+                </div>
+                <h3 class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold text-[var(--color-on-surface)] mb-[var(--space-xs)]">{{ item.event.name }}</h3>
+                <div class="flex items-center gap-[var(--space-xs)] text-[var(--color-on-surface-variant)] mb-[var(--space-md)]">
+                    <span class="material-symbols-outlined text-lg">calendar_today</span>
+                    <span class="text-[14px] leading-[20px]">{{ item.event.event_date }}</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between mt-auto pt-[var(--space-md)]">
+                <div class="flex -space-x-2">
+                    <div class="w-8 h-8 rounded-full border-2 border-[var(--color-surface-container-lowest)] bg-[var(--color-coral-soft)] flex items-center justify-center">
+                        <span class="text-[10px] font-bold text-[var(--color-secondary)]">{{ item.event.owner_user.display_name|make_list|first }}</span>
+                    </div>
+                </div>
+                <span class="text-[var(--color-primary)] hover:bg-[var(--color-coral-soft)] p-2 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </span>
+            </div>
+            <div class="card-status-indicator {% if item.event.status == 'active' %}bg-[var(--color-state-bought)]{% elif item.event.status == 'closed' %}bg-[var(--color-gray-muted)]{% else %}bg-[var(--color-error)]{% endif %}"></div>
+        </a>
+        {% empty %}
+        <!-- Empty state message when no events -->
+        <div class="sm:col-span-2 bg-[var(--color-surface-container-lowest)] border border-[var(--color-gray-border)] rounded-xl p-[var(--space-xl)] text-center">
+            <span class="material-symbols-outlined text-4xl text-[var(--color-on-surface-variant)] mb-[var(--space-md)]">event_busy</span>
+            <p class="text-[14px] text-[var(--color-on-surface-variant)]">Aún no tenés eventos. ¡Creá el primero!</p>
+        </div>
+        {% endfor %}
+
+        {% if events_data %}
+        <!-- Create Event Ghost Card -->
+        <a href="{% url 'events:create' %}" class="bg-[var(--color-surface-container-low)] border-2 border-dashed border-[var(--color-gray-border)] rounded-xl p-[var(--space-lg)] flex flex-col items-center justify-center gap-[var(--space-sm)] cursor-pointer hover:border-[var(--color-primary)] transition-colors group min-h-[200px]">
+            <span class="material-symbols-outlined text-3xl text-[var(--color-on-surface-variant)] group-hover:text-[var(--color-primary)] transition-colors">add_circle</span>
+            <span class="text-[15px] font-semibold text-[var(--color-on-surface-variant)] group-hover:text-[var(--color-primary)] transition-colors">Nuevo evento</span>
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Stats Section -->
+<section class="mt-[var(--space-xl)] grid grid-cols-1 md:grid-cols-3 gap-[var(--space-gutter)]">
+    <div class="bg-[var(--color-surface-container)] border border-[var(--color-gray-border)] rounded-xl p-[var(--space-lg)] flex items-center gap-[var(--space-md)]">
+        <div class="w-12 h-12 bg-[var(--color-coral-soft)] rounded-lg flex items-center justify-center text-[var(--color-primary)]">
+            <span class="material-symbols-outlined text-2xl">pending_actions</span>
+        </div>
+        <div>
+            <span class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold block">{{ events_data|length }} Activos</span>
+            <span class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)]">Eventos en curso</span>
+        </div>
+    </div>
+    <div class="bg-[var(--color-surface-container)] border border-[var(--color-gray-border)] rounded-xl p-[var(--space-lg)] flex items-center gap-[var(--space-md)]">
+        <div class="w-12 h-12 bg-[var(--color-state-partial-bought)]/20 rounded-lg flex items-center justify-center text-[var(--color-tertiary)]">
+            <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+        </div>
+        <div>
+            <span class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold block">—</span>
+            <span class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)]">Total a rendir</span>
+        </div>
+    </div>
+    <div class="bg-[var(--color-surface-container)] border border-[var(--color-gray-border)] rounded-xl p-[var(--space-lg)] flex items-center gap-[var(--space-md)]">
+        <div class="w-12 h-12 bg-[var(--color-state-covered)]/20 rounded-lg flex items-center justify-center text-[var(--color-tertiary)]">
+            <span class="material-symbols-outlined text-2xl">groups</span>
+        </div>
+        <div>
+            <span class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold block">—</span>
+            <span class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)]">Amigos colaborando</span>
+        </div>
+    </div>
+</section>
+
+<!-- FAB (Mobile) -->
+<a href="{% url 'events:create' %}" class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-[var(--color-primary)] rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition-all active:scale-95 z-50">
+    <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</a>
+{% endblock %}
