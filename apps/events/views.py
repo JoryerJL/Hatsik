@@ -119,6 +119,34 @@ def event_detail_view(request, event, participation):
     # Items with computed status annotations
     items = get_items_with_status(event)
 
+    # Prefetch active assignments for display
+    from apps.items.models import ItemAssignment
+    from apps.items.services import compute_event_progress, get_available_quantity
+
+    items_list = list(items)
+    item_pks = [item.pk for item in items_list]
+    assignments_by_item = {}
+    all_assignments = (
+        ItemAssignment.objects.filter(
+            item__pk__in=item_pks, cancelled_at__isnull=True
+        )
+        .select_related("user")
+        .order_by("created_at")
+    )
+    for assignment in all_assignments:
+        assignments_by_item.setdefault(assignment.item_id, []).append(assignment)
+
+    # Annotate each item with assignments, availability, and user assignment check
+    for item in items_list:
+        item.active_assignments = assignments_by_item.get(item.pk, [])
+        item.computed_available = get_available_quantity(item)
+        item.user_has_assignment = any(
+            a.user_id == request.user.pk for a in item.active_assignments
+        )
+
+    # Event progress
+    progress = compute_event_progress(event)
+
     # Moderation: pending suggestions (admin only) and user's own suggestions
     pending_suggestions = []
     pending_suggestions_count = 0
@@ -139,7 +167,8 @@ def event_detail_view(request, event, participation):
             "is_admin": is_admin,
             "pending_count": pending_count,
             "pending_requests": pending_requests,
-            "items": items,
+            "items": items_list,
+            "progress": progress,
             "pending_suggestions": pending_suggestions,
             "pending_suggestions_count": pending_suggestions_count,
             "user_suggestions": user_suggestions,

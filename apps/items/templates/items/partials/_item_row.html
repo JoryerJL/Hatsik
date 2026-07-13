@@ -3,12 +3,13 @@
 {% item_status_css_class item as status_class %}
 {% item_status_label item as status_label %}
 
-<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)] relative overflow-hidden" id="item-row-{{ item.pk }}">
+<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)] relative overflow-hidden {% if event.status == 'closed' and current_status == 'sin_asignar' or current_status == 'parcialmente_cubierto' and event.status == 'closed' %}ring-2 ring-[#FCA5A5] bg-red-50/30{% endif %}"
+     id="item-row-{{ item.pk }}">
     <!-- Top row: name + status -->
-    <div class="flex justify-between items-start mb-[var(--space-md)]">
+    <div class="flex justify-between items-start mb-[var(--space-sm)]">
         <div class="flex-1 min-w-0">
             <h3 class="font-heading font-bold text-on-surface truncate">
-                {{ item.name }}{% if item.quantity_total %} <span class="text-on-surface-variant font-normal">({{ item.quantity_total }}{{ item.unit }})</span>{% endif %}
+                {{ item.name }}{% if item.quantity_total %} <span class="text-on-surface-variant font-normal text-sm">({{ item.quantity_total }} {{ item.unit }})</span>{% endif %}
             </h3>
         </div>
         <span class="bg-{{ status_class }} text-on-surface text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-[var(--space-sm)]">
@@ -16,9 +17,39 @@
         </span>
     </div>
 
-    <!-- Owner actions -->
-    {% if is_owner %}
-    <div class="flex items-center gap-[var(--space-sm)]">
+    <!-- Assignment List -->
+    {% if assignments %}
+    <div class="space-y-[var(--space-xs)] mb-[var(--space-md)]">
+        {% for assignment in assignments %}
+        {% include "items/partials/_assignment_row.html" with assignment=assignment item=item event=event %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Available quantity hint -->
+    {% if item.quantity_total and available_quantity and available_quantity > 0 %}
+    <p class="text-xs text-gray-muted mb-[var(--space-sm)]">
+        Disponible: {{ available_quantity }} {{ item.unit }}
+    </p>
+    {% endif %}
+
+    <!-- Action buttons row -->
+    <div class="flex items-center gap-[var(--space-sm)] flex-wrap">
+        <!-- Claim button (accepted participants, active events, item not fully covered) -->
+        {% if event.status == "active" and current_status != "cubierto" and current_status != "parcialmente_comprado" and current_status != "comprado" %}
+            {% if not user_has_active_assignment %}
+            <button hx-get="{% url 'items:claim' pk=event.pk item_pk=item.pk %}"
+                    hx-target="#item-row-{{ item.pk }}"
+                    hx-swap="innerHTML"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-colors">
+                <span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+                Asignarme
+            </button>
+            {% endif %}
+        {% endif %}
+
+        <!-- Owner actions -->
+        {% if is_owner and event.status == "active" %}
         <button hx-get="{% url 'items:edit' pk=event.pk item_pk=item.pk %}"
                 hx-target="#modal-container" hx-swap="innerHTML"
                 class="p-1.5 text-gray-muted hover:text-primary hover:bg-coral-soft rounded-lg transition-colors"
@@ -37,8 +68,8 @@
                 <span class="material-symbols-outlined text-lg">delete</span>
             </button>
         </form>
+        {% endif %}
     </div>
-    {% endif %}
 
     <!-- Bottom color bar -->
     <div class="absolute bottom-0 left-0 right-0 h-1 bg-{{ status_class }}"></div>

@@ -31,13 +31,7 @@
     <!-- Progress Card -->
     <div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)] flex flex-col md:flex-row md:items-center gap-[var(--space-lg)]">
         <div class="flex-1">
-            <div class="flex justify-between items-end mb-[var(--space-xs)]">
-                <span class="text-sm font-semibold text-on-surface-variant">Progreso del evento</span>
-                <span class="font-heading text-xl font-bold text-primary">0%</span>
-            </div>
-            <div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
-                <div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: 0%"></div>
-            </div>
+            {% include "items/partials/_progress_bar.html" %}
         </div>
         <div class="flex items-center gap-[var(--space-md)] border-l-0 md:border-l border-gray-border md:pl-[var(--space-lg)]">
             <div class="flex -space-x-3">

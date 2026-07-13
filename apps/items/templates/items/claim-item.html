@@ -1,0 +1,57 @@
+<div class="p-[var(--space-md)] bg-surface-container-low rounded-lg border border-gray-border/50">
+    <form method="post" action="{% url 'items:claim' pk=event.pk item_pk=item.pk %}"
+          hx-post="{% url 'items:claim' pk=event.pk item_pk=item.pk %}"
+          hx-target="#item-row-{{ item.pk }}"
+          hx-swap="outerHTML">
+        {% csrf_token %}
+
+        <p class="text-sm font-semibold text-on-surface mb-[var(--space-sm)]">
+            {% if is_quantified %}
+            ¿Cuánto vas a traer de "{{ item.name }}"?
+            {% else %}
+            ¿Vas a traer "{{ item.name }}"?
+            {% endif %}
+        </p>
+
+        {% if form.non_field_errors %}
+        <div class="text-error text-xs mb-[var(--space-sm)]">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if is_quantified %}
+        <div class="flex items-center gap-[var(--space-sm)] mb-[var(--space-sm)]">
+            <input type="number" name="quantity_assigned"
+                   min="0.01" step="0.01"
+                   {% if available_quantity %}max="{{ available_quantity }}"{% endif %}
+                   placeholder="Cantidad"
+                   class="flex-1 px-3 py-2 border border-gray-border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                   autofocus>
+            <span class="text-sm text-gray-muted">{{ item.unit }}</span>
+        </div>
+        {% if available_quantity %}
+        <p class="text-xs text-gray-muted mb-[var(--space-sm)]">Disponible: {{ available_quantity }} {{ item.unit }}</p>
+        {% endif %}
+        {% if form.quantity_assigned.errors %}
+        <p class="text-error text-xs mb-[var(--space-sm)]">{{ form.quantity_assigned.errors.0 }}</p>
+        {% endif %}
+        {% endif %}
+
+        <div class="flex items-center gap-[var(--space-sm)]">
+            <button type="submit"
+                    class="px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg active:scale-95 transition-transform">
+                {% if is_quantified %}Confirmar{% else %}Yo lo llevo{% endif %}
+            </button>
+            <button type="button"
+                    hx-get="{% url 'items:progress' pk=event.pk %}"
+                    hx-target="#item-row-{{ item.pk }}"
+                    hx-swap="none"
+                    onclick="this.closest('[id^=item-row-]').outerHTML = this.closest('[id^=item-row-]').outerHTML"
+                    class="px-4 py-2 text-gray-muted text-xs font-semibold hover:text-on-surface transition-colors">
+                Cancelar
+            </button>
+        </div>
+    </form>
+</div>
