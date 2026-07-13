@@ -6,8 +6,8 @@ const fs = require('fs');
 
 const BASE_URL = 'http://localhost:8000';
 const SCREENSHOT_DIR = path.join(__dirname, '..', 'static', 'img', 'screenshots');
-const EMAIL = 'joryerjesus10@gmail.com';
-const PASSWORD = 'Hatsik2026!';
+const EMAIL = 'maria@demo.hatsik.com';
+const PASSWORD = 'Demo2026!';
 
 async function hideDebugToolbar(page) {
     await page.evaluate(() => {
