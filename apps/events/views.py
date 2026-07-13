@@ -113,7 +113,7 @@ def edit_event_view(request, event):
 
     return render(
         request,
-        "events/_edit-form.html",
+        "events/edit-event.html",
         {
             "form": form,
             "event": event,

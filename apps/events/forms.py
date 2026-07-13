@@ -46,12 +46,14 @@ class EditEventForm(forms.ModelForm):
         fields = ["name", "event_date", "description", "assignment_deadline_at"]
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": "Nombre del evento"}),
-            "event_date": forms.DateInput(attrs={"type": "date"}),
+            "event_date": forms.DateInput(
+                attrs={"type": "date"}, format="%Y-%m-%d"
+            ),
             "description": forms.Textarea(
                 attrs={"placeholder": "Descripción (opcional)", "rows": 3}
             ),
             "assignment_deadline_at": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}
+                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
             ),
         }
         labels = {
