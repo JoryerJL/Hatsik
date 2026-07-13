@@ -1,0 +1,246 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .modal-blur {
+            backdrop-filter: blur(4px);
+            background-color: rgba(28, 27, 27, 0.4);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed": "#400200",
+                      "on-surface": "#1c1b1b",
+                      "on-secondary-fixed": "#3f0200",
+                      "primary": "#b51d0c",
+                      "primary-container": "#d83823",
+                      "tertiary-container": "#007da9",
+                      "surface-bright": "#fcf9f8",
+                      "surface-tint": "#b8200e",
+                      "tertiary-fixed": "#c4e7ff",
+                      "surface-container-low": "#f6f3f2",
+                      "state-partial": "#FDBA74",
+                      "on-background": "#1c1b1b",
+                      "coral-soft": "#FDE8E4",
+                      "state-bought": "#4ADE80",
+                      "on-secondary-container": "#6f0a01",
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#e4beb7",
+                      "secondary-fixed-dim": "#ffb4a6",
+                      "on-primary-fixed-variant": "#910900",
+                      "on-tertiary-container": "#fcfcff",
+                      "inverse-primary": "#ffb4a7",
+                      "state-partial-bought": "#93C5FD",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed-dim": "#ffb4a7",
+                      "secondary-container": "#fd735c",
+                      "secondary-fixed": "#ffdad4",
+                      "surface-variant": "#e5e2e1",
+                      "inverse-surface": "#313030",
+                      "tertiary-fixed-dim": "#7cd0ff",
+                      "background": "#fcf9f8",
+                      "surface-container-highest": "#e5e2e1",
+                      "on-error": "#ffffff",
+                      "inverse-on-surface": "#f3f0ef",
+                      "on-surface-variant": "#5b403b",
+                      "outline": "#8f706a",
+                      "on-primary": "#ffffff",
+                      "gray-muted": "#6B7280",
+                      "surface-container-high": "#eae7e7",
+                      "secondary": "#a93624",
+                      "on-tertiary-fixed": "#001e2c",
+                      "primary-fixed": "#ffdad4",
+                      "state-unassigned": "#FCA5A5",
+                      "error": "#ba1a1a",
+                      "tertiary": "#006387",
+                      "gray-border": "#E5E7EB",
+                      "surface-dim": "#dcd9d9",
+                      "surface-container": "#f0eded",
+                      "surface": "#fcf9f8",
+                      "on-tertiary-fixed-variant": "#004c69",
+                      "on-primary-container": "#fffbff",
+                      "on-secondary-fixed-variant": "#881e0f",
+                      "state-covered": "#86EFAC",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "on-error-container": "#93000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "xs": "4px",
+                      "unit": "4px",
+                      "md": "12px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "32px",
+                      "xl": "24px",
+                      "lg": "16px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "label-md": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Nunito"],
+                      "body-md": ["Plus Jakarta Sans"],
+                      "body-lg": ["Plus Jakarta Sans"],
+                      "headline-md": ["Nunito"],
+                      "display-logo": ["Nunito"],
+                      "caption": ["Plus Jakarta Sans"],
+                      "headline-lg-mobile": ["Nunito"]
+              },
+              "fontSize": {
+                      "label-md": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                      "display-logo": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Header (Shared Component) -->
+<header class="bg-surface border-b border-gray-border fixed top-0 w-full z-10">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-md w-full max-w-7xl mx-auto">
+<span class="text-display-logo font-display-logo text-on-surface">hatsik</span>
+<nav class="hidden md:flex gap-xl">
+<a class="text-primary font-bold border-b-2 border-primary py-xs" href="#">Mis eventos</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200" href="#">Crear evento</a>
+</nav>
+<button class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200">Cerrar sesión</button>
+</div>
+</header>
+<!-- Background Content: Event Details (Simulated) -->
+<main class="pt-20 pb-10 px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto opacity-40 select-none">
+<!-- Event Hero -->
+<div class="mb-xl">
+<div class="h-48 rounded-xl bg-gray-200 mb-lg overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="A festive outdoor gathering with friends around a rustic long table filled with colorful mediterranean dishes and drinks. The atmosphere is warm, captured in a bright, high-key photography style with soft sunlight filtering through green trees. The overall mood is communal and joyous, emphasizing the Hatsik brand identity of sharing and organized celebration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3WnNasUgXvQQcnPgfNElyNhB6_5nqUrUG6dxe79I_gaSgUhueQm1npe6JO1PBaMivvZjGk1HyrknpC9bzY8qfOpTZs4cX_ej9Ad1OyYhWrblSvK4JbQv1o2yWJL5DxOv_M0VARprS5C-Fdu2y_a6gGmlg35OpGFnrwQgFJNebvf2hLklWCqyPnGiLSrarKOLLCSgs-Zcojj_VkB2EhtiPd9XCuZrZnrV6be0966HhVVGubvhU1L4KpzPo3bHb3VGLhgHbJFzyJOEs">
+</div>
+<h1 class="font-headline-lg text-headline-lg mb-xs">Asado del Sábado</h1>
+<p class="text-gray-muted flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm">calendar_today</span> 15 de Octubre, 13:30 hs
+            </p>
+</div>
+<!-- Section Title -->
+<div class="flex justify-between items-end mb-lg">
+<h2 class="font-headline-md text-headline-md">Lista de Ítems</h2>
+<span class="text-label-md font-label-md text-primary">8 de 12 cubiertos</span>
+</div>
+<!-- List Staggered Layout -->
+<div class="space-y-md">
+<!-- Mock Card 1 -->
+<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-lg flex justify-between items-center">
+<div>
+<p class="font-body-lg text-body-lg">Carne (Vacío)</p>
+<p class="text-caption text-gray-muted">3 kg • Juan Manuel</p>
+</div>
+<span class="bg-state-bought/20 text-on-surface px-sm py-xs rounded-full text-caption">Cubierto</span>
+</div>
+<!-- Mock Card 2 -->
+<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-lg flex justify-between items-center">
+<div>
+<p class="font-body-lg text-body-lg">Carbón</p>
+<p class="text-caption text-gray-muted">2 bolsas • Sin asignar</p>
+</div>
+<span class="bg-state-unassigned/20 text-on-surface px-sm py-xs rounded-full text-caption">Falta</span>
+</div>
+<!-- Mock Card 3 -->
+<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-lg flex justify-between items-center">
+<div>
+<p class="font-body-lg text-body-lg">Cervezas</p>
+<p class="text-caption text-gray-muted">12 unidades • Marina</p>
+</div>
+<span class="bg-state-partial/20 text-on-surface px-sm py-xs rounded-full text-caption">En camino</span>
+</div>
+</div>
+</main>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-50 modal-blur flex items-center justify-center p-margin-mobile">
+<div class="bg-surface-container-lowest w-full max-w-md rounded-xl shadow-2xl border border-gray-border overflow-hidden animate-in fade-in zoom-in duration-300">
+<!-- Modal Header -->
+<div class="p-lg pt-xl">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-sm">Sugerir nuevo ítem</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    ¿Crees que falta algo? Haz una sugerencia y el organizador la revisará para incluirla en la lista.
+                </p>
+</div>
+<!-- Modal Content (Form) -->
+<form class="p-lg space-y-lg" onsubmit="return false;">
+<!-- Field 1: Item Name -->
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-label-md text-on-surface-variant ml-1">Nombre del ítem</label>
+<input class="w-full bg-surface-container-low border border-gray-border rounded-[10px] px-lg py-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-muted" placeholder="Ej: Hielo, Servilletas..." type="text">
+</div>
+<!-- Field 2: Quantity & Unit -->
+<div class="grid grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-label-md text-on-surface-variant ml-1">Cantidad</label>
+<input class="w-full bg-surface-container-low border border-gray-border rounded-[10px] px-lg py-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" min="1" type="number" value="1">
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-label-md text-on-surface-variant ml-1">Unidad</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-low border border-gray-border rounded-[10px] px-lg py-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+<option value="piezas">piezas</option>
+<option value="kg">kg</option>
+<option value="bolsas">bolsas</option>
+<option value="litros">litros</option>
+<option value="paquetes">paquetes</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-gray-muted">keyboard_arrow_down</span>
+</div>
+</div>
+</div>
+<!-- CTAs -->
+<div class="flex flex-col gap-md pt-md">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-lg rounded-xl active:scale-95 transition-all duration-150 shadow-md hover:brightness-110" type="submit">
+                        Enviar sugerencia
+                    </button>
+<button class="w-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md py-lg rounded-xl active:scale-95 transition-all duration-150 hover:bg-surface-variant" onclick="window.location.reload()" type="button">
+                        Cancelar
+                    </button>
+</div>
+</form>
+</div>
+</div>
+<!-- Floating Background Details for Visual Interest -->
+<div class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none">
+<div class="absolute top-[20%] left-[5%] w-64 h-64 bg-coral-soft/30 rounded-full blur-3xl"></div>
+<div class="absolute bottom-[10%] right-[10%] w-96 h-96 bg-tertiary-fixed/20 rounded-full blur-3xl"></div>
+</div>
+<script>
+        // Simple micro-interaction for button press
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95');
+            });
+            button.addEventListener('mouseleave', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body></html>
