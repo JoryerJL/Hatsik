@@ -6,7 +6,10 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
+from config.views import landing_view
+
 urlpatterns = [
+    path("", landing_view, name="landing"),
     path("admin/", admin.site.urls),
     path("internal/", include("apps.internal.urls")),
     path("events/", include("apps.events.urls")),
