@@ -3,7 +3,7 @@
 <section>
     <div class="flex items-center justify-between mb-[var(--space-lg)]">
         <h2 class="font-heading text-xl font-bold text-on-surface">Lista de ítems</h2>
-        {% if is_owner %}
+        {% if is_owner and event.status == "active" %}
         <button hx-get="{% url 'items:add' pk=event.pk %}"
                 hx-target="#modal-container" hx-swap="innerHTML"
                 class="flex items-center gap-[var(--space-xs)] text-primary font-bold text-sm hover:opacity-80 transition-opacity">
@@ -16,7 +16,7 @@
     {% if items %}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-md)]">
         {% for item in items %}
-        {% include "items/partials/_item_row.html" with item=item is_owner=is_owner event=event %}
+        {% include "items/partials/_item_row.html" with item=item is_owner=is_owner is_admin=is_admin event=event assignments=item.active_assignments available_quantity=item.computed_available user_has_active_assignment=item.user_has_assignment %}
         {% endfor %}
     </div>
     {% else %}
@@ -31,7 +31,7 @@
     {% endif %}
 
     <!-- Suggest button for participants -->
-    {% if not is_owner %}
+    {% if not is_owner and event.status == "active" %}
     <div class="mt-[var(--space-lg)]">
         <button hx-get="{% url 'moderation:suggest' pk=event.pk %}"
                 hx-target="#modal-container" hx-swap="innerHTML"

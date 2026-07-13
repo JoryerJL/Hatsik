@@ -151,3 +151,61 @@ class EditItemForm(forms.ModelForm):
                 )
 
         return cleaned_data
+
+
+class ClaimItemForm(forms.Form):
+    """Form for claiming an item (or portion of one).
+
+    For quantified items: quantity_assigned is required.
+    For binary items: this form is submitted empty (no quantity field shown).
+    """
+
+    quantity_assigned = forms.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        required=False,
+        min_value=0.01,
+        widget=forms.NumberInput(
+            attrs={
+                "placeholder": "Cantidad",
+                "class": "w-full",
+                "min": "0.01",
+                "step": "0.01",
+            }
+        ),
+        label="Cantidad",
+    )
+
+    def __init__(self, *args, is_quantified=True, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.is_quantified = is_quantified
+        if not is_quantified:
+            # Binary items don't show quantity field
+            self.fields["quantity_assigned"].widget = forms.HiddenInput()
+
+    def clean_quantity_assigned(self):
+        quantity = self.cleaned_data.get("quantity_assigned")
+        if self.is_quantified:
+            if quantity is None or quantity <= 0:
+                raise forms.ValidationError("La cantidad debe ser mayor a cero.")
+        return quantity
+
+
+class EditAssignmentForm(forms.Form):
+    """Form for modifying an existing assignment's quantity."""
+
+    quantity_assigned = forms.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        required=True,
+        min_value=0.01,
+        widget=forms.NumberInput(
+            attrs={
+                "placeholder": "Nueva cantidad",
+                "class": "w-full",
+                "min": "0.01",
+                "step": "0.01",
+            }
+        ),
+        label="Cantidad",
+    )

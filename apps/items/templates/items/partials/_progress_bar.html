@@ -1,0 +1,13 @@
+<div id="progress-section"
+     hx-get="{% url 'items:progress' pk=event.pk %}"
+     hx-trigger="progress-updated from:body"
+     hx-swap="outerHTML">
+    <div class="flex justify-between items-end mb-[var(--space-xs)]">
+        <span class="text-sm font-semibold text-on-surface-variant">Progreso del evento</span>
+        <span class="font-heading text-xl font-bold text-primary">{{ progress.percentage }}%</span>
+    </div>
+    <div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+        <div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: {{ progress.percentage }}%"></div>
+    </div>
+    <p class="text-xs text-gray-muted mt-1">{{ progress.covered }} de {{ progress.total }} ítems cubiertos</p>
+</div>

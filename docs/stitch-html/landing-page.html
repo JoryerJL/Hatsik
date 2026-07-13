@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hatsik — Logística Colaborativa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&amp;family=Plus+Jakarta+Sans:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#8f706a",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#ffb4a6",
+                        "secondary": "#a93624",
+                        "inverse-surface": "#313030",
+                        "coral-soft": "#FDE8E4",
+                        "state-partial": "#FDBA74",
+                        "tertiary-container": "#007da9",
+                        "gray-border": "#E5E7EB",
+                        "on-tertiary-container": "#fcfcff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#ffb4a7",
+                        "surface-container-highest": "#e5e2e1",
+                        "surface-dim": "#dcd9d9",
+                        "error": "#ba1a1a",
+                        "surface-container": "#f0eded",
+                        "on-primary-fixed-variant": "#910900",
+                        "primary-container": "#d83823",
+                        "on-primary-fixed": "#400200",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-tint": "#b8200e",
+                        "tertiary-fixed-dim": "#7cd0ff",
+                        "primary-fixed": "#ffdad4",
+                        "state-bought": "#4ADE80",
+                        "on-secondary": "#ffffff",
+                        "gray-muted": "#6B7280",
+                        "on-background": "#1c1b1b",
+                        "surface-variant": "#e5e2e1",
+                        "background": "#fcf9f8",
+                        "surface": "#fcf9f8",
+                        "secondary-fixed": "#ffdad4",
+                        "tertiary-fixed": "#c4e7ff",
+                        "outline-variant": "#e4beb7",
+                        "on-secondary-fixed": "#3f0200",
+                        "on-surface-variant": "#5b403b",
+                        "state-covered": "#86EFAC",
+                        "state-unassigned": "#FCA5A5",
+                        "on-tertiary-fixed-variant": "#004c69",
+                        "on-secondary-fixed-variant": "#881e0f",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#1c1b1b",
+                        "state-partial-bought": "#93C5FD",
+                        "on-secondary-container": "#6f0a01",
+                        "tertiary": "#006387",
+                        "primary": "#b51d0c",
+                        "surface-bright": "#fcf9f8",
+                        "primary-fixed-dim": "#ffb4a7",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#eae7e7",
+                        "secondary-container": "#fd735c",
+                        "on-primary-container": "#fffbff",
+                        "on-tertiary-fixed": "#001e2c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "12px",
+                        "xs": "4px",
+                        "lg": "16px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "xl": "24px",
+                        "sm": "8px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Nunito"],
+                        "caption": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Nunito"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Nunito"],
+                        "display-logo": ["Nunito"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "label-md": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "display-logo": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .bento-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05);
+        }
+        .kitchen-board-item {
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed">
+<nav class="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-gray-border">
+<div class="max-w-7xl mx-auto flex justify-between items-center px-margin-mobile md:px-margin-desktop py-md">
+<div class="flex items-center gap-3">
+<img alt="hatsik logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIK120p4HAi0OtipMAIL1U8uCT7OG_PofelK50weCi_tCYG1SjjvxShoqzA6jPI76ABg_Mrf54WdgrkJ2qiKf68nr9taPXszaRDq4xDzHi98sMoU90tZOwoTar-3R2HSg9Px-qqO22lQT8f0zs7Ieb1Bm5j5LSyAG1Kftl1QPZwykz8q30our9zYKQk3mjcYJUMFE2yozKyI5t2btwX6tHYTKmguwReOI0Klc4cfIHoCB_72mqfuWerdTRqyr9fKpplFaqYh2Ih8M7"/>
+<span class="font-display-logo text-display-logo text-primary hidden md:block">hatsik</span>
+</div>
+<div class="flex items-center gap-xl">
+<div class="hidden md:flex gap-lg">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Mis eventos</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Crear evento</a>
+</div>
+<button class="bg-primary text-on-primary px-lg py-2 rounded-xl font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all">
+                    Empezar gratis
+                </button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-xl md:pt-32 pb-xl px-margin-mobile">
+<div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-xl items-center">
+<div class="z-10 text-center md:text-left">
+<h1 class="font-headline-lg text-headline-lg md:text-[56px] md:leading-[64px] text-on-surface mb-lg tracking-tight">
+                        Organiza tus convivios sin el caos del <span class="text-primary">"¿qué llevo?"</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-xl max-w-lg mx-auto md:mx-0">
+                        La app que hace logística colaborativa para que tú solo disfrutes el convivio. Divide la lista, comparte el link y relájate.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-md justify-center md:justify-start">
+<button class="bg-primary text-on-primary px-xl py-lg rounded-xl font-headline-md text-headline-md shadow-lg hover:shadow-primary/20 transition-all">
+                            Crear mi primer evento
+                        </button>
+<button class="bg-surface text-on-surface border border-gray-border px-xl py-lg rounded-xl font-headline-md text-headline-md hover:bg-surface-container-low transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">play_circle</span> Ver cómo funciona
+                        </button>
+</div>
+</div>
+<div class="relative mt-xl md:mt-0">
+<div class="rounded-3xl overflow-hidden shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
+<img class="w-full aspect-[4/3] object-cover" data-alt="A warm and festive high-angle photograph of a diverse group of friends laughing around a long rustic wooden table filled with delicious asado, grilled vegetables, and wine. The scene is bathed in golden hour sunlight, creating a cozy and welcoming light-mode aesthetic. The composition is clean and modern, focusing on the joy of shared meals and collaboration, echoing the Hatsik brand identity with soft coral accents in the table decor." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBasnJbpzyX0YitBPNhh1hJVG8vIHVzYyDFHEHEDMsDtS8PvPZ3CHTebKcNj9m0NSNvkF7YdQoKnh3oEurWtX6VD_8_tdkmXEkoxF9Hi6ZdufiKuSHQsGFetBmqeF-Vg2fqbGwollSTDnEbuklmYDDbPO5QrrSS3uP8u5p_KX4nygMjulfvv67V6SFpoVkZQPCMd7zZ-quA2TaD1t1iW6oJS-ggnckQy-sGCHfmDhx5EziIffRsQPQRAWA3eMRk_LCVwBXrPp8CeWtk"/>
+</div>
+<div class="absolute -bottom-6 -left-6 bg-surface p-lg rounded-2xl shadow-xl border border-gray-border animate-bounce-slow">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-state-bought" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md">¡Juan trajo el carbón!</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Problem vs Solution -->
+<section class="py-32 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto px-margin-mobile">
+<div class="text-center mb-24">
+<h2 class="font-headline-lg text-headline-lg mb-md">El caos vs La claridad</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Compara la frustración de los grupos de chat con la organización de Hatsik.</p>
+</div>
+<div class="grid md:grid-cols-2 gap-xl">
+<!-- WhatsApp Chaos -->
+<div class="bg-surface-container-low p-xl rounded-[32px] border border-gray-border opacity-80">
+<div class="flex items-center gap-md mb-xl">
+<span class="material-symbols-outlined text-error">forum</span>
+<h3 class="font-headline-md text-headline-md">Caos en WhatsApp</h3>
+</div>
+<div class="space-y-md">
+<div class="bg-white p-md rounded-xl rounded-tl-none shadow-sm max-w-[80%]">¿Quién lleva las tortillas?</div>
+<div class="bg-white p-md rounded-xl rounded-tl-none shadow-sm max-w-[80%] ml-auto bg-primary-fixed text-on-primary-fixed">Yo llevo, creo...</div>
+<div class="bg-white p-md rounded-xl rounded-tl-none shadow-sm max-w-[80%]">Yo también traje!!</div>
+<div class="bg-white p-md rounded-xl rounded-tl-none shadow-sm max-w-[80%] opacity-50 italic">50 mensajes nuevos...</div>
+</div>
+<div class="mt-xl flex items-center gap-xs text-error font-label-md">
+<span class="material-symbols-outlined text-sm">close</span> Confusión y duplicados
+                        </div>
+</div>
+<!-- Hatsik Clarity -->
+<div class="bg-white p-xl rounded-[32px] border-2 border-primary shadow-xl">
+<div class="flex items-center gap-md mb-xl">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">fact_check</span>
+<h3 class="font-headline-md text-headline-md">Claridad en Hatsik</h3>
+</div>
+<div class="space-y-md">
+<div class="flex justify-between items-center p-md bg-state-covered/10 border border-state-covered/20 rounded-xl">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-state-bought">check_box</span>
+<span class="font-body-md">Tortillas (2kg)</span>
+</div>
+<span class="bg-state-covered text-on-surface text-[10px] px-2 py-1 rounded-full font-bold uppercase">Cubierto</span>
+</div>
+<div class="flex justify-between items-center p-md bg-state-partial/10 border border-state-partial/20 rounded-xl">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-state-partial">pending</span>
+<span class="font-body-md">Refrescos (6L)</span>
+</div>
+<span class="bg-state-partial text-on-surface text-[10px] px-2 py-1 rounded-full font-bold uppercase">Pendiente</span>
+</div>
+<div class="flex justify-between items-center p-md bg-surface-container-high rounded-xl">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-gray-muted">add_circle</span>
+<span class="font-body-md text-gray-muted">Agregar algo más...</span>
+</div>
+</div>
+</div>
+<div class="mt-xl flex items-center gap-xs text-state-bought font-label-md">
+<span class="material-symbols-outlined text-sm">check</span> Todo bajo control
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- How it works -->
+<section class="py-32 bg-white">
+<div class="max-w-7xl mx-auto px-margin-mobile">
+<h2 class="font-headline-lg text-headline-lg text-center mb-24">En solo 3 pasos</h2>
+<div class="grid md:grid-cols-3 gap-xl">
+<div class="text-center group">
+<div class="w-20 h-20 bg-coral-soft text-primary rounded-3xl flex items-center justify-center mx-auto mb-lg group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">edit_note</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-md">1. Crea tu evento</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Define el nombre del convivio y arma la lista de lo que se necesita.</p>
+</div>
+<div class="text-center group">
+<div class="w-20 h-20 bg-coral-soft text-primary rounded-3xl flex items-center justify-center mx-auto mb-lg group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">qr_code_2</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-md">2. Comparte el link</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Manda el enlace o el QR por WhatsApp. Sin que nadie tenga que registrarse.</p>
+</div>
+<div class="text-center group">
+<div class="w-20 h-20 bg-coral-soft text-primary rounded-3xl flex items-center justify-center mx-auto mb-lg group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">volunteer_activism</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-md">3. ¡Y listo!</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Cada quien se anota a lo que traerá. Verás en tiempo real quién ya cumplió.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Key Features Bento -->
+<section class="py-32 px-margin-mobile bg-surface">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="md:col-span-2 bg-white p-xl rounded-[32px] border border-gray-border bento-card">
+<span class="material-symbols-outlined text-primary mb-md">bolt</span>
+<h3 class="font-headline-md text-headline-md mb-md">Listas en tiempo real</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl">Olvídate de refrescar la página. Si alguien se anota para las cervezas, todos lo ven al instante. Cero duplicados, cero confusiones.</p>
+<div class="h-32 bg-surface-container-low rounded-2xl overflow-hidden relative">
+<div class="absolute inset-0 flex items-center justify-center gap-4">
+<div class="bg-state-bought/20 px-4 py-2 rounded-full text-state-bought font-bold animate-pulse">Ana trajo Hielo</div>
+<div class="bg-primary-fixed px-4 py-2 rounded-full text-on-primary-fixed font-bold">Carlos se anotó</div>
+</div>
+</div>
+</div>
+<div class="bg-primary text-on-primary p-xl rounded-[32px] bento-card">
+<span class="material-symbols-outlined mb-md text-3xl">no_accounts</span>
+<h3 class="font-headline-md text-headline-md mb-md">Sin registros</h3>
+<p class="font-body-md text-body-md opacity-90">Tus invitados entran, ven la lista y se anotan. Tan simple como eso. La barrera de entrada es cero.</p>
+</div>
+<div class="bg-white p-xl rounded-[32px] border border-gray-border bento-card">
+<span class="material-symbols-outlined text-primary mb-md">admin_panel_settings</span>
+<h3 class="font-headline-md text-headline-md mb-md">Control total</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Como organizador, puedes editar cantidades, agregar items de último minuto o reasignar tareas.</p>
+</div>
+<div class="md:col-span-2 bg-white p-xl rounded-[32px] border border-gray-border bento-card flex flex-col md:flex-row gap-xl items-center">
+<div class="flex-1">
+<span class="material-symbols-outlined text-primary mb-md">bar_chart</span>
+<h3 class="font-headline-md text-headline-md mb-md">Visualización clara</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Un tablero visual que te dice qué falta por cubrir de un solo vistazo. El semáforo de tu evento.</p>
+</div>
+<div class="flex-none w-full md:w-48 h-48 bg-surface-container-high rounded-full flex items-center justify-center border-8 border-state-covered">
+<div class="text-center">
+<div class="text-3xl font-bold">85%</div>
+<div class="text-[10px] uppercase font-bold text-on-surface-variant">Cubierto</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Social Proof / Kitchen Board -->
+<section class="py-32 bg-white overflow-hidden">
+<div class="max-w-7xl mx-auto px-margin-mobile">
+<div class="kitchen-board-item border border-gray-border rounded-[40px] p-xl md:p-32 relative">
+<div class="max-w-3xl mx-auto text-center">
+<h2 class="font-headline-lg text-headline-lg mb-xl">Como la nota en el refrigerador, pero mejor.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-24 italic">"Hatsik nació en una cocina, entre amigos que querían compartir sin pelearse por quién trajo el carbón."</p>
+</div>
+<!-- Decorative Sticky Notes -->
+<div class="hidden md:block">
+<div class="absolute top-12 left-12 w-48 h-48 bg-[#fef3c7] shadow-lg -rotate-3 p-md flex flex-col justify-between">
+<p class="font-caption text-black font-semibold italic text-lg leading-tight">"Ya no pierdo 20 min en el chat buscando la lista"</p>
+<span class="text-right text-sm text-gray-500">— Mariana</span>
+</div>
+<div class="absolute bottom-12 right-12 w-52 h-52 bg-[#dcfce7] shadow-lg rotate-6 p-md flex flex-col justify-between">
+<p class="font-caption text-black font-semibold italic text-lg leading-tight">"El QR en la entrada fue un éxito total. ¡Nadie se olvidó nada!"</p>
+<span class="text-right text-sm text-gray-500">— Roberto</span>
+</div>
+<div class="absolute top-24 right-24 w-44 h-44 bg-[#e0f2fe] shadow-lg -rotate-6 p-md flex flex-col justify-between">
+<p class="font-caption text-black font-semibold italic text-lg leading-tight">"Hatsik = Paz mental para el parrillero."</p>
+<span class="text-right text-sm text-gray-500">— El Chef</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-32 px-margin-mobile">
+<div class="max-w-4xl mx-auto bg-primary rounded-[48px] p-xl md:p-24 text-center text-on-primary relative overflow-hidden">
+<!-- Background decoration -->
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<div class="grid grid-cols-10 h-full">
+<div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div>
+</div>
+</div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-5xl mb-md z-10 relative">Haz que tu próxima reunión sea un éxito.</h2>
+<p class="font-body-lg text-body-lg mb-xl opacity-90 z-10 relative">Empieza gratis hoy y olvida el caos para siempre.</p>
+<button class="bg-white text-primary px-xl py-lg rounded-2xl font-headline-md text-headline-md hover:bg-surface-container-low transition-all shadow-2xl z-10 relative">
+                    Crear mi primer evento ahora
+                </button>
+</div>
+</section>
+</main>
+<footer class="bg-surface border-t border-gray-border pt-32 pb-16">
+<div class="max-w-7xl mx-auto px-margin-mobile">
+<div class="flex flex-col md:flex-row justify-between items-start gap-xl mb-24">
+<div class="max-w-xs">
+<div class="flex items-center gap-3 mb-md">
+<img alt="hatsik logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIK120p4HAi0OtipMAIL1U8uCT7OG_PofelK50weCi_tCYG1SjjvxShoqzA6jPI76ABg_Mrf54WdgrkJ2qiKf68nr9taPXszaRDq4xDzHi98sMoU90tZOwoTar-3R2HSg9Px-qqO22lQT8f0zs7Ieb1Bm5j5LSyAG1Kftl1QPZwykz8q30our9zYKQk3mjcYJUMFE2yozKyI5t2btwX6tHYTKmguwReOI0Klc4cfIHoCB_72mqfuWerdTRqyr9fKpplFaqYh2Ih8M7"/>
+<span class="font-display-logo text-display-logo text-primary">hatsik</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Dividir, compartir. Logística colaborativa para seres sociales que aman sus convivios.</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-xl">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-lg">Producto</h4>
+<ul class="space-y-md font-body-md text-on-surface-variant">
+<li><a class="hover:text-primary" href="#">Funciones</a></li>
+<li><a class="hover:text-primary" href="#">Precios</a></li>
+<li><a class="hover:text-primary" href="#">Historias</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-lg">Compañía</h4>
+<ul class="space-y-md font-body-md text-on-surface-variant">
+<li><a class="hover:text-primary" href="#">Nosotros</a></li>
+<li><a class="hover:text-primary" href="#">Contacto</a></li>
+<li><a class="hover:text-primary" href="#">Blog</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-lg">Legal</h4>
+<ul class="space-y-md font-body-md text-on-surface-variant">
+<li><a class="hover:text-primary" href="#">Privacidad</a></li>
+<li><a class="hover:text-primary" href="#">Términos</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-center pt-md border-t border-gray-border/50 gap-md">
+<span class="font-caption text-caption text-gray-muted">© 2024 Hatsik. Hecho con ❤️ para la comunidad.</span>
+<div class="flex gap-lg">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">share</span></a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">group</span></a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions and simple observers
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100');
+                        entry.target.classList.remove('translate-y-10', 'opacity-0');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.bento-card').forEach(el => {
+                el.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+                observer.observe(el);
+            });
+        });
+    </script>
+</body></html>

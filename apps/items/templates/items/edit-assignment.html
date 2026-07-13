@@ -1,0 +1,48 @@
+<div class="p-[var(--space-md)] bg-surface-container-low rounded-lg border border-gray-border/50">
+    <form method="post" action="{% url 'items:edit_assignment' pk=event.pk assignment_pk=assignment.pk %}"
+          hx-post="{% url 'items:edit_assignment' pk=event.pk assignment_pk=assignment.pk %}"
+          hx-target="#item-row-{{ item.pk }}"
+          hx-swap="outerHTML">
+        {% csrf_token %}
+
+        <p class="text-sm font-semibold text-on-surface mb-[var(--space-sm)]">
+            Modificar cantidad para "{{ item.name }}"
+        </p>
+
+        {% if form.non_field_errors %}
+        <div class="text-error text-xs mb-[var(--space-sm)]">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="flex items-center gap-[var(--space-sm)] mb-[var(--space-sm)]">
+            <input type="number" name="quantity_assigned"
+                   min="0.01" step="0.01"
+                   value="{{ form.quantity_assigned.value }}"
+                   {% if available_quantity %}max="{{ available_quantity }}"{% endif %}
+                   placeholder="Nueva cantidad"
+                   class="flex-1 px-3 py-2 border border-gray-border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                   autofocus>
+            <span class="text-sm text-gray-muted">{{ item.unit }}</span>
+        </div>
+        {% if available_quantity %}
+        <p class="text-xs text-gray-muted mb-[var(--space-sm)]">Máximo disponible: {{ available_quantity }} {{ item.unit }}</p>
+        {% endif %}
+        {% if form.quantity_assigned.errors %}
+        <p class="text-error text-xs mb-[var(--space-sm)]">{{ form.quantity_assigned.errors.0 }}</p>
+        {% endif %}
+
+        <div class="flex items-center gap-[var(--space-sm)]">
+            <button type="submit"
+                    class="px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg active:scale-95 transition-transform">
+                Guardar
+            </button>
+            <a href="{% url 'events:detail' pk=event.pk %}"
+               class="px-4 py-2 text-gray-muted text-xs font-semibold hover:text-on-surface transition-colors">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>

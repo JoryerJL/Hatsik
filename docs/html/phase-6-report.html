@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6 Report — Assignments | Hatsik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root { --primary: #b51d0c; --surface: #fcf9f8; --on-surface: #1c1b1b; --coral: #FDE8E4; --gray: #6B7280; --border: #E5E7EB; --green: #4ADE80; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Plus Jakarta Sans", sans-serif; background: var(--surface); color: var(--on-surface); line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1 { font-family: "Nunito", sans-serif; font-size: 2rem; font-weight: 800; color: var(--primary); }
+        h2 { font-family: "Nunito", sans-serif; font-size: 1.4rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 2px solid var(--coral); padding-bottom: 0.5rem; }
+        h3 { font-family: "Nunito", sans-serif; font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        p, li { margin-bottom: 0.5rem; }
+        code { background: #f3f0ef; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .badge-done { background: var(--green); color: #064e3b; }
+        .badge-mvp { background: var(--coral); color: var(--primary); }
+        .meta { color: var(--gray); font-size: 0.9rem; margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; }
+        th { background: var(--coral); font-weight: 700; }
+        tr:nth-child(even) { background: #fafafa; }
+        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .metric { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; text-align: center; }
+        .metric .value { font-size: 2rem; font-weight: 800; color: var(--primary); font-family: "Nunito", sans-serif; }
+        .metric .label { font-size: 0.8rem; color: var(--gray); margin-top: 0.25rem; }
+        .checklist label { display: block; padding: 0.4rem 0; font-size: 0.9rem; cursor: pointer; }
+        .checklist input { margin-right: 0.5rem; accent-color: var(--primary); }
+        .mermaid { margin: 1.5rem 0; }
+        @media (max-width: 640px) { body { padding: 1rem; } .metric-grid { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+
+<h1>📦 Phase 6 — Assignments</h1>
+<p class="meta">
+    <span class="badge badge-done">✓ COMPLETADA</span>
+    <span class="badge badge-mvp">ÚLTIMA FASE MVP</span>
+    · 13 de julio 2026 · Branch: <code>phase-6/assignments</code>
+</p>
+
+<p><strong>Objetivo:</strong> Los participantes pueden reclamar ítems (parcial o totalmente), modificar sus claims, y marcarlos como comprados. El Owner puede cancelar asignaciones ajenas.</p>
+
+<h2>🏗️ Lo que se construyó</h2>
+
+<div class="mermaid">
+flowchart LR
+    subgraph "Event Detail View"
+        A[Progress Bar] -->|HX-Trigger| B[_progress_bar.html]
+        C[Item Row] --> D[Assignment List]
+        D --> E[Claim Form]
+        D --> F[Edit Form]
+    end
+
+    subgraph "Service Layer"
+        G[claim_item] -->|select_for_update| H[ItemAssignment]
+        I[modify_assignment] --> H
+        J[cancel_assignment] --> H
+        K[mark_as_purchased] --> H
+        L[compute_event_progress] --> M[Status Engine]
+    end
+
+    subgraph "Permisos"
+        N[Participant] --> G
+        N --> I
+        N --> J
+        N --> K
+        O[Owner] --> J
+        O --> K
+        P[Co-admin] --> K
+    end
+</div>
+
+<h3>Componentes implementados</h3>
+<table>
+    <tr><th>Capa</th><th>Archivo</th><th>Qué hace</th></tr>
+    <tr><td>Service</td><td><code>apps/items/services.py</code></td><td>6 funciones: claim, modify, cancel, purchase, available_qty, progress</td></tr>
+    <tr><td>Forms</td><td><code>apps/items/forms.py</code></td><td>ClaimItemForm + EditAssignmentForm</td></tr>
+    <tr><td>Views</td><td><code>apps/items/views.py</code></td><td>5 vistas HTMX con HX-Trigger: progress-updated</td></tr>
+    <tr><td>URLs</td><td><code>apps/items/urls.py</code></td><td>8 patterns (3 items + 4 assignments + 1 progress)</td></tr>
+    <tr><td>Templates</td><td><code>apps/items/templates/</code></td><td>_item_row, _assignment_row, _progress_bar, claim, edit</td></tr>
+    <tr><td>Integration</td><td><code>apps/events/views.py</code></td><td>Prefetch assignments, compute progress en event detail</td></tr>
+    <tr><td>Tags</td><td><code>apps/items/templatetags/</code></td><td>item_available_quantity</td></tr>
+    <tr><td>Tests</td><td><code>apps/items/tests/test_assignments.py</code></td><td>51 tests (service + views)</td></tr>
+</table>
+
+<h3>Reglas de negocio implementadas</h3>
+<table>
+    <tr><th>Regla</th><th>Enforcement</th></tr>
+    <tr><td>Suma de asignaciones ≤ quantity_total</td><td>select_for_update + validación en service</td></tr>
+    <tr><td>Asignaciones compradas son inmutables</td><td>Service bloquea modify/cancel</td></tr>
+    <tr><td>Evento cancelado: todo bloqueado</td><td>_check_event_allows_action</td></tr>
+    <tr><td>Evento cerrado: solo marcar comprado</td><td>_check_event_allows_action</td></tr>
+    <tr><td>Co-admin NO puede cancelar ajenas</td><td>Permission check en cancel_assignment</td></tr>
+    <tr><td>Un assignment activo por user por item</td><td>DB UniqueConstraint + check previo</td></tr>
+</table>
+
+<h2>📝 Commits</h2>
+
+<table>
+    <tr><th>Hash</th><th>Tipo</th><th>Mensaje</th></tr>
+    <tr><td><code>e622a6b</code></td><td>docs</td><td>docs(phase-6): add specs for assignments phase</td></tr>
+    <tr><td><code>353ab60</code></td><td>feat</td><td>feat(items): add assignment service layer with business rules</td></tr>
+    <tr><td><code>f4d56bc</code></td><td>feat</td><td>feat(items): add assignment views, forms, and URL patterns</td></tr>
+    <tr><td><code>d14f271</code></td><td>feat</td><td>feat(items): add assignment UI templates and event detail integration</td></tr>
+    <tr><td><code>b1343bb</code></td><td>test</td><td>test(items): add comprehensive assignment test suite</td></tr>
+    <tr><td><code>f1475cc</code></td><td>docs</td><td>docs(phase-6): add manual testing guide HTML</td></tr>
+    <tr><td><code>b3ee7fc</code></td><td>fix</td><td>fix(items): replace broken cancel button with simple link</td></tr>
+</table>
+
+<h2>📊 Métricas</h2>
+
+<div class="metric-grid">
+    <div class="metric">
+        <div class="value">18</div>
+        <div class="label">Archivos modificados</div>
+    </div>
+    <div class="metric">
+        <div class="value">+2,472</div>
+        <div class="label">Líneas añadidas</div>
+    </div>
+    <div class="metric">
+        <div class="value">51</div>
+        <div class="label">Tests nuevos</div>
+    </div>
+    <div class="metric">
+        <div class="value">385</div>
+        <div class="label">Tests totales (pass)</div>
+    </div>
+    <div class="metric">
+        <div class="value">7</div>
+        <div class="label">Commits atómicos</div>
+    </div>
+    <div class="metric">
+        <div class="value">0</div>
+        <div class="label">Regresiones</div>
+    </div>
+</div>
+
+<h2>✅ Done Criteria — Verificación</h2>
+
+<div class="checklist">
+    <label><input type="checkbox" checked> Participante puede reclamar ítem cuantificado con cantidad válida</label>
+    <label><input type="checkbox" checked> Claim bloqueado cuando la cantidad excedería el total</label>
+    <label><input type="checkbox" checked> Claim binario funciona sin input de cantidad</label>
+    <label><input type="checkbox" checked> Participante puede modificar su asignación no comprada</label>
+    <label><input type="checkbox" checked> Participante puede cancelar su asignación (con confirmación)</label>
+    <label><input type="checkbox" checked> Marcar como comprado requiere confirmación y es irreversible</label>
+    <label><input type="checkbox" checked> Marcar como comprado permitido en eventos cerrados</label>
+    <label><input type="checkbox" checked> Marcar como comprado bloqueado en eventos cancelados</label>
+    <label><input type="checkbox" checked> Owner puede cancelar asignaciones ajenas (con confirmación)</label>
+    <label><input type="checkbox" checked> Co-admin NO puede cancelar asignaciones ajenas</label>
+    <label><input type="checkbox" checked> Semáforo de status se actualiza correctamente</label>
+    <label><input type="checkbox" checked> Barra de progreso refleja cobertura real del evento</label>
+    <label><input type="checkbox" checked> Ítems sin cubrir resaltados en rojo al cerrar evento</label>
+</div>
+
+<h2>🎯 Estado del MVP</h2>
+
+<div class="mermaid">
+flowchart LR
+    P1[Phase 1\nFoundation]:::done --> P2[Phase 2\nAuth]:::done
+    P2 --> P3[Phase 3\nEvents]:::done
+    P3 --> P4[Phase 4\nEvent Access]:::done
+    P4 --> P5[Phase 5\nItems + Moderation]:::done
+    P5 --> P6[Phase 6\nAssignments]:::done
+    P6 --> MVP{🎉 MVP\nCOMPLETO}:::mvp
+
+    classDef done fill:#4ADE80,stroke:#064e3b,color:#064e3b
+    classDef mvp fill:#FDE8E4,stroke:#b51d0c,color:#b51d0c
+</div>
+
+<p><strong>¡MVP completo!</strong> Las 6 fases del roadmap están implementadas, testeadas y funcionando. El sistema soporta el flujo completo: registro → verificación → crear evento → invitar → aprobar → agregar ítems → sugerir ítems → moderar → asignar → comprar.</p>
+
+<h3>Cross-cutting concerns pendientes de revisión final</h3>
+<div class="checklist">
+    <label><input type="checkbox"> Todas las rutas enforce autenticación</label>
+    <label><input type="checkbox"> Unverified accounts bloqueados</label>
+    <label><input type="checkbox"> RBAC enforced server-side</label>
+    <label><input type="checkbox"> Confirmation dialogs match Warm Kitchen Board</label>
+    <label><input type="checkbox"> Event status transitions correctas</label>
+    <label><input type="checkbox"> Solo emails transaccionales (verification, password reset)</label>
+</div>
+
+<script>mermaid.initialize({startOnLoad: true, theme: 'neutral'});</script>
+</body>
+</html>

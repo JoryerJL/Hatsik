@@ -1,0 +1,330 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hatsik — Logística Colaborativa</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=6">
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .bento-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05);
+        }
+        .kitchen-board-item {
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body">
+
+<!-- Navigation -->
+<nav class="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-gray-border">
+    <div class="max-w-7xl mx-auto flex justify-between items-center px-[var(--space-margin-mobile)] md:px-[var(--space-margin-desktop)] py-[var(--space-md)]">
+        <div class="flex items-center gap-3">
+            <img alt="hatsik logo" class="h-10 w-auto rounded-lg" src="{% static 'img/logo.png' %}">
+            <span class="font-heading text-[32px] leading-[40px] tracking-[-0.02em] font-extrabold text-primary hidden md:block">hatsik</span>
+        </div>
+        <div class="flex items-center gap-[var(--space-xl)]">
+            <div class="hidden md:flex gap-[var(--space-lg)]">
+                <a class="font-body text-[15px] leading-[20px] font-semibold text-on-surface-variant hover:text-primary transition-colors" href="{% url 'accounts:login' %}">Iniciar sesión</a>
+                <a class="font-body text-[15px] leading-[20px] font-semibold text-on-surface-variant hover:text-primary transition-colors" href="{% url 'accounts:register' %}">Registrarse</a>
+            </div>
+            <a href="{% url 'accounts:register' %}" class="bg-primary text-on-primary px-[var(--space-lg)] py-2 rounded-xl font-body text-[15px] font-semibold hover:opacity-90 active:scale-95 transition-all">
+                Empezar gratis
+            </a>
+        </div>
+    </div>
+</nav>
+
+<main>
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-[var(--space-xl)] md:pt-32 pb-[var(--space-xl)] px-[var(--space-margin-mobile)]">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-[var(--space-xl)] items-center">
+        <div class="z-10 text-center md:text-left">
+            <h1 class="font-heading text-[28px] leading-[36px] md:text-[56px] md:leading-[64px] font-bold text-on-surface mb-[var(--space-lg)] tracking-tight">
+                Organiza tus convivios sin el caos del <span class="text-primary">"¿qué llevo?"</span>
+            </h1>
+            <p class="font-body text-[16px] leading-[24px] font-semibold text-on-surface-variant mb-[var(--space-xl)] max-w-lg mx-auto md:mx-0">
+                La app que hace logística colaborativa para que tú solo disfrutes el convivio. Divide la lista, comparte el link y relájate.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-[var(--space-md)] justify-center md:justify-start">
+                <a href="{% url 'accounts:register' %}" class="bg-primary text-on-primary px-[var(--space-xl)] py-[var(--space-lg)] rounded-xl font-heading text-[20px] leading-[28px] font-bold shadow-lg hover:shadow-primary/20 transition-all text-center">
+                    Crear mi primer evento
+                </a>
+                <button class="bg-surface text-on-surface border border-gray-border px-[var(--space-xl)] py-[var(--space-lg)] rounded-xl font-heading text-[20px] leading-[28px] font-bold hover:bg-surface-container-low transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">play_circle</span> Ver cómo funciona
+                </button>
+            </div>
+        </div>
+        <div class="relative mt-[var(--space-xl)] md:mt-0">
+            <div class="rounded-3xl overflow-hidden shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
+                <img class="w-full aspect-[4/3] object-cover" alt="Amigos disfrutando de un convivio organizado con Hatsik" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBasnJbpzyX0YitBPNhh1hJVG8vIHVzYyDFHEHEDMsDtS8PvPZ3CHTebKcNj9m0NSNvkF7YdQoKnh3oEurWtX6VD_8_tdkmXEkoxF9Hi6ZdufiKuSHQsGFetBmqeF-Vg2fqbGwollSTDnEbuklmYDDbPO5QrrSS3uP8u5p_KX4nygMjulfvv67V6SFpoVkZQPCMd7zZ-quA2TaD1t1iW6oJS-ggnckQy-sGCHfmDhx5EziIffRsQPQRAWA3eMRk_LCVwBXrPp8CeWtk">
+            </div>
+            <div class="absolute -bottom-6 -left-6 bg-surface p-[var(--space-lg)] rounded-2xl shadow-xl border border-gray-border animate-bounce">
+                <div class="flex items-center gap-[var(--space-md)]">
+                    <span class="material-symbols-outlined text-state-bought" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    <span class="font-body text-[15px] font-semibold">¡Juan trajo el carbón!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Problem vs Solution -->
+<section class="py-32 bg-surface-container-lowest">
+    <div class="max-w-7xl mx-auto px-[var(--space-margin-mobile)]">
+        <div class="text-center mb-24">
+            <h2 class="font-heading text-[28px] leading-[36px] font-bold mb-[var(--space-md)]">El caos vs La claridad</h2>
+            <p class="font-body text-[16px] leading-[24px] font-semibold text-on-surface-variant max-w-2xl mx-auto">Compara la frustración de los grupos de chat con la organización de Hatsik.</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-[var(--space-xl)]">
+            <!-- WhatsApp Chaos -->
+            <div class="bg-surface-container-low p-[var(--space-xl)] rounded-[32px] border border-gray-border opacity-80">
+                <div class="flex items-center gap-[var(--space-md)] mb-[var(--space-xl)]">
+                    <span class="material-symbols-outlined text-error">forum</span>
+                    <h3 class="font-heading text-[20px] leading-[28px] font-bold">Caos en WhatsApp</h3>
+                </div>
+                <div class="space-y-[var(--space-md)]">
+                    <div class="bg-white p-[var(--space-md)] rounded-xl rounded-tl-none shadow-sm max-w-[80%]">¿Quién lleva las tortillas?</div>
+                    <div class="bg-coral-soft p-[var(--space-md)] rounded-xl rounded-tl-none shadow-sm max-w-[80%] ml-auto">Yo llevo, creo...</div>
+                    <div class="bg-white p-[var(--space-md)] rounded-xl rounded-tl-none shadow-sm max-w-[80%]">Yo también traje!!</div>
+                    <div class="bg-white p-[var(--space-md)] rounded-xl rounded-tl-none shadow-sm max-w-[80%] opacity-50 italic">50 mensajes nuevos...</div>
+                </div>
+                <div class="mt-[var(--space-xl)] flex items-center gap-[var(--space-xs)] text-error font-body text-[15px] font-semibold">
+                    <span class="material-symbols-outlined text-sm">close</span> Confusión y duplicados
+                </div>
+            </div>
+            <!-- Hatsik Clarity -->
+            <div class="bg-white p-[var(--space-xl)] rounded-[32px] border-2 border-primary shadow-xl">
+                <div class="flex items-center gap-[var(--space-md)] mb-[var(--space-xl)]">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">fact_check</span>
+                    <h3 class="font-heading text-[20px] leading-[28px] font-bold">Claridad en Hatsik</h3>
+                </div>
+                <div class="space-y-[var(--space-md)]">
+                    <div class="flex justify-between items-center p-[var(--space-md)] bg-state-covered/10 border border-state-covered/20 rounded-xl">
+                        <div class="flex items-center gap-[var(--space-md)]">
+                            <span class="material-symbols-outlined text-state-bought">check_box</span>
+                            <span class="font-body text-[14px]">Tortillas (2kg)</span>
+                        </div>
+                        <span class="bg-state-covered text-on-surface text-[10px] px-2 py-1 rounded-full font-bold uppercase">Cubierto</span>
+                    </div>
+                    <div class="flex justify-between items-center p-[var(--space-md)] bg-state-partial/10 border border-state-partial/20 rounded-xl">
+                        <div class="flex items-center gap-[var(--space-md)]">
+                            <span class="material-symbols-outlined text-state-partial">pending</span>
+                            <span class="font-body text-[14px]">Refrescos (6L)</span>
+                        </div>
+                        <span class="bg-state-partial text-on-surface text-[10px] px-2 py-1 rounded-full font-bold uppercase">Pendiente</span>
+                    </div>
+                    <div class="flex justify-between items-center p-[var(--space-md)] bg-surface-container-high rounded-xl">
+                        <div class="flex items-center gap-[var(--space-md)]">
+                            <span class="material-symbols-outlined text-gray-muted">add_circle</span>
+                            <span class="font-body text-[14px] text-gray-muted">Agregar algo más...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-[var(--space-xl)] flex items-center gap-[var(--space-xs)] text-state-bought font-body text-[15px] font-semibold">
+                    <span class="material-symbols-outlined text-sm">check</span> Todo bajo control
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-[var(--space-margin-mobile)]">
+        <h2 class="font-heading text-[28px] leading-[36px] font-bold text-center mb-24">En solo 3 pasos</h2>
+        <div class="grid md:grid-cols-3 gap-[var(--space-xl)]">
+            <div class="text-center group">
+                <div class="w-20 h-20 bg-coral-soft text-primary rounded-3xl flex items-center justify-center mx-auto mb-[var(--space-lg)] group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-4xl">edit_note</span>
+                </div>
+                <h3 class="font-heading text-[20px] leading-[28px] font-bold mb-[var(--space-md)]">1. Crea tu evento</h3>
+                <p class="font-body text-[14px] leading-[20px] text-on-surface-variant">Define el nombre del convivio y arma la lista de lo que se necesita.</p>
+            </div>
+            <div class="text-center group">
+                <div class="w-20 h-20 bg-coral-soft text-primary rounded-3xl flex items-center justify-center mx-auto mb-[var(--space-lg)] group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-4xl">qr_code_2</span>
+                </div>
+                <h3 class="font-heading text-[20px] leading-[28px] font-bold mb-[var(--space-md)]">2. Comparte el link</h3>
+                <p class="font-body text-[14px] leading-[20px] text-on-surface-variant">Manda el enlace o el QR por WhatsApp. Sin que nadie tenga que registrarse.</p>
+            </div>
+            <div class="text-center group">
+                <div class="w-20 h-20 bg-coral-soft text-primary rounded-3xl flex items-center justify-center mx-auto mb-[var(--space-lg)] group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-4xl">volunteer_activism</span>
+                </div>
+                <h3 class="font-heading text-[20px] leading-[28px] font-bold mb-[var(--space-md)]">3. ¡Y listo!</h3>
+                <p class="font-body text-[14px] leading-[20px] text-on-surface-variant">Cada quien se anota a lo que traerá. Verás en tiempo real quién ya cumplió.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Features Bento -->
+<section class="py-32 px-[var(--space-margin-mobile)] bg-surface">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-[var(--space-lg)]">
+            <div class="md:col-span-2 bg-white p-[var(--space-xl)] rounded-[32px] border border-gray-border bento-card">
+                <span class="material-symbols-outlined text-primary mb-[var(--space-md)]">bolt</span>
+                <h3 class="font-heading text-[20px] leading-[28px] font-bold mb-[var(--space-md)]">Listas en tiempo real</h3>
+                <p class="font-body text-[14px] leading-[20px] text-on-surface-variant mb-[var(--space-xl)]">Olvídate de refrescar la página. Si alguien se anota para las cervezas, todos lo ven al instante. Cero duplicados, cero confusiones.</p>
+                <div class="h-32 bg-surface-container-low rounded-2xl overflow-hidden relative">
+                    <div class="absolute inset-0 flex items-center justify-center gap-4">
+                        <div class="bg-state-bought/20 px-4 py-2 rounded-full text-state-bought font-bold animate-pulse">Ana trajo Hielo</div>
+                        <div class="bg-coral-soft px-4 py-2 rounded-full text-on-surface font-bold">Carlos se anotó</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-primary text-on-primary p-[var(--space-xl)] rounded-[32px] bento-card">
+                <span class="material-symbols-outlined mb-[var(--space-md)] text-3xl">no_accounts</span>
+                <h3 class="font-heading text-[20px] leading-[28px] font-bold mb-[var(--space-md)]">Sin registros</h3>
+                <p class="font-body text-[14px] leading-[20px] opacity-90">Tus invitados entran, ven la lista y se anotan. Tan simple como eso. La barrera de entrada es cero.</p>
+            </div>
+            <div class="bg-white p-[var(--space-xl)] rounded-[32px] border border-gray-border bento-card">
+                <span class="material-symbols-outlined text-primary mb-[var(--space-md)]">admin_panel_settings</span>
+                <h3 class="font-heading text-[20px] leading-[28px] font-bold mb-[var(--space-md)]">Control total</h3>
+                <p class="font-body text-[14px] leading-[20px] text-on-surface-variant">Como organizador, puedes editar cantidades, agregar items de último minuto o reasignar tareas.</p>
+            </div>
+            <div class="md:col-span-2 bg-white p-[var(--space-xl)] rounded-[32px] border border-gray-border bento-card flex flex-col md:flex-row gap-[var(--space-xl)] items-center">
+                <div class="flex-1">
+                    <span class="material-symbols-outlined text-primary mb-[var(--space-md)]">bar_chart</span>
+                    <h3 class="font-heading text-[20px] leading-[28px] font-bold mb-[var(--space-md)]">Visualización clara</h3>
+                    <p class="font-body text-[14px] leading-[20px] text-on-surface-variant">Un tablero visual que te dice qué falta por cubrir de un solo vistazo. El semáforo de tu evento.</p>
+                </div>
+                <div class="flex-none w-full md:w-48 h-48 bg-surface-container-high rounded-full flex items-center justify-center border-8 border-state-covered">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold">85%</div>
+                        <div class="text-[10px] uppercase font-bold text-on-surface-variant">Cubierto</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Social Proof / Kitchen Board -->
+<section class="py-32 bg-white overflow-hidden">
+    <div class="max-w-7xl mx-auto px-[var(--space-margin-mobile)]">
+        <div class="kitchen-board-item border border-gray-border rounded-[40px] p-[var(--space-xl)] md:p-32 relative">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="font-heading text-[28px] leading-[36px] font-bold mb-[var(--space-xl)]">Como la nota en el refrigerador, pero mejor.</h2>
+                <p class="font-body text-[16px] leading-[24px] font-semibold text-on-surface-variant mb-24 italic">"Hatsik nació en una cocina, entre amigos que querían compartir sin pelearse por quién trajo el carbón."</p>
+            </div>
+            <!-- Decorative Sticky Notes -->
+            <div class="hidden md:block">
+                <div class="absolute top-12 left-12 w-48 h-48 bg-[#fef3c7] shadow-lg -rotate-3 p-[var(--space-md)] flex flex-col justify-between">
+                    <p class="font-body text-black font-semibold italic text-lg leading-tight">"Ya no pierdo 20 min en el chat buscando la lista"</p>
+                    <span class="text-right text-sm text-gray-500">— Mariana</span>
+                </div>
+                <div class="absolute bottom-12 right-12 w-52 h-52 bg-[#dcfce7] shadow-lg rotate-6 p-[var(--space-md)] flex flex-col justify-between">
+                    <p class="font-body text-black font-semibold italic text-lg leading-tight">"El QR en la entrada fue un éxito total. ¡Nadie se olvidó nada!"</p>
+                    <span class="text-right text-sm text-gray-500">— Roberto</span>
+                </div>
+                <div class="absolute top-24 right-24 w-44 h-44 bg-[#e0f2fe] shadow-lg -rotate-6 p-[var(--space-md)] flex flex-col justify-between">
+                    <p class="font-body text-black font-semibold italic text-lg leading-tight">"Hatsik = Paz mental para el parrillero."</p>
+                    <span class="text-right text-sm text-gray-500">— El Chef</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-32 px-[var(--space-margin-mobile)]">
+    <div class="max-w-4xl mx-auto bg-primary rounded-[48px] p-[var(--space-xl)] md:p-24 text-center text-on-primary relative overflow-hidden">
+        <!-- Background decoration -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <div class="grid grid-cols-10 h-full">
+                <div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div><div class="border-r border-on-primary"></div>
+            </div>
+        </div>
+        <h2 class="font-heading text-[24px] leading-[32px] md:text-5xl font-bold mb-[var(--space-md)] z-10 relative">Haz que tu próxima reunión sea un éxito.</h2>
+        <p class="font-body text-[16px] leading-[24px] font-semibold mb-[var(--space-xl)] opacity-90 z-10 relative">Empieza gratis hoy y olvida el caos para siempre.</p>
+        <a href="{% url 'accounts:register' %}" class="inline-block bg-white text-primary px-[var(--space-xl)] py-[var(--space-lg)] rounded-2xl font-heading text-[20px] leading-[28px] font-bold hover:bg-surface-container-low transition-all shadow-2xl z-10 relative">
+            Crear mi primer evento ahora
+        </a>
+    </div>
+</section>
+</main>
+
+<footer class="bg-surface border-t border-gray-border pt-32 pb-16">
+    <div class="max-w-7xl mx-auto px-[var(--space-margin-mobile)]">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-[var(--space-xl)] mb-24">
+            <div class="max-w-xs">
+                <div class="flex items-center gap-3 mb-[var(--space-md)]">
+                    <img alt="hatsik logo" class="h-10 w-auto rounded-lg" src="{% static 'img/logo.png' %}">
+                    <span class="font-heading text-[32px] leading-[40px] tracking-[-0.02em] font-extrabold text-primary">hatsik</span>
+                </div>
+                <p class="font-body text-[14px] leading-[20px] text-on-surface-variant">Dividir, compartir. Logística colaborativa para seres sociales que aman sus convivios.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-[var(--space-xl)]">
+                <div>
+                    <h4 class="font-body text-[15px] font-semibold text-on-surface mb-[var(--space-lg)]">Producto</h4>
+                    <ul class="space-y-[var(--space-md)] font-body text-[14px] text-on-surface-variant">
+                        <li><a class="hover:text-primary" href="#">Funciones</a></li>
+                        <li><a class="hover:text-primary" href="#">Precios</a></li>
+                        <li><a class="hover:text-primary" href="#">Historias</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-body text-[15px] font-semibold text-on-surface mb-[var(--space-lg)]">Compañía</h4>
+                    <ul class="space-y-[var(--space-md)] font-body text-[14px] text-on-surface-variant">
+                        <li><a class="hover:text-primary" href="#">Nosotros</a></li>
+                        <li><a class="hover:text-primary" href="#">Contacto</a></li>
+                        <li><a class="hover:text-primary" href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-body text-[15px] font-semibold text-on-surface mb-[var(--space-lg)]">Legal</h4>
+                    <ul class="space-y-[var(--space-md)] font-body text-[14px] text-on-surface-variant">
+                        <li><a class="hover:text-primary" href="#">Privacidad</a></li>
+                        <li><a class="hover:text-primary" href="#">Términos</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center pt-[var(--space-md)] border-t border-gray-border/50 gap-[var(--space-md)]">
+            <span class="font-body text-[12px] text-gray-muted">© 2024 Hatsik. Hecho con ❤️ para la comunidad.</span>
+            <div class="flex gap-[var(--space-lg)]">
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">share</span></a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">group</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100');
+                    entry.target.classList.remove('translate-y-10', 'opacity-0');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.bento-card').forEach(el => {
+            el.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+            observer.observe(el);
+        });
+    });
+</script>
+</body>
+</html>
