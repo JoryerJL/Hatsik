@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../../templates/**/*.html";
+@source "../../apps/**/templates/**/*.html";
 
 /* ==============================================================
    Hatsik Design Tokens — Tailwind CSS v4 @theme
