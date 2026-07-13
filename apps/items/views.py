@@ -166,9 +166,12 @@ def _render_item_row_response(request, event, item):
     ).select_related("user")
 
     is_owner = event.owner_user == request.user
-    is_admin = is_owner or event.participations.filter(
-        user=request.user, role="co_admin", access_status="accepted"
-    ).exists()
+    is_admin = (
+        is_owner
+        or event.participations.filter(
+            user=request.user, role="co_admin", access_status="accepted"
+        ).exists()
+    )
 
     available = get_available_quantity(item)
 
@@ -236,9 +239,7 @@ def edit_assignment_view(request, event, participation, assignment_pk):
     GET: Return edit form fragment.
     POST: Modify the assignment.
     """
-    assignment = get_object_or_404(
-        ItemAssignment, pk=assignment_pk, item__event=event
-    )
+    assignment = get_object_or_404(ItemAssignment, pk=assignment_pk, item__event=event)
     item = assignment.item
 
     if request.method == "POST":
@@ -261,12 +262,11 @@ def edit_assignment_view(request, event, participation, assignment_pk):
         )
 
     # Available = max they could set (excluding their current amount)
-    others_sum = (
-        ItemAssignment.objects.filter(item=item, cancelled_at__isnull=True)
-        .exclude(pk=assignment.pk)
-        .aggregate(total=Sum("quantity_assigned"))["total"]
-        or Decimal("0")
-    )
+    others_sum = ItemAssignment.objects.filter(
+        item=item, cancelled_at__isnull=True
+    ).exclude(pk=assignment.pk).aggregate(total=Sum("quantity_assigned"))[
+        "total"
+    ] or Decimal("0")
     available = item.quantity_total - others_sum if item.quantity_total else None
 
     return render(
@@ -289,9 +289,7 @@ def cancel_assignment_view(request, event, participation, assignment_pk):
     if request.method != "POST":
         return redirect("events:detail", pk=event.pk)
 
-    assignment = get_object_or_404(
-        ItemAssignment, pk=assignment_pk, item__event=event
-    )
+    assignment = get_object_or_404(ItemAssignment, pk=assignment_pk, item__event=event)
     item = assignment.item
 
     try:
@@ -316,9 +314,7 @@ def purchase_assignment_view(request, event, participation, assignment_pk):
     if request.method != "POST":
         return redirect("events:detail", pk=event.pk)
 
-    assignment = get_object_or_404(
-        ItemAssignment, pk=assignment_pk, item__event=event
-    )
+    assignment = get_object_or_404(ItemAssignment, pk=assignment_pk, item__event=event)
     item = assignment.item
 
     try:

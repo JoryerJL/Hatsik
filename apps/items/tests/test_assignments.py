@@ -147,25 +147,19 @@ class TestClaimItem(AssignmentServiceTestBase):
         self.event.status = EventStatus.CLOSED
         self.event.save()
         with self.assertRaises(ItemError) as ctx:
-            claim_item(
-                self.q_item, self.participant, quantity_assigned=Decimal("1.00")
-            )
+            claim_item(self.q_item, self.participant, quantity_assigned=Decimal("1.00"))
         self.assertIn("cerrado o cancelado", str(ctx.exception))
 
     def test_claim_cancelled_event_blocked(self):
         self.event.status = EventStatus.CANCELLED
         self.event.save()
         with self.assertRaises(ItemError) as ctx:
-            claim_item(
-                self.q_item, self.participant, quantity_assigned=Decimal("1.00")
-            )
+            claim_item(self.q_item, self.participant, quantity_assigned=Decimal("1.00"))
         self.assertIn("cerrado o cancelado", str(ctx.exception))
 
     def test_claim_non_participant_blocked(self):
         with self.assertRaises(ItemError) as ctx:
-            claim_item(
-                self.q_item, self.outsider, quantity_assigned=Decimal("1.00")
-            )
+            claim_item(self.q_item, self.outsider, quantity_assigned=Decimal("1.00"))
         self.assertIn("participantes confirmados", str(ctx.exception))
 
     def test_claim_quantified_zero_blocked(self):
@@ -213,9 +207,7 @@ class TestModifyAssignment(AssignmentServiceTestBase):
             self.q_item, self.participant, quantity_assigned=Decimal("1.00")
         )
         with self.assertRaises(ItemError) as ctx:
-            modify_assignment(
-                assignment, self.owner, quantity_assigned=Decimal("2.00")
-            )
+            modify_assignment(assignment, self.owner, quantity_assigned=Decimal("2.00"))
         self.assertIn("propias asignaciones", str(ctx.exception))
 
     def test_modify_purchased_blocked(self):
@@ -462,7 +454,9 @@ class TestAssignmentViews(AssignmentServiceTestBase):
 
     def test_claim_item_view_post_success(self):
         self.client.login(email="participant@test.com", password="testpass123")
-        url = reverse("items:claim", kwargs={"pk": self.event.pk, "item_pk": self.q_item.pk})
+        url = reverse(
+            "items:claim", kwargs={"pk": self.event.pk, "item_pk": self.q_item.pk}
+        )
         response = self.client.post(
             url,
             {"quantity_assigned": "2.00"},
@@ -477,13 +471,17 @@ class TestAssignmentViews(AssignmentServiceTestBase):
         )
 
     def test_claim_item_view_unauthenticated_redirects(self):
-        url = reverse("items:claim", kwargs={"pk": self.event.pk, "item_pk": self.q_item.pk})
+        url = reverse(
+            "items:claim", kwargs={"pk": self.event.pk, "item_pk": self.q_item.pk}
+        )
         response = self.client.post(url, {"quantity_assigned": "1.00"})
         self.assertEqual(response.status_code, 302)
 
     def test_claim_item_view_non_participant_forbidden(self):
         self.client.login(email="outsider@test.com", password="testpass123")
-        url = reverse("items:claim", kwargs={"pk": self.event.pk, "item_pk": self.q_item.pk})
+        url = reverse(
+            "items:claim", kwargs={"pk": self.event.pk, "item_pk": self.q_item.pk}
+        )
         response = self.client.post(url, {"quantity_assigned": "1.00"})
         self.assertEqual(response.status_code, 403)
 

@@ -127,9 +127,7 @@ def event_detail_view(request, event, participation):
     item_pks = [item.pk for item in items_list]
     assignments_by_item = {}
     all_assignments = (
-        ItemAssignment.objects.filter(
-            item__pk__in=item_pks, cancelled_at__isnull=True
-        )
+        ItemAssignment.objects.filter(item__pk__in=item_pks, cancelled_at__isnull=True)
         .select_related("user")
         .order_by("created_at")
     )

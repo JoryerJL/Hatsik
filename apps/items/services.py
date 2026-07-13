@@ -332,7 +332,9 @@ def _check_user_is_participant(event, user) -> None:
         event=event, user=user, access_status=AccessStatus.ACCEPTED
     ).exists()
     if not exists:
-        raise ItemError("Solo los participantes confirmados pueden realizar esta acción.")
+        raise ItemError(
+            "Solo los participantes confirmados pueden realizar esta acción."
+        )
 
 
 def get_available_quantity(item) -> Decimal | None:
@@ -397,9 +399,7 @@ def claim_item(item, user, *, quantity_assigned=None) -> ItemAssignment:
             raise ItemError("Los ítems binarios no tienen cantidad.")
 
         # Check if item is already fully covered (has any active assignment)
-        if ItemAssignment.objects.filter(
-            item=item, cancelled_at__isnull=True
-        ).exists():
+        if ItemAssignment.objects.filter(item=item, cancelled_at__isnull=True).exists():
             raise ItemError("Este ítem ya fue tomado por otro participante.")
 
         return ItemAssignment.objects.create(
@@ -445,14 +445,11 @@ def modify_assignment(assignment, user, *, quantity_assigned) -> ItemAssignment:
     with transaction.atomic():
         locked_item = EventItem.objects.select_for_update().get(pk=item.pk)
         # Available = total - other active assignments (excluding current)
-        others_sum = (
-            ItemAssignment.objects.filter(
-                item=locked_item, cancelled_at__isnull=True
-            )
-            .exclude(pk=assignment.pk)
-            .aggregate(total=Sum("quantity_assigned"))["total"]
-            or Decimal("0")
-        )
+        others_sum = ItemAssignment.objects.filter(
+            item=locked_item, cancelled_at__isnull=True
+        ).exclude(pk=assignment.pk).aggregate(total=Sum("quantity_assigned"))[
+            "total"
+        ] or Decimal("0")
         available = locked_item.quantity_total - others_sum
         if quantity_assigned > available:
             raise ItemError(
