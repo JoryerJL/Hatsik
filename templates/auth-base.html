@@ -9,23 +9,31 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS (compiled) -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
     <style>
-        .material-symbols-rounded {
+        .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            font-size: 20px;
-            vertical-align: middle;
+        }
+        .hatsik-input {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hatsik-input:focus {
+            box-shadow: 0 0 0 4px rgba(253, 232, 228, 0.8);
+            border-color: var(--color-secondary);
+        }
+        .btn-active-state:active {
+            transform: scale(0.96);
         }
     </style>
 
     {% block extra_css %}{% endblock %}
 </head>
-<body class="font-[var(--font-body)] bg-[var(--color-surface)] text-[var(--color-neutral-900)] min-h-screen flex items-center justify-center">
+<body class="font-[var(--font-body)] bg-surface text-on-surface min-h-screen flex items-center justify-center p-[var(--space-margin-mobile)]">
 
     <!-- Messages / Toasts -->
     {% if messages %}
@@ -37,7 +45,7 @@
     {% endif %}
 
     <!-- Auth content -->
-    <main class="w-full max-w-md mx-auto px-[var(--space-4)] py-[var(--space-6)]">
+    <main class="w-full max-w-[440px]">
         {% block content %}{% endblock %}
     </main>
 
