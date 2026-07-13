@@ -8,15 +8,15 @@ Context:
 {% endcomment %}
 
 {% if sent %}
-<p class="text-sm text-[var(--color-success)] flex items-center justify-center gap-1 mb-[var(--space-2)]">
-    <span class="material-symbols-rounded" style="font-size: 16px;">check_circle</span>
+<p class="text-[14px] text-[var(--color-state-bought)] flex items-center justify-center gap-1 mb-[var(--space-sm)]">
+    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
     ¡Email de verificación enviado!
 </p>
 {% endif %}
 
 {% if rate_limited %}
-<p class="text-sm text-[var(--color-neutral-500)] flex items-center justify-center gap-1">
-    <span class="material-symbols-rounded" style="font-size: 16px;">schedule</span>
+<p class="text-[14px] text-[var(--color-on-surface-variant)] flex items-center justify-center gap-1">
+    <span class="material-symbols-outlined text-lg">schedule</span>
     Podés reenviar en 60 segundos.
 </p>
 {% else %}
@@ -25,8 +25,8 @@ Context:
       hx-swap="innerHTML">
     {% csrf_token %}
     <button type="submit"
-            class="inline-flex items-center gap-1 text-sm text-[var(--color-primary)] font-medium hover:underline cursor-pointer">
-        <span class="material-symbols-rounded" style="font-size: 16px;">refresh</span>
+            class="inline-flex items-center gap-1 text-[15px] font-semibold text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] hover:underline cursor-pointer transition-colors">
+        <span class="material-symbols-outlined text-lg">refresh</span>
         Reenviar correo
     </button>
 </form>
