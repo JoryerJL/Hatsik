@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 4 — Event Access — Reporte de Finalización</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #b51d0c;
+            --secondary: #a93624;
+            --surface: #fcf9f8;
+            --on-surface: #1c1b1b;
+            --on-surface-variant: #5b403b;
+            --coral-soft: #FDE8E4;
+            --gray-border: #E5E7EB;
+            --success: #22C55E;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--surface); color: var(--on-surface); line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+        h1, h2, h3 { font-family: 'Nunito', sans-serif; }
+        h1 { font-size: 32px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+        h2 { font-size: 22px; font-weight: 700; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--coral-soft); }
+        h3 { font-size: 16px; font-weight: 700; margin: 16px 0 8px; }
+        p { margin-bottom: 12px; font-size: 14px; color: var(--on-surface-variant); }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-phase { background: var(--coral-soft); color: var(--primary); }
+        .card { background: white; border: 1px solid var(--gray-border); border-radius: 16px; padding: 24px; margin: 16px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 16px 0; }
+        .stat { background: white; border: 1px solid var(--gray-border); border-radius: 12px; padding: 16px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); font-family: 'Nunito'; }
+        .stat-label { font-size: 12px; color: var(--on-surface-variant); margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--gray-border); }
+        th { background: var(--coral-soft); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        tr:hover { background: #fafafa; }
+        code { background: #f3f0ef; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 8px 0; border-bottom: 1px solid #f3f0ef; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .checklist input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
+        .mermaid { margin: 16px 0; background: white; border-radius: 12px; padding: 24px; border: 1px solid var(--gray-border); }
+        .meta { font-size: 13px; color: var(--on-surface-variant); margin-bottom: 24px; }
+        @media print { .no-print { display: none; } body { background: white; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Header -->
+    <div>
+        <span class="badge badge-phase">Fase 4</span>
+        <span class="badge badge-success">✓ Completada</span>
+        <h1>Event Access</h1>
+        <p class="meta">
+            <strong>Objetivo:</strong> Un usuario puede unirse a un evento vía link/QR, pasar por el flujo de aprobación, y ser aceptado o rechazado. También puede abandonar un evento voluntariamente.<br>
+            <strong>Módulo:</strong> EventAccess<br>
+            <strong>Fecha:</strong> 12 de Julio, 2026<br>
+            <strong>Branch:</strong> <code>phase-4/event-access</code>
+        </p>
+    </div>
+
+    <!-- What was built -->
+    <h2>🏗️ Lo que se construyó</h2>
+
+    <div class="card">
+        <h3>Flujo de acceso a eventos</h3>
+        <p>Implementación completa del módulo EventAccess: solicitud de ingreso, gestión de solicitudes (aceptar/rechazar/corregir), abandono voluntario, y badge de solicitudes pendientes en el dashboard.</p>
+
+        <ul style="font-size: 14px; padding-left: 20px; margin-top: 12px;">
+            <li><strong>Join flow:</strong> Usuario sigue link → ve Ficha del Evento → solicita unirse → estado pendiente</li>
+            <li><strong>Request management:</strong> Owner/Co-admin acepta o rechaza solicitudes (con HTMX)</li>
+            <li><strong>Rejection correction:</strong> Owner/Co-admin puede corregir un rechazo erróneo</li>
+            <li><strong>Leave event:</strong> Participante abandona voluntariamente (con validación de compras)</li>
+            <li><strong>Dashboard badge:</strong> Badge coral con conteo de solicitudes pendientes</li>
+            <li><strong>Redesign event-detail:</strong> Hero image, progress bar, grid layout fiel a Stitch</li>
+        </ul>
+    </div>
+
+    <!-- Architecture Diagram -->
+    <h2>📐 Arquitectura</h2>
+
+    <div class="mermaid">
+        <pre class="mermaid">
+flowchart TD
+    A[Usuario sigue share link] --> B{¿Autenticado?}
+    B -->|No| C[Redirect a login con ?next]
+    B -->|Sí| D[public_card_view]
+    D --> E{Estado de participación}
+    E -->|Sin participación / left / removed| F[Mostrar Ficha + botón Solicitar]
+    E -->|Pending| G[Redirect a participation_status]
+    E -->|Accepted| H[Redirect a event_detail]
+    E -->|Rejected| G
+    F -->|POST| I[request_to_join service]
+    I --> J[Crear/resetear participación a PENDING]
+    J --> G
+
+    K[Owner/Co-admin ve event_detail] --> L{¿Hay solicitudes?}
+    L -->|Sí| M[Sección solicitudes pendientes]
+    M --> N[Aceptar via HTMX]
+    M --> O[Rechazar via HTMX + confirm]
+
+    P[Participante aceptado] --> Q[Botón No puedo asistir]
+    Q -->|Confirm| R[leave_event service]
+    R --> S{¿Tiene compras?}
+    S -->|Sí| T[Bloqueado]
+    S -->|No| U[access_status = left]
+        </pre>
+    </div>
+
+    <!-- Commits -->
+    <h2>📝 Commits</h2>
+
+    <table>
+        <thead>
+            <tr><th>Hash</th><th>Tipo</th><th>Scope</th><th>Descripción</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>c9c8fe2</code></td><td>feat</td><td>events</td><td>add event access services and decorator</td></tr>
+            <tr><td><code>4832dda</code></td><td>feat</td><td>events</td><td>add event access views and URL patterns</td></tr>
+            <tr><td><code>ef40c11</code></td><td>feat</td><td>events</td><td>add event access templates matching Stitch design</td></tr>
+            <tr><td><code>24fc3b5</code></td><td>test</td><td>events</td><td>add comprehensive event access test suite</td></tr>
+            <tr><td><code>0e44371</code></td><td>docs</td><td>phase-4</td><td>add specs and Stitch HTML references</td></tr>
+            <tr><td><code>518a507</code></td><td>style</td><td>events</td><td>format forms.py</td></tr>
+        </tbody>
+    </table>
+
+    <!-- Metrics -->
+    <h2>📊 Métricas</h2>
+
+    <div class="stats-grid">
+        <div class="stat">
+            <div class="stat-value">17</div>
+            <div class="stat-label">Archivos modificados</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">+2,898</div>
+            <div class="stat-label">Líneas añadidas</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">189</div>
+            <div class="stat-label">Tests pasando</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">56</div>
+            <div class="stat-label">Tests nuevos</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Migraciones</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">6</div>
+            <div class="stat-label">Commits atómicos</div>
+        </div>
+    </div>
+
+    <!-- Verification -->
+    <h2>✅ Criterios de finalización (ROADMAP)</h2>
+
+    <ul class="checklist">
+        <li><input type="checkbox" checked> Usuario siguiendo share link llega a Ficha del Evento</li>
+        <li><input type="checkbox" checked> Usuario no autenticado es redirigido a login y retorna al evento</li>
+        <li><input type="checkbox" checked> Se crea la solicitud de ingreso y el usuario ve la pantalla de pendiente</li>
+        <li><input type="checkbox" checked> La lista de ítems está oculta para usuarios pendientes y rechazados</li>
+        <li><input type="checkbox" checked> Owner y Co-admin pueden aprobar y rechazar solicitudes</li>
+        <li><input type="checkbox" checked> Rechazo requiere confirmación. Se puede corregir un rechazo a aceptado</li>
+        <li><input type="checkbox" checked> Usuario rechazado no puede volver a solicitar (salvo corrección manual)</li>
+        <li><input type="checkbox" checked> Participante puede abandonar voluntariamente (con confirmación), bloqueado si tiene compras</li>
+        <li><input type="checkbox" checked> Rol de Co-admin se revoca automáticamente al abandonar</li>
+        <li><input type="checkbox" checked> Ambas pantallas de Stitch para esta fase coinciden con el design system</li>
+    </ul>
+
+    <!-- What's next -->
+    <h2>🔜 Siguiente fase</h2>
+
+    <div class="card">
+        <h3>Fase 5 — Items & Moderation</h3>
+        <p><strong>Objetivo:</strong> Owner gestiona la lista de ítems. Participantes sugieren nuevos ítems. Owner/Co-admin aprueba o rechaza sugerencias.</p>
+        <p><strong>Módulos:</strong> Items, Moderation</p>
+        <p><strong>Depende de:</strong> Fase 4 (participantes aceptados deben existir; roles deben estar enforced)</p>
+        <p><strong>Pantallas Stitch:</strong> Añadir Ítem, Editar Ítem, Sugerir Ítem</p>
+    </div>
+
+    <!-- Module Dependency -->
+    <div class="mermaid">
+        <pre class="mermaid">
+graph LR
+    P1[Fase 1: Foundation] --> P2[Fase 2: Auth]
+    P2 --> P3[Fase 3: Events]
+    P3 --> P4[Fase 4: Event Access]
+    P4 --> P5[Fase 5: Items + Moderation]
+    P5 --> P6[Fase 6: Assignments]
+
+    style P1 fill:#dcfce7,stroke:#166534
+    style P2 fill:#dcfce7,stroke:#166534
+    style P3 fill:#dcfce7,stroke:#166534
+    style P4 fill:#dcfce7,stroke:#166534
+    style P5 fill:#FDE8E4,stroke:#b51d0c
+    style P6 fill:#f3f0ef,stroke:#8f706a
+        </pre>
+    </div>
+
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+</body>
+</html>
