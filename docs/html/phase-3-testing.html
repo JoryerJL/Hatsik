@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fase 3 — Guía de Testing Manual</title>
+
+  <style>
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface-2: #222637;
+      --border: #2d3148; --text: #e2e8f0; --text-muted: #94a3b8;
+      --accent: #E8432D; --accent-2: #F26B54;
+      --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+      --radius: 8px; --radius-lg: 12px;
+      --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: "Fira Code", "JetBrains Mono", monospace;
+      --font-heading: "Nunito", -apple-system, sans-serif;
+      --sidebar-w: 260px; --content-max: 860px;
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9;
+      --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; line-height: 1.7; display: flex; min-height: 100vh; }
+
+    #sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; background: var(--surface); border-right: 1px solid var(--border); padding: 24px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+    #sidebar .logo { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+    #sidebar .doc-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    #toc { list-style: none; }
+    #toc li { margin: 2px 0; }
+    #toc a { display: block; padding: 5px 10px; border-radius: var(--radius); font-size: 13px; color: var(--text-muted); text-decoration: none; transition: all 0.15s; }
+    #toc a:hover, #toc a.active { background: var(--surface-2); color: var(--text); }
+    #toc a.active { color: var(--accent-2); }
+
+    .meta-badges { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    #main { margin-left: var(--sidebar-w); flex: 1; padding: 48px 40px; max-width: calc(var(--sidebar-w) + var(--content-max)); }
+
+    .doc-header { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .doc-type-chip { display: inline-block; background: var(--surface-2); border: 1px solid var(--border); color: var(--accent-2); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; }
+    .doc-header h1 { font-family: var(--font-heading); font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    .doc-header p { color: var(--text-muted); font-size: 14px; }
+
+    section { margin-bottom: 48px; }
+    h2 { font-family: var(--font-heading); font-size: 20px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    h3 { font-family: var(--font-heading); font-size: 16px; font-weight: 700; margin: 24px 0 12px; }
+
+    .test-flow { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; }
+    .test-flow h3 { margin-top: 0; color: var(--accent-2); }
+    .preconditions { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; padding: 8px 12px; background: var(--surface-2); border-radius: var(--radius); }
+    .steps { padding-left: 20px; margin-bottom: 16px; }
+    .steps li { margin-bottom: 8px; font-size: 14px; }
+    .steps li strong { color: var(--success); }
+    .steps code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; }
+
+    .checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+    .checkbox-row label { font-size: 13px; font-weight: 600; cursor: pointer; }
+
+    .callout { background: var(--surface-2); border-left: 3px solid var(--warning); padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; margin: 16px 0; font-size: 13px; }
+    .callout.info { border-left-color: #3b82f6; }
+    .callout.danger { border-left-color: var(--danger); }
+
+    .checklist-final { list-style: none; }
+    .checklist-final li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .checklist-final input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--success); cursor: pointer; flex-shrink: 0; }
+
+    .theme-toggle { position: fixed; top: 16px; right: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--text-muted); z-index: 200; }
+    .theme-toggle:hover { color: var(--text); }
+
+    .reset-btn { background: var(--danger); color: #fff; border: none; border-radius: var(--radius); padding: 8px 16px; cursor: pointer; font-size: 13px; font-weight: 600; margin-top: 16px; transition: opacity 0.2s; }
+    .reset-btn:hover { opacity: 0.85; }
+
+    /* Collapsible sections */
+    .collapsible-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+    .collapsible-header::after { content: "▾"; font-size: 14px; color: var(--text-muted); transition: transform 0.2s; }
+    .collapsible-header.collapsed::after { transform: rotate(-90deg); }
+    .collapsible-content { overflow: hidden; transition: max-height 0.3s ease; }
+    .collapsible-content.collapsed { max-height: 0 !important; }
+
+    @media (max-width: 768px) {
+      #sidebar { display: none; }
+      #main { margin-left: 0; padding: 24px 16px; }
+    }
+    @media print {
+      #sidebar, .theme-toggle, .reset-btn { display: none; }
+      #main { margin-left: 0; max-width: 100%; }
+      .test-flow { break-inside: avoid; }
+      .collapsible-content { max-height: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Theme toggle -->
+<button class="theme-toggle" onclick="toggleTheme()">🌓 Tema</button>
+
+<!-- Sidebar -->
+<aside id="sidebar">
+  <div class="logo">Hatsik</div>
+  <div class="doc-title">Fase 3 — Guía de Testing Manual</div>
+  <ul id="toc">
+    <li><a href="#requisitos">Requisitos previos</a></li>
+    <li><a href="#flujo-dashboard">Dashboard (Mis Eventos)</a></li>
+    <li><a href="#flujo-crear">Crear Evento</a></li>
+    <li><a href="#flujo-detalle">Detalle del Evento</a></li>
+    <li><a href="#flujo-editar">Editar Evento</a></li>
+    <li><a href="#flujo-lifecycle">Ciclo de Vida</a></li>
+    <li><a href="#flujo-participantes">Gestión de Participantes</a></li>
+    <li><a href="#flujo-compartir">Compartir Evento</a></li>
+    <li><a href="#flujo-ficha">Ficha Pública</a></li>
+    <li><a href="#flujo-cierre-auto">Cierre Automático</a></li>
+    <li><a href="#casos-limite">Casos límite</a></li>
+    <li><a href="#checklist">Checklist final</a></li>
+  </ul>
+  <div class="meta-badges">
+    <span class="badge"><span class="badge-dot"></span>Fase 3 — Events</span>
+    <span class="badge"><span class="badge-dot" style="background:var(--warning)"></span>QA manual pendiente</span>
+  </div>
+</aside>
+
+<!-- Main content -->
+<main id="main">
+  <div class="doc-header">
+    <span class="doc-type-chip">Testing Manual</span>
+    <h1>Fase 3 — Events &amp; Dashboard</h1>
+    <p>Un usuario verificado puede crear eventos, ver sus eventos, gestionar el ciclo de vida, compartir link/QR, administrar co-admins y remover participantes.</p>
+  </div>
+
+  <!-- Requisitos previos -->
+  <section id="requisitos">
+    <h2 class="collapsible-header" data-section="requisitos">🛠️ Requisitos previos</h2>
+    <div class="collapsible-content" data-section="requisitos">
+      <div class="test-flow">
+        <h3>Preparar el entorno</h3>
+        <ol class="steps">
+          <li>Asegurarse de tener el virtualenv activo: <code>source .venv/bin/activate</code></li>
+          <li>Verificar que PostgreSQL esté corriendo (local o Neon)</li>
+          <li>Correr migraciones: <code>python manage.py migrate</code></li>
+          <li>Iniciar el servidor de desarrollo: <code>python manage.py runserver</code></li>
+          <li>Abrir el navegador en <code>http://localhost:8000</code></li>
+          <li>Tener un usuario registrado y verificado (completar Fase 2 antes)</li>
+          <li>Estar logueado con ese usuario verificado</li>
+        </ol>
+        <div class="callout info">
+          💡 Todos los flujos de esta fase requieren un usuario verificado y logueado, salvo la Ficha Pública que se prueba también sin autenticación.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Dashboard -->
+  <section id="flujo-dashboard">
+    <h2 class="collapsible-header" data-section="dashboard">📋 1. Dashboard (Mis Eventos)</h2>
+    <div class="collapsible-content" data-section="dashboard">
+      <div class="test-flow">
+        <h3>Empty state</h3>
+        <p class="preconditions">Precondiciones: Usuario verificado sin eventos creados ni participaciones activas.</p>
+        <ol class="steps">
+          <li>Navegar a <code>http://localhost:8000/events/</code></li>
+          <li><strong>Esperado:</strong> Se muestra un empty state indicando que no hay eventos</li>
+          <li>Verificar que existe un CTA para crear un evento nuevo</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-dash-empty" data-test="dash-empty">
+          <label for="test-dash-empty">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Listado con eventos</h3>
+        <p class="preconditions">Precondiciones: Usuario con al menos un evento creado.</p>
+        <ol class="steps">
+          <li>Navegar a <code>http://localhost:8000/events/</code></li>
+          <li><strong>Esperado:</strong> Se muestran los eventos del usuario</li>
+          <li>Verificar que cada evento muestra el rol del usuario (Owner, Co-admin, Participante)</li>
+          <li>Verificar que cada evento muestra el status correcto (active, closed, cancelled)</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-dash-list" data-test="dash-list">
+          <label for="test-dash-list">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Filtrado de participaciones inactivas</h3>
+        <p class="preconditions">Precondiciones: Usuario que fue removido de un evento o dejó un evento.</p>
+        <ol class="steps">
+          <li>Navegar a <code>http://localhost:8000/events/</code></li>
+          <li><strong>Esperado:</strong> Eventos con status de participación pending, removed o left NO aparecen en el listado</li>
+          <li>Verificar en la base de datos que los registros existen pero no se muestran</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-dash-filter" data-test="dash-filter">
+          <label for="test-dash-filter">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Crear Evento -->
+  <section id="flujo-crear">
+    <h2 class="collapsible-header" data-section="crear">➕ 2. Crear Evento</h2>
+    <div class="collapsible-content" data-section="crear">
+      <div class="test-flow">
+        <h3>Creación exitosa (happy path)</h3>
+        <p class="preconditions">Precondiciones: Usuario verificado y logueado.</p>
+        <ol class="steps">
+          <li>Navegar a <code>http://localhost:8000/events/create/</code></li>
+          <li>Verificar que se muestra el formulario con campos: nombre, fecha del evento</li>
+          <li>Completar: Nombre = "Amigo Invisible 2025", Fecha = fecha futura</li>
+          <li>Click en <strong>"Crear evento"</strong></li>
+          <li><strong>Esperado:</strong> Redirige al detalle del evento recién creado</li>
+          <li>Navegar a <code>/events/</code></li>
+          <li><strong>Esperado:</strong> El evento aparece en el dashboard con rol "Owner"</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-crear-ok" data-test="crear-ok">
+          <label for="test-crear-ok">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Validación de campos obligatorios</h3>
+        <ol class="steps">
+          <li>Navegar a <code>http://localhost:8000/events/create/</code></li>
+          <li>Enviar el formulario sin nombre</li>
+          <li><strong>Esperado:</strong> Error de validación indicando que el nombre es obligatorio</li>
+          <li>Enviar el formulario sin fecha</li>
+          <li><strong>Esperado:</strong> Error de validación indicando que la fecha es obligatoria</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-crear-validation" data-test="crear-validation">
+          <label for="test-crear-validation">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Campos opcionales</h3>
+        <ol class="steps">
+          <li>Navegar a <code>http://localhost:8000/events/create/</code></li>
+          <li>Completar nombre y fecha, además agregar descripción y fecha límite de asignación</li>
+          <li>Click en "Crear evento"</li>
+          <li><strong>Esperado:</strong> Se crea correctamente con todos los campos opcionales guardados</li>
+          <li>Verificar en el detalle que descripción y fecha límite se muestran</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-crear-optional" data-test="crear-optional">
+          <label for="test-crear-optional">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Detalle del Evento -->
+  <section id="flujo-detalle">
+    <h2 class="collapsible-header" data-section="detalle">🔍 3. Detalle del Evento</h2>
+    <div class="collapsible-content" data-section="detalle">
+      <div class="test-flow">
+        <h3>Vista del Owner</h3>
+        <p class="preconditions">Precondiciones: Ser el Owner del evento.</p>
+        <ol class="steps">
+          <li>Navegar al detalle de un evento propio: <code>/events/&lt;id&gt;/</code></li>
+          <li><strong>Esperado:</strong> Muestra nombre, fecha, status, lista de participantes</li>
+          <li>Verificar que se muestran los botones de lifecycle (cerrar, cancelar)</li>
+          <li>Verificar que se muestran opciones de gestión de participantes</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-detalle-owner" data-test="detalle-owner">
+          <label for="test-detalle-owner">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Acceso denegado a no-participante</h3>
+        <p class="preconditions">Precondiciones: Estar logueado con un usuario que NO es participante del evento.</p>
+        <ol class="steps">
+          <li>Navegar al detalle de un evento del cual no sos participante</li>
+          <li><strong>Esperado:</strong> Recibe error 403 Forbidden</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-detalle-403" data-test="detalle-403">
+          <label for="test-detalle-403">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Editar Evento -->
+  <section id="flujo-editar">
+    <h2 class="collapsible-header" data-section="editar">✏️ 4. Editar Evento</h2>
+    <div class="collapsible-content" data-section="editar">
+      <div class="test-flow">
+        <h3>Edición exitosa como Owner</h3>
+        <p class="preconditions">Precondiciones: Ser Owner del evento.</p>
+        <ol class="steps">
+          <li>Navegar a <code>/events/&lt;id&gt;/edit/</code></li>
+          <li>Cambiar el nombre del evento y la fecha</li>
+          <li>Click en "Guardar cambios"</li>
+          <li><strong>Esperado:</strong> Se guardan los cambios correctamente</li>
+          <li>Verificar en el detalle que los cambios se reflejan</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-editar-ok" data-test="editar-ok">
+          <label for="test-editar-ok">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Acceso denegado a no-owner</h3>
+        <p class="preconditions">Precondiciones: Estar logueado como participante (no Owner) del evento.</p>
+        <ol class="steps">
+          <li>Navegar a <code>/events/&lt;id&gt;/edit/</code> de un evento donde NO sos Owner</li>
+          <li><strong>Esperado:</strong> Recibe error 403 Forbidden</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-editar-403" data-test="editar-403">
+          <label for="test-editar-403">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Ciclo de Vida -->
+  <section id="flujo-lifecycle">
+    <h2 class="collapsible-header" data-section="lifecycle">🔄 5. Ciclo de Vida</h2>
+    <div class="collapsible-content" data-section="lifecycle">
+      <div class="test-flow">
+        <h3>Cerrar evento</h3>
+        <p class="preconditions">Precondiciones: Ser Owner de un evento con status active.</p>
+        <ol class="steps">
+          <li>Desde el detalle del evento, ejecutar acción de cerrar (POST <code>/events/&lt;id&gt;/close/</code>)</li>
+          <li><strong>Esperado:</strong> El status del evento cambia a "closed"</li>
+          <li>Verificar en el dashboard que el evento muestra status "closed"</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-lifecycle-close" data-test="lifecycle-close">
+          <label for="test-lifecycle-close">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Reabrir evento</h3>
+        <p class="preconditions">Precondiciones: Ser Owner de un evento con status closed.</p>
+        <ol class="steps">
+          <li>Desde el detalle del evento cerrado, ejecutar acción de reabrir (POST <code>/events/&lt;id&gt;/reopen/</code>)</li>
+          <li><strong>Esperado:</strong> El status del evento vuelve a "active"</li>
+          <li>Verificar en el dashboard que el evento muestra status "active"</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-lifecycle-reopen" data-test="lifecycle-reopen">
+          <label for="test-lifecycle-reopen">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Cancelar evento</h3>
+        <p class="preconditions">Precondiciones: Ser Owner de un evento con status active.</p>
+        <ol class="steps">
+          <li>Desde el detalle del evento, ejecutar acción de cancelar (POST <code>/events/&lt;id&gt;/cancel/</code>)</li>
+          <li><strong>Esperado:</strong> El status del evento cambia a "cancelled"</li>
+          <li>Verificar en el dashboard que el evento muestra status "cancelled"</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-lifecycle-cancel" data-test="lifecycle-cancel">
+          <label for="test-lifecycle-cancel">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Reabrir evento cancelado — debe fallar</h3>
+        <p class="preconditions">Precondiciones: Evento con status cancelled.</p>
+        <ol class="steps">
+          <li>Intentar reabrir un evento cancelado (POST <code>/events/&lt;id&gt;/reopen/</code>)</li>
+          <li><strong>Esperado:</strong> Error — no se puede reabrir un evento cancelado</li>
+          <li>Verificar que el status sigue siendo "cancelled"</li>
+        </ol>
+        <div class="callout danger">
+          ⚠️ Un evento cancelado es un estado terminal. Solo se puede reabrir un evento "closed", no uno "cancelled".
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-lifecycle-reopen-cancelled" data-test="lifecycle-reopen-cancelled">
+          <label for="test-lifecycle-reopen-cancelled">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Gestión de Participantes -->
+  <section id="flujo-participantes">
+    <h2 class="collapsible-header" data-section="participantes">👥 6. Gestión de Participantes</h2>
+    <div class="collapsible-content" data-section="participantes">
+      <div class="test-flow">
+        <h3>Promover a co-admin</h3>
+        <p class="preconditions">Precondiciones: Ser Owner. Tener al menos un participante con rol "participant".</p>
+        <ol class="steps">
+          <li>Desde el detalle del evento, buscar un participante con rol "participant"</li>
+          <li>Ejecutar la acción de promover a co-admin</li>
+          <li><strong>Esperado:</strong> El rol del participante cambia a "co_admin"</li>
+          <li>Verificar que el cambio se refleja en la lista de participantes</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-part-promote" data-test="part-promote">
+          <label for="test-part-promote">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Degradar co-admin a participante</h3>
+        <p class="preconditions">Precondiciones: Ser Owner. Tener al menos un co-admin.</p>
+        <ol class="steps">
+          <li>Desde el detalle del evento, buscar un co-admin</li>
+          <li>Ejecutar la acción de degradar a participante</li>
+          <li><strong>Esperado:</strong> El rol del co-admin vuelve a "participant"</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-part-demote" data-test="part-demote">
+          <label for="test-part-demote">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Remover participante</h3>
+        <p class="preconditions">Precondiciones: Ser Owner. Participante sin asignaciones compradas.</p>
+        <ol class="steps">
+          <li>Desde el detalle del evento, seleccionar un participante</li>
+          <li>Ejecutar la acción de remover</li>
+          <li><strong>Esperado:</strong> El participante desaparece de la lista activa</li>
+          <li>Verificar que el participante removido ya no ve el evento en su dashboard</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-part-remove" data-test="part-remove">
+          <label for="test-part-remove">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Intentar removerse a sí mismo — debe fallar</h3>
+        <p class="preconditions">Precondiciones: Ser Owner del evento.</p>
+        <ol class="steps">
+          <li>Intentar ejecutar la acción de remover sobre tu propio usuario</li>
+          <li><strong>Esperado:</strong> Error — no podés removerte a vos mismo del evento</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-part-self" data-test="part-self">
+          <label for="test-part-self">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Compartir Evento -->
+  <section id="flujo-compartir">
+    <h2 class="collapsible-header" data-section="compartir">🔗 7. Compartir Evento</h2>
+    <div class="collapsible-content" data-section="compartir">
+      <div class="test-flow">
+        <h3>Página de compartir</h3>
+        <p class="preconditions">Precondiciones: Ser Owner o co-admin del evento.</p>
+        <ol class="steps">
+          <li>Navegar a <code>/events/&lt;id&gt;/share/</code></li>
+          <li><strong>Esperado:</strong> Se muestra el link de invitación compartido</li>
+          <li>Verificar que el link tiene formato <code>/events/join/&lt;token&gt;/</code></li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-share-page" data-test="share-page">
+          <label for="test-share-page">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Copiar link al clipboard</h3>
+        <ol class="steps">
+          <li>En la página de compartir, click en el botón "Copiar link"</li>
+          <li><strong>Esperado:</strong> El link se copia al portapapeles (Clipboard API)</li>
+          <li>Verificar pegando en otra pestaña que el link es correcto</li>
+        </ol>
+        <div class="callout info">
+          💡 La Clipboard API requiere HTTPS o localhost. En desarrollo local debería funcionar.
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-share-copy" data-test="share-copy">
+          <label for="test-share-copy">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>QR code inline</h3>
+        <ol class="steps">
+          <li>En la página de compartir, verificar que se muestra un código QR</li>
+          <li><strong>Esperado:</strong> El QR se renderiza inline (no como link externo)</li>
+          <li>Escanear el QR con un celular</li>
+          <li><strong>Esperado:</strong> Abre la URL de join del evento</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-share-qr" data-test="share-qr">
+          <label for="test-share-qr">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Descargar QR como PNG</h3>
+        <ol class="steps">
+          <li>Click en el botón "Descargar QR"</li>
+          <li><strong>Esperado:</strong> Se descarga un archivo PNG con el código QR</li>
+          <li>Abrir el PNG descargado y verificar que es legible</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-share-download" data-test="share-download">
+          <label for="test-share-download">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Ficha Pública del Evento -->
+  <section id="flujo-ficha">
+    <h2 class="collapsible-header" data-section="ficha">🌐 8. Ficha Pública del Evento</h2>
+    <div class="collapsible-content" data-section="ficha">
+      <div class="test-flow">
+        <h3>Vista como no-participante logueado</h3>
+        <p class="preconditions">Precondiciones: Estar logueado con un usuario que NO es participante del evento.</p>
+        <ol class="steps">
+          <li>Navegar a <code>/events/join/&lt;token&gt;/</code></li>
+          <li><strong>Esperado:</strong> Muestra nombre, descripción, fecha y status del evento</li>
+          <li>Verificar que NO muestra la lista de ítems/regalos</li>
+          <li>Verificar que hay un botón para unirse al evento</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-ficha-view" data-test="ficha-view">
+          <label for="test-ficha-view">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Redirección si ya es participante</h3>
+        <p class="preconditions">Precondiciones: Estar logueado como participante activo del evento.</p>
+        <ol class="steps">
+          <li>Navegar a <code>/events/join/&lt;token&gt;/</code> del evento donde ya participás</li>
+          <li><strong>Esperado:</strong> Redirige automáticamente al detalle del evento</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-ficha-redirect" data-test="ficha-redirect">
+          <label for="test-ficha-redirect">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Redirección a login sin autenticación</h3>
+        <p class="preconditions">Precondiciones: No estar logueado.</p>
+        <ol class="steps">
+          <li>Cerrar sesión</li>
+          <li>Navegar a <code>/events/join/&lt;token&gt;/</code></li>
+          <li><strong>Esperado:</strong> Redirige a login con <code>?next=/events/join/&lt;token&gt;/</code></li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-ficha-login" data-test="ficha-login">
+          <label for="test-ficha-login">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujo: Cierre Automático -->
+  <section id="flujo-cierre-auto">
+    <h2 class="collapsible-header" data-section="cierre-auto">⏰ 9. Cierre Automático</h2>
+    <div class="collapsible-content" data-section="cierre-auto">
+      <div class="test-flow">
+        <h3>Cierre por deadline expirado</h3>
+        <p class="preconditions">Precondiciones: Crear un evento con <code>assignment_deadline_at</code> en el pasado.</p>
+        <ol class="steps">
+          <li>Crear un evento con fecha límite de asignación en el pasado (o modificar uno existente en la DB)</li>
+          <li>Verificar que el evento tiene status "active"</li>
+          <li>Ejecutar: <code>curl -X POST http://localhost:8000/internal/close-expired-events/ -H "X-Internal-Token: &lt;token&gt;"</code></li>
+          <li><strong>Esperado:</strong> El evento cambia a status "closed"</li>
+          <li>Verificar en el dashboard que el status se actualizó</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-auto-close" data-test="auto-close">
+          <label for="test-auto-close">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Sin token — acceso denegado</h3>
+        <ol class="steps">
+          <li>Ejecutar: <code>curl -X POST http://localhost:8000/internal/close-expired-events/</code> (sin header)</li>
+          <li><strong>Esperado:</strong> Recibe error 401 Unauthorized</li>
+          <li>Ejecutar con token incorrecto: <code>-H "X-Internal-Token: token-falso"</code></li>
+          <li><strong>Esperado:</strong> Recibe error 401 Unauthorized</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-auto-notoken" data-test="auto-notoken">
+          <label for="test-auto-notoken">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Casos límite -->
+  <section id="casos-limite">
+    <h2 class="collapsible-header" data-section="edge">⚠️ Casos límite</h2>
+    <div class="collapsible-content" data-section="edge">
+      <div class="test-flow">
+        <h3>Evento sin descripción</h3>
+        <ol class="steps">
+          <li>Crear un evento sin completar el campo de descripción</li>
+          <li>Navegar al detalle del evento</li>
+          <li><strong>Esperado:</strong> No se rompe nada — la UI maneja el campo vacío sin errores</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-edge-nodesc" data-test="edge-nodesc">
+          <label for="test-edge-nodesc">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Evento sin deadline</h3>
+        <ol class="steps">
+          <li>Crear un evento sin fecha límite de asignación</li>
+          <li>Ejecutar el endpoint de cierre automático</li>
+          <li><strong>Esperado:</strong> El evento NO se cierra automáticamente (solo se cierran los que tienen deadline expirado)</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-edge-nodeadline" data-test="edge-nodeadline">
+          <label for="test-edge-nodeadline">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Múltiples participantes con distintos roles</h3>
+        <ol class="steps">
+          <li>Crear un evento con 3+ participantes: Owner, Co-admin, Participante</li>
+          <li>Verificar que cada uno ve las acciones correspondientes a su rol</li>
+          <li>Verificar que Co-admin puede gestionar participantes pero no cambiar lifecycle</li>
+          <li>Verificar que Participante solo puede ver, no gestionar</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-edge-roles" data-test="edge-roles">
+          <label for="test-edge-roles">Verificado ✓</label>
+        </div>
+      </div>
+
+      <div class="test-flow">
+        <h3>Evento cancelado es estado terminal</h3>
+        <ol class="steps">
+          <li>Tener un evento con status "cancelled"</li>
+          <li>Intentar cualquier acción de lifecycle (reabrir, cerrar)</li>
+          <li><strong>Esperado:</strong> Todas las acciones fallan — cancelled es irreversible</li>
+        </ol>
+        <div class="checkbox-row">
+          <input type="checkbox" id="test-edge-cancelled" data-test="edge-cancelled">
+          <label for="test-edge-cancelled">Verificado ✓</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Checklist final -->
+  <section id="checklist">
+    <h2 class="collapsible-header" data-section="checklist">✅ Checklist final — Done Criteria del ROADMAP</h2>
+    <div class="collapsible-content" data-section="checklist">
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+        Estos son los criterios de aceptación definidos en <code>docs/ROADMAP.md</code> para la Fase 3.
+      </p>
+      <ul class="checklist-final">
+        <li><input type="checkbox" id="dc-1" data-test="dc-1"> Usuario puede crear evento y verlo en Dashboard</li>
+        <li><input type="checkbox" id="dc-2" data-test="dc-2"> Dashboard muestra rol y status correctos</li>
+        <li><input type="checkbox" id="dc-3" data-test="dc-3"> Link compartido y QR descargable funcionan</li>
+        <li><input type="checkbox" id="dc-4" data-test="dc-4"> Owner puede cerrar, reabrir y cancelar (con confirmación)</li>
+        <li><input type="checkbox" id="dc-5" data-test="dc-5"> Owner puede asignar y revocar co-admins</li>
+        <li><input type="checkbox" id="dc-6" data-test="dc-6"> Owner puede remover participantes (bloqueado si tienen asignaciones compradas)</li>
+        <li><input type="checkbox" id="dc-7" data-test="dc-7"> Cierre automático funciona cuando se alcanza assignment_deadline_at</li>
+        <li><input type="checkbox" id="dc-8" data-test="dc-8"> Los 5 screens de Stitch coinciden con el design system</li>
+      </ul>
+      <button class="reset-btn" onclick="resetChecks()">🗑️ Resetear todos los checks</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- Scripts -->
+<script>
+  // Theme toggle
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('hatsik-testing-theme', next);
+  }
+
+  // Restore theme
+  const savedTheme = localStorage.getItem('hatsik-testing-theme');
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
+  // Persist checkboxes in localStorage
+  const STORAGE_KEY = 'hatsik-phase3-testing';
+
+  function loadChecks() {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    document.querySelectorAll('input[type="checkbox"][data-test]').forEach(cb => {
+      cb.checked = !!saved[cb.dataset.test];
+    });
+  }
+
+  function saveChecks() {
+    const state = {};
+    document.querySelectorAll('input[type="checkbox"][data-test]').forEach(cb => {
+      state[cb.dataset.test] = cb.checked;
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function resetChecks() {
+    if (!confirm('¿Resetear todos los checks? Esta acción no se puede deshacer.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    document.querySelectorAll('input[type="checkbox"][data-test]').forEach(cb => {
+      cb.checked = false;
+    });
+  }
+
+  // Collapsible sections
+  function initCollapsibles() {
+    document.querySelectorAll('.collapsible-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const section = header.dataset.section;
+        const content = document.querySelector(`.collapsible-content[data-section="${section}"]`);
+        header.classList.toggle('collapsed');
+        content.classList.toggle('collapsed');
+        // Save collapse state
+        const collapseState = JSON.parse(localStorage.getItem('hatsik-phase3-collapse') || '{}');
+        collapseState[section] = header.classList.contains('collapsed');
+        localStorage.setItem('hatsik-phase3-collapse', JSON.stringify(collapseState));
+      });
+    });
+
+    // Restore collapse state
+    const collapseState = JSON.parse(localStorage.getItem('hatsik-phase3-collapse') || '{}');
+    Object.entries(collapseState).forEach(([section, collapsed]) => {
+      if (collapsed) {
+        const header = document.querySelector(`.collapsible-header[data-section="${section}"]`);
+        const content = document.querySelector(`.collapsible-content[data-section="${section}"]`);
+        if (header && content) {
+          header.classList.add('collapsed');
+          content.classList.add('collapsed');
+        }
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadChecks();
+    initCollapsibles();
+    document.querySelectorAll('input[type="checkbox"][data-test]').forEach(cb => {
+      cb.addEventListener('change', saveChecks);
+    });
+  });
+
+  // TOC active state on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = document.querySelectorAll('#toc a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`#toc a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -80% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

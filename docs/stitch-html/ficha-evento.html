@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Invitación al Evento - hatsik</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&amp;family=Plus+Jakarta+Sans:wght@400;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "surface-bright": "#fcf9f8",
+                    "gray-border": "#E5E7EB",
+                    "error": "#ba1a1a",
+                    "gray-muted": "#6B7280",
+                    "coral-soft": "#FDE8E4",
+                    "on-background": "#1c1b1b",
+                    "surface-container": "#f0eded",
+                    "state-bought": "#4ADE80",
+                    "on-secondary-fixed": "#3f0200",
+                    "inverse-on-surface": "#f3f0ef",
+                    "on-secondary-container": "#6f0a01",
+                    "on-secondary-fixed-variant": "#881e0f",
+                    "surface-container-highest": "#e5e2e1",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#007da9",
+                    "surface-dim": "#dcd9d9",
+                    "tertiary-fixed": "#c4e7ff",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed": "#400200",
+                    "outline": "#8f706a",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#313030",
+                    "on-tertiary-fixed-variant": "#004c69",
+                    "outline-variant": "#e4beb7",
+                    "surface": "#fcf9f8",
+                    "secondary-container": "#fd735c",
+                    "primary-fixed-dim": "#ffb4a7",
+                    "surface-variant": "#e5e2e1",
+                    "background": "#fcf9f8",
+                    "on-primary-container": "#fffbff",
+                    "secondary": "#a93624",
+                    "surface-container-low": "#f6f3f2",
+                    "secondary-fixed-dim": "#ffb4a6",
+                    "tertiary": "#006387",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#b51d0c",
+                    "on-error-container": "#93000a",
+                    "surface-container-high": "#eae7e7",
+                    "on-tertiary-container": "#fcfcff",
+                    "on-secondary": "#ffffff",
+                    "on-surface-variant": "#5b403b",
+                    "on-surface": "#1c1b1b",
+                    "state-covered": "#86EFAC",
+                    "surface-tint": "#b8200e",
+                    "primary-container": "#d83823",
+                    "inverse-primary": "#ffb4a7",
+                    "tertiary-fixed-dim": "#7cd0ff",
+                    "primary-fixed": "#ffdad4",
+                    "on-primary-fixed-variant": "#910900",
+                    "state-unassigned": "#FCA5A5",
+                    "secondary-fixed": "#ffdad4",
+                    "on-tertiary-fixed": "#001e2c",
+                    "state-partial": "#FDBA74",
+                    "state-partial-bought": "#93C5FD"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "12px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "gutter": "16px",
+                    "xs": "4px",
+                    "lg": "16px",
+                    "xl": "24px",
+                    "margin-desktop": "32px",
+                    "margin-mobile": "16px",
+                    "sm": "8px",
+                    "md": "12px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Nunito"],
+                    "display-logo": ["Nunito"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Nunito"],
+                    "headline-lg-mobile": ["Nunito"],
+                    "caption": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "display-logo": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-md": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hero-gradient {
+            background: linear-gradient(180deg, rgba(252, 249, 248, 0) 0%, rgba(252, 249, 248, 1) 100%);
+        }
+        .active-interaction:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen">
+<!-- TopNavBar -->
+<nav class="bg-surface border-b border-gray-border docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-md w-full max-w-7xl mx-auto">
+<div class="text-display-logo font-display-logo text-on-surface">hatsik</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 text-label-md font-label-md" href="#">Mis eventos</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 text-label-md font-label-md" href="#">Crear evento</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:block text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 text-label-md font-label-md">Cerrar sesión</button>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4eQwJMqN0CGaPntEfj_11CiyLFg3kQOyYiv2dutXVzfZKdx7VE882Bqy8XNlMbJbfmeFwq6ypZvcOiuQ2OOGsRlG7QKnuv-N4Z7EfmP8anbRB7GELqUGSQPwIZaPoTBRUWms5J_xidEX4mJniS6gnEZIRTgTWsXuLhsAGNL2F9CmFDjWU0uPXBh_otGCVB6lVQv-MQlo1VJ0BoYLzIWS5Oum600oqLCEy5L0Q-zMVUzW-S0t92wsbtNO3FX9GVXCP-u4xn6rZbA-O">
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop py-xl">
+<!-- Welcoming Invitation Card Container -->
+<div class="bg-surface-container-lowest rounded-xl border border-gray-border overflow-hidden flex flex-col md:flex-row transition-all duration-300">
+<!-- Hero Section (Left/Top) -->
+<div class="relative w-full md:w-5/12 h-64 md:h-auto overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A warm and festive gathering of diverse friends sharing a Mediterranean-style meal outdoors. Soft evening golden hour sunlight illuminates a wooden kitchen table filled with tapas, wine, and fresh bread. The atmosphere is joyous and communal, reflecting a soft modern aesthetic with vibrant earth tones and cozy, inviting lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbo71eKcHUG3itC69XxE8WJReg35suvM_o_7dV3dHjXGCH8GsQeMJhBafzg5uhlHACOCUGNdGVD6NWHqpy7KhfiDxb-O-U0X7AH-neuisl1okKYNBtNj4UwDVo5LaKEQNaLJHGcHQcC1PjCiGsRx71b18TV2Hazo6TgPV47PzZ81mU_AZg_6lZSYfvNsirDciIxHSXZJDXNTQhBIn-6NVk64y39wAGxenOgn2c5V6cqfnWJkpvZYP3WH8L19MJT26msRnM9PDTsFdJ">
+<div class="absolute inset-0 hero-gradient md:hidden"></div>
+<div class="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-surface-container-lowest to-transparent hidden md:block"></div>
+</div>
+<!-- Content Area (Right/Bottom) -->
+<div class="w-full md:w-7/12 p-lg md:p-xl flex flex-col justify-between">
+<div>
+<!-- Organizer Badge -->
+<div class="flex items-center gap-sm mb-lg">
+<div class="w-8 h-8 rounded-full overflow-hidden">
+<img alt="Organizado por" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWxwZrnLglWNieI0GDZUOSvJkRJzYrARH-dL5Pk15m3aKXbVWiWsGUvGDIWCwkaQ29JT6ls4AK3Xdgxw1u1j7tq4VnC1StsGsG5HgV-tAc95TyQupk4G3_M_09iqL6y_LtyEIwBtLF_tS3BgOuON1kxdMrlJqN3lTpoemHCWTsn09BBAdqdy47KI6qx8DCaTlC5dmmJ8K3mcU5N-h7v-panL8zx004wgZ0yIslY0ymg6UqD3gUqrqu9i6n6qdoN1BMpc371jHkIPRv">
+</div>
+<span class="text-caption font-caption text-gray-muted">Organizado por <strong class="text-on-surface">Lucía García</strong></span>
+</div>
+<!-- Event Meta -->
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface mb-md">Paella &amp; Amigos: Despedida de Verano</h1>
+<div class="space-y-md mb-xl">
+<div class="flex items-center gap-md text-on-surface-variant">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+<span class="text-body-md font-body-md">Sábado, 21 de Septiembre, 2024</span>
+</div>
+<div class="flex items-center gap-md text-on-surface-variant">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<span class="text-body-md font-body-md">14:00 - 19:00</span>
+</div>
+<div class="flex items-center gap-md text-on-surface-variant">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<span class="text-body-md font-body-md">Terraza de Lucía, Poblenou, Barcelona</span>
+</div>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant mb-xl leading-relaxed">
+                        ¡Hola! Quiero juntar a todos antes de que termine el buen tiempo para compartir una paella colaborativa. Traed ganas de pasar un buen rato y muchas risas.
+                    </p>
+</div>
+<!-- Access Status Section -->
+<div class="bg-coral-soft p-lg rounded-xl mb-xl border border-primary/10">
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">lock</span>
+<div>
+<h3 class="text-label-md font-label-md text-primary mb-xs">Evento Privado</h3>
+<p class="text-caption font-caption text-on-surface-variant">Solicita unirte para ver la lista y organizarte con los demás.</p>
+</div>
+</div>
+</div>
+<!-- Primary Action -->
+<button class="w-full bg-primary text-on-primary font-headline-md text-headline-md py-lg rounded-xl active-interaction transition-transform shadow-sm hover:bg-secondary" id="requestBtn">
+                    Solicitar entrada
+                </button>
+</div>
+</div>
+<!-- Footer / Trust Badges -->
+<div class="mt-xl text-center">
+<p class="text-caption font-caption text-gray-muted">hatsik • Logística colaborativa para tus momentos especiales</p>
+</div>
+</main>
+<script>
+        document.getElementById('requestBtn').addEventListener('click', function() {
+            const btn = this;
+            btn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="material-symbols-outlined animate-spin">refresh</span> Procesando...</span>';
+            btn.disabled = true;
+            btn.classList.add('opacity-80');
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="material-symbols-outlined">check_circle</span> Solicitud enviada</span>';
+                btn.classList.replace('bg-primary', 'bg-state-bought');
+                btn.classList.replace('hover:bg-secondary', 'hover:bg-state-bought');
+            }, 1500);
+        });
+    </script>
+</body></html>

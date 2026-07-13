@@ -1,0 +1,223 @@
+<!DOCTYPE html><html class="light" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Hatsik - Iniciar Sesión</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#ffb4a6",
+                    "surface-dim": "#dcd9d9",
+                    "surface-tint": "#b8200e",
+                    "primary": "#b51d0c",
+                    "outline": "#8f706a",
+                    "surface-container": "#f0eded",
+                    "inverse-surface": "#313030",
+                    "on-background": "#1c1b1b",
+                    "outline-variant": "#e4beb7",
+                    "on-error-container": "#93000a",
+                    "coral-soft": "#FDE8E4",
+                    "on-secondary-fixed": "#3f0200",
+                    "secondary": "#a93624",
+                    "on-primary-fixed-variant": "#910900",
+                    "tertiary-container": "#007da9",
+                    "state-covered": "#86EFAC",
+                    "primary-fixed-dim": "#ffb4a7",
+                    "primary-container": "#d83823",
+                    "on-primary-fixed": "#400200",
+                    "state-partial": "#FDBA74",
+                    "state-bought": "#4ADE80",
+                    "secondary-fixed": "#ffdad4",
+                    "surface-container-highest": "#e5e2e1",
+                    "primary-fixed": "#ffdad4",
+                    "on-secondary-container": "#6f0a01",
+                    "inverse-on-surface": "#f3f0ef",
+                    "on-tertiary-fixed": "#001e2c",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#ffb4a7",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#c4e7ff",
+                    "surface-variant": "#e5e2e1",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#7cd0ff",
+                    "gray-muted": "#6B7280",
+                    "secondary-container": "#fd735c",
+                    "surface-bright": "#fcf9f8",
+                    "on-surface": "#1c1b1b",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#fcfcff",
+                    "gray-border": "#E5E7EB",
+                    "surface-container-high": "#eae7e7",
+                    "surface": "#fcf9f8",
+                    "background": "#fcf9f8",
+                    "state-unassigned": "#FCA5A5",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#004c69",
+                    "on-surface-variant": "#5b403b",
+                    "on-primary-container": "#fffbff",
+                    "tertiary": "#006387",
+                    "state-partial-bought": "#93C5FD",
+                    "on-secondary-fixed-variant": "#881e0f",
+                    "surface-container-low": "#f6f3f2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "xl": "24px",
+                    "xs": "4px",
+                    "margin-desktop": "32px",
+                    "gutter": "16px",
+                    "margin-mobile": "16px",
+                    "lg": "16px",
+                    "sm": "8px",
+                    "md": "12px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Nunito"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "display-logo": ["Nunito"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Nunito"],
+                    "headline-lg-mobile": ["Nunito"]
+            },
+            "fontSize": {
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "display-logo": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-md": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fcf9f8;
+            -webkit-font-smoothing: antialiased;
+        }
+        .hatsik-input {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hatsik-input:focus {
+            box-shadow: 0 0 0 4px rgba(216, 56, 35, 0.1);
+            border-color: #d83823;
+        }
+        .btn-active-state:active {
+            transform: scale(0.96);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-margin-mobile">
+<!-- Main Container -->
+<main class="w-full max-w-[420px] bg-surface-container-lowest rounded-[24px] p-xl flex flex-col items-center gap-xl">
+<!-- Logo Section -->
+<div class="flex flex-col items-center gap-md">
+<div class="w-24 h-24 overflow-hidden rounded-xl">
+<img alt="Hatsik Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD_YDa50roOC5irtilxu1aSNslq8agYicmnJduXQc79iB6bpGwGXgwM28NvbT_kTzD47CitDdXhQVmvAE6LZU8RVO7rxo4ZdrpZI3HDOwLsao9orBK-gP6mWQWWvPKJlcIoawHJxvlgTNAsRPm-usLYxPE02WcOfxGZzplSQhkrzy2OD0VqYmQLqoTQEQqAa5KM-kXddlf5Mo__Z0TAUTRV4mbvZxoF8Bo4ep2qFUxVMTzkpbeZhXUt7bdS1kamHMTbxxobq9z-ha3">
+</div>
+<div class="text-center">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Bienvenido a Hatsik</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Logística colaborativa hecha fácil.</p>
+</div>
+</div>
+<!-- Form Section -->
+<form class="w-full flex flex-col gap-lg" onsubmit="event.preventDefault();">
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant px-sm" for="email">Correo electrónico</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
+<input class="hatsik-input w-full pl-12 pr-4 py-3.5 bg-surface-container-low border border-gray-border rounded-full font-body-md text-body-md focus:outline-none placeholder:text-gray-muted" id="email" placeholder="nombre@ejemplo.com" type="email">
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant px-sm" for="password">Contraseña</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
+<input class="hatsik-input w-full pl-12 pr-12 py-3.5 bg-surface-container-low border border-gray-border rounded-full font-body-md text-body-md focus:outline-none placeholder:text-gray-muted" id="password" placeholder="••••••••" type="password">
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+<div class="flex justify-end px-sm">
+<a class="font-label-md text-label-md text-primary hover:underline transition-all" href="#">¿Olvidaste tu contraseña?</a>
+</div>
+</div>
+<button class="btn-active-state w-full py-4 bg-primary text-on-primary font-headline-md text-headline-md rounded-full shadow-sm hover:bg-primary-container transition-all flex items-center justify-center gap-sm" type="submit">
+                Entrar
+                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</form>
+<!-- Divider -->
+<div class="w-full flex items-center gap-md">
+<div class="h-[1px] flex-1 bg-gray-border"></div>
+<span class="font-caption text-caption text-gray-muted">O</span>
+<div class="h-[1px] flex-1 bg-gray-border"></div>
+</div>
+<!-- Social/Secondary Section -->
+<div class="w-full flex flex-col gap-md">
+<button class="btn-active-state w-full py-3 bg-surface-container-lowest border border-gray-border text-on-surface font-body-lg text-body-lg rounded-full flex items-center justify-center gap-md hover:bg-surface-container-low transition-all">
+<img alt="Google Logo" class="w-5 h-5" data-alt="Icon representation of the Google brand logo for authentication purposes, colorful and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAy4U4cSK4tDi4GUQVD-vEPd45iBE1sLktF_K0yl-kdJ_8VRuYM7-sOVj83Dd5rhioH_E3iCXlNVZoxjkFmYHvnbWS0u-iiaZFQH7jxHmNAqjaNlIOgBh9OgGVs3iQE7vWB7RFktIoD-nr0kFI7E4bBlgyndiBr67s92HyW4M1HQToLvpQPh4Vdq9JvmPQoeZZMsFZOlEdhr9xCk3ylOF1EQDMsCgdSQ1tbo1zM6eubtfsPyQ2BiOT0nFu_vB1NWa744BzwtlCo4FrK">
+                Continuar con Google
+            </button>
+<p class="font-body-md text-body-md text-on-surface-variant text-center">
+                ¿Aún no tienes cuenta? 
+                <a class="text-primary font-bold hover:underline transition-all" href="#">Crear cuenta</a>
+</p>
+</div>
+</main>
+<!-- Footer Decoration (Warm atmosphere) -->
+<footer class="mt-xl text-center">
+<div class="flex items-center gap-xs text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="font-caption text-caption">Organiza con cariño</span>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for password visibility toggle
+        const toggleBtn = document.querySelector('button[type="button"]');
+        const passInput = document.getElementById('password');
+        const icon = toggleBtn.querySelector('.material-symbols-outlined');
+
+        toggleBtn.addEventListener('click', () => {
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                passInput.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        });
+
+        // Atmosphere effect: subtle parallax on the card
+        document.addEventListener('mousemove', (e) => {
+            const card = document.querySelector('main');
+            const { clientX, clientY } = e;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            const moveX = (clientX - centerX) / 100;
+            const moveY = (clientY - centerY) / 100;
+            
+            card.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+    </script>
+</body></html>
