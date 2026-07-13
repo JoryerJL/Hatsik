@@ -27,6 +27,37 @@ def event_owner_required(view_func):
     return wrapper
 
 
+def event_admin_required(view_func):
+    """Require that request.user is the event owner or an accepted co-admin.
+
+    Fetches Event by `pk` kwarg, verifies user is owner or has an
+    EventParticipation with role='co_admin' and access_status='accepted'.
+    Returns 403 if neither condition is met.
+    Injects `event` into kwargs for the wrapped view.
+    """
+
+    @functools.wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        pk = kwargs.pop("pk")
+        event = get_object_or_404(Event, pk=pk)
+        if request.user == event.owner_user:
+            kwargs["event"] = event
+            return view_func(request, *args, **kwargs)
+        # Check if co-admin
+        is_co_admin = EventParticipation.objects.filter(
+            event=event,
+            user=request.user,
+            role="co_admin",
+            access_status=AccessStatus.ACCEPTED,
+        ).exists()
+        if is_co_admin:
+            kwargs["event"] = event
+            return view_func(request, *args, **kwargs)
+        return HttpResponseForbidden()
+
+    return wrapper
+
+
 def participant_required(view_func):
     """Require that request.user is an accepted participant of the event.
 
