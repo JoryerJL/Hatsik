@@ -2,9 +2,11 @@
 
 from decimal import Decimal
 
+from django.db import transaction
 from django.db.models import Count, Q, Sum
+from django.utils import timezone
 
-from apps.events.models import EventStatus
+from apps.events.models import AccessStatus, EventParticipation, EventStatus
 from apps.items.models import EventItem, ItemAssignment
 
 
@@ -291,3 +293,272 @@ def _get_assigned_sum(item) -> Decimal:
         item=item, cancelled_at__isnull=True
     ).aggregate(total=Sum("quantity_assigned"))
     return result["total"] or Decimal("0")
+
+
+# --- Assignment Operations ---
+
+# Allowed actions per event status
+_ALLOWED_ACTIONS = {
+    EventStatus.ACTIVE: {"claim", "modify", "cancel", "purchase"},
+    EventStatus.CLOSED: {"purchase"},
+    EventStatus.CANCELLED: set(),
+}
+
+
+def _check_event_allows_action(event, action: str) -> None:
+    """Raise ItemError if event status blocks the action.
+
+    Args:
+        event: The event to check.
+        action: One of "claim", "modify", "cancel", "purchase".
+
+    Raises:
+        ItemError: With a user-facing Spanish message.
+    """
+    allowed = _ALLOWED_ACTIONS.get(event.status, set())
+    if action not in allowed:
+        messages = {
+            "claim": "No se pueden tomar ítems en un evento cerrado o cancelado.",
+            "modify": "No se pueden modificar asignaciones en un evento cerrado o cancelado.",
+            "cancel": "No se pueden cancelar asignaciones en un evento cerrado o cancelado.",
+            "purchase": "No se pueden marcar compras en un evento cancelado.",
+        }
+        raise ItemError(messages.get(action, "Acción no permitida."))
+
+
+def _check_user_is_participant(event, user) -> None:
+    """Raise ItemError if user is not an accepted participant."""
+    exists = EventParticipation.objects.filter(
+        event=event, user=user, access_status=AccessStatus.ACCEPTED
+    ).exists()
+    if not exists:
+        raise ItemError("Solo los participantes confirmados pueden realizar esta acción.")
+
+
+def get_available_quantity(item) -> Decimal | None:
+    """Return the remaining claimable quantity for an item.
+
+    Returns None for binary items (no quantity concept).
+    For quantified items, returns quantity_total - sum of active assignments.
+    """
+    if item.quantity_total is None:
+        return None
+
+    assigned = _get_assigned_sum(item)
+    return item.quantity_total - assigned
+
+
+def claim_item(item, user, *, quantity_assigned=None) -> ItemAssignment:
+    """Claim an item (or a portion of it) for a participant.
+
+    Args:
+        item: The EventItem to claim.
+        user: The participant claiming the item.
+        quantity_assigned: Amount to claim (required for quantified items, None for binary).
+
+    Returns:
+        The created ItemAssignment.
+
+    Raises:
+        ItemError: If validation fails.
+    """
+    event = item.event
+    _check_event_allows_action(event, "claim")
+    _check_user_is_participant(event, user)
+
+    # Check for existing active assignment (redundant with DB constraint but better UX)
+    if ItemAssignment.objects.filter(
+        item=item, user=user, cancelled_at__isnull=True
+    ).exists():
+        raise ItemError("Ya tenés una asignación activa para este ítem.")
+
+    if item.quantity_total is not None:
+        # Quantified item
+        if quantity_assigned is None or quantity_assigned <= 0:
+            raise ItemError("La cantidad debe ser mayor a cero.")
+
+        with transaction.atomic():
+            # Lock item row to prevent race condition
+            locked_item = EventItem.objects.select_for_update().get(pk=item.pk)
+            available = get_available_quantity(locked_item)
+            if quantity_assigned > available:
+                raise ItemError(
+                    f"Cantidad no disponible. Máximo: {available} {locked_item.unit}."
+                )
+
+            return ItemAssignment.objects.create(
+                item=locked_item,
+                user=user,
+                quantity_assigned=quantity_assigned,
+            )
+    else:
+        # Binary item
+        if quantity_assigned is not None:
+            raise ItemError("Los ítems binarios no tienen cantidad.")
+
+        # Check if item is already fully covered (has any active assignment)
+        if ItemAssignment.objects.filter(
+            item=item, cancelled_at__isnull=True
+        ).exists():
+            raise ItemError("Este ítem ya fue tomado por otro participante.")
+
+        return ItemAssignment.objects.create(
+            item=item,
+            user=user,
+            quantity_assigned=None,
+        )
+
+
+def modify_assignment(assignment, user, *, quantity_assigned) -> ItemAssignment:
+    """Modify the quantity of an existing assignment.
+
+    Args:
+        assignment: The ItemAssignment to modify.
+        user: The user performing the modification (must be the assignee).
+        quantity_assigned: New quantity.
+
+    Returns:
+        The updated ItemAssignment.
+
+    Raises:
+        ItemError: If validation fails.
+    """
+    item = assignment.item
+    event = item.event
+    _check_event_allows_action(event, "modify")
+
+    if assignment.user != user:
+        raise ItemError("Solo podés modificar tus propias asignaciones.")
+
+    if assignment.purchased_at is not None:
+        raise ItemError("No se puede modificar una asignación ya comprada.")
+
+    if assignment.cancelled_at is not None:
+        raise ItemError("No se puede modificar una asignación cancelada.")
+
+    if item.quantity_total is None:
+        raise ItemError("Los ítems binarios no tienen cantidad para modificar.")
+
+    if quantity_assigned is None or quantity_assigned <= 0:
+        raise ItemError("La cantidad debe ser mayor a cero.")
+
+    with transaction.atomic():
+        locked_item = EventItem.objects.select_for_update().get(pk=item.pk)
+        # Available = total - other active assignments (excluding current)
+        others_sum = (
+            ItemAssignment.objects.filter(
+                item=locked_item, cancelled_at__isnull=True
+            )
+            .exclude(pk=assignment.pk)
+            .aggregate(total=Sum("quantity_assigned"))["total"]
+            or Decimal("0")
+        )
+        available = locked_item.quantity_total - others_sum
+        if quantity_assigned > available:
+            raise ItemError(
+                f"Cantidad no disponible. Máximo: {available} {locked_item.unit}."
+            )
+
+        assignment.quantity_assigned = quantity_assigned
+        assignment.save(update_fields=["quantity_assigned", "updated_at"])
+
+    return assignment
+
+
+def cancel_assignment(assignment, user) -> ItemAssignment:
+    """Cancel an assignment (own or owner cancels others).
+
+    Args:
+        assignment: The ItemAssignment to cancel.
+        user: The user performing the cancellation.
+
+    Returns:
+        The updated ItemAssignment.
+
+    Raises:
+        ItemError: If validation fails.
+    """
+    item = assignment.item
+    event = item.event
+    _check_event_allows_action(event, "cancel")
+
+    if assignment.purchased_at is not None:
+        raise ItemError("No se puede cancelar una asignación ya comprada.")
+
+    if assignment.cancelled_at is not None:
+        raise ItemError("Esta asignación ya fue cancelada.")
+
+    # Permission: own assignment OR event owner
+    is_own = assignment.user == user
+    is_owner = event.owner_user == user
+    if not is_own and not is_owner:
+        raise ItemError("No tenés permiso para cancelar esta asignación.")
+
+    assignment.cancelled_at = timezone.now()
+    assignment.cancelled_by_user = user
+    assignment.save(update_fields=["cancelled_at", "cancelled_by_user", "updated_at"])
+    return assignment
+
+
+def mark_as_purchased(assignment, user) -> ItemAssignment:
+    """Mark an assignment as purchased.
+
+    Args:
+        assignment: The ItemAssignment to mark.
+        user: The user marking it (assignee, owner, or co-admin).
+
+    Returns:
+        The updated ItemAssignment.
+
+    Raises:
+        ItemError: If validation fails.
+    """
+    item = assignment.item
+    event = item.event
+    _check_event_allows_action(event, "purchase")
+
+    if assignment.purchased_at is not None:
+        raise ItemError("Esta asignación ya fue marcada como comprada.")
+
+    if assignment.cancelled_at is not None:
+        raise ItemError("No se puede marcar como comprada una asignación cancelada.")
+
+    # Permission: own assignment OR event admin (owner/co-admin)
+    is_own = assignment.user == user
+    is_admin = EventParticipation.objects.filter(
+        event=event,
+        user=user,
+        access_status=AccessStatus.ACCEPTED,
+        role__in=["owner", "co_admin"],
+    ).exists()
+
+    if not is_own and not is_admin:
+        raise ItemError("No tenés permiso para marcar esta asignación como comprada.")
+
+    assignment.purchased_at = timezone.now()
+    assignment.purchased_by_user = user
+    assignment.save(update_fields=["purchased_at", "purchased_by_user", "updated_at"])
+    return assignment
+
+
+def compute_event_progress(event) -> dict:
+    """Compute overall event progress based on item coverage.
+
+    Returns dict with:
+        - percentage: int (0-100)
+        - covered: number of items with status >= cubierto
+        - total: total item count
+    """
+    items = get_items_with_status(event)
+    total = items.count()
+    if total == 0:
+        return {"percentage": 0, "covered": 0, "total": total}
+
+    covered = 0
+    for item in items:
+        status = get_computed_status_from_annotations(item)
+        if status in (STATUS_COVERED, STATUS_PARTIALLY_BOUGHT, STATUS_BOUGHT):
+            covered += 1
+
+    percentage = int((covered / total) * 100)
+    return {"percentage": percentage, "covered": covered, "total": total}
