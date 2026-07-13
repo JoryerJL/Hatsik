@@ -11,9 +11,7 @@
         <!-- Hero Section (Left) -->
         <div class="relative w-full md:w-5/12 h-64 md:h-auto overflow-hidden bg-[var(--color-coral-soft)] flex items-center justify-center">
             <span class="material-symbols-outlined text-[var(--color-primary)] text-7xl opacity-60">celebration</span>
-            <!-- Fade edge for desktop -->
             <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[var(--color-surface-container-lowest)] to-transparent hidden md:block"></div>
-            <!-- Fade edge for mobile -->
             <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--color-surface-container-lowest)] to-transparent md:hidden"></div>
         </div>
 
@@ -60,24 +58,36 @@
                     <div>
                         <h3 class="text-[15px] leading-[20px] font-semibold text-[var(--color-primary)] mb-[var(--space-xs)]">Evento Privado</h3>
                         <p class="text-[12px] leading-[16px] text-[var(--color-on-surface-variant)]">
-                            Solicita unirte para ver la lista y organizarte con los demás.
+                            Solicitá unirte para ver la lista y organizarte con los demás.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Primary Action (disabled for Phase 3) -->
-            <button
-                type="button"
-                disabled
-                class="w-full bg-[var(--color-primary)] text-[var(--color-on-primary)] font-[var(--font-heading)] text-[20px] leading-[28px] font-bold py-[var(--space-lg)] rounded-[12px] opacity-60 cursor-not-allowed"
-                title="Disponible próximamente"
-            >
-                Solicitar entrada
-            </button>
+            {% if can_join %}
+            <!-- Join Request Form -->
+            <form method="post" action="{% url 'events:request_to_join' token=event.public_share_token %}">
+                {% csrf_token %}
+                <button
+                    type="submit"
+                    class="w-full bg-[var(--color-primary)] text-[var(--color-on-primary)] font-[var(--font-heading)] text-[20px] leading-[28px] font-bold py-[var(--space-lg)] rounded-[12px] hover:opacity-90 active:scale-[0.98] transition-all shadow-sm"
+                >
+                    Solicitar unirme
+                </button>
+            </form>
             <p class="text-[12px] leading-[16px] text-[var(--color-gray-muted)] text-center mt-[var(--space-sm)]">
-                Próximamente podrás solicitar unirte a eventos.
+                El organizador revisará tu solicitud.
             </p>
+            {% else %}
+            <!-- Event closed/cancelled — cannot join -->
+            <div class="w-full bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)] font-[var(--font-heading)] text-[16px] leading-[24px] font-semibold py-[var(--space-lg)] rounded-[12px] text-center border border-[var(--color-gray-border)]">
+                <span class="material-symbols-outlined text-base align-middle mr-1">block</span>
+                Este evento ya no acepta solicitudes
+            </div>
+            <p class="text-[12px] leading-[16px] text-[var(--color-gray-muted)] text-center mt-[var(--space-sm)]">
+                El evento fue {{ event.get_status_display|lower }}.
+            </p>
+            {% endif %}
         </div>
     </div>
 

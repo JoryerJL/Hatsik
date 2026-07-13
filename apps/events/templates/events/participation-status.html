@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if participation.access_status == "pending" %}Solicitud Pendiente{% else %}Solicitud Rechazada{% endif %} — Hatsik
+{% endblock %}
+
+{% block content %}
+<main class="flex flex-col items-center justify-center px-[var(--space-margin-mobile)] py-[var(--space-xl)] min-h-[calc(100vh-80px)]">
+    <div class="w-full max-w-lg">
+
+        <!-- Central Card: Status Feedback -->
+        <div class="bg-[var(--color-surface-container-lowest)] border border-[var(--color-gray-border)] rounded-[12px] p-[var(--space-xl)] shadow-sm text-center mb-[var(--space-xl)]">
+
+            {% if participation.access_status == "pending" %}
+            <!-- Pending State -->
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[var(--color-coral-soft)] text-[var(--color-primary)] mb-[var(--space-lg)]">
+                <span class="material-symbols-outlined text-5xl">schedule</span>
+            </div>
+            <h1 class="font-[var(--font-heading)] text-[24px] leading-[32px] md:text-[28px] md:leading-[36px] font-bold text-[var(--color-on-surface)] mb-[var(--space-sm)]">
+                ¡Solicitud enviada!
+            </h1>
+            <p class="text-[16px] leading-[24px] font-semibold text-[var(--color-on-surface-variant)] max-w-xs mx-auto">
+                Solo falta que el organizador te acepte para empezar a colaborar.
+            </p>
+
+            {% else %}
+            <!-- Rejected State -->
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[var(--color-error-container)] text-[var(--color-error)] mb-[var(--space-lg)]">
+                <span class="material-symbols-outlined text-5xl">block</span>
+            </div>
+            <h1 class="font-[var(--font-heading)] text-[24px] leading-[32px] md:text-[28px] md:leading-[36px] font-bold text-[var(--color-on-surface)] mb-[var(--space-sm)]">
+                Solicitud rechazada
+            </h1>
+            <p class="text-[16px] leading-[24px] font-semibold text-[var(--color-on-surface-variant)] max-w-xs mx-auto">
+                El organizador no aprobó tu solicitud para este evento.
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Event Context Card (The "Sticky Note") -->
+        <div class="bg-[var(--color-surface-container-lowest)] border border-[var(--color-gray-border)] rounded-[12px] p-[var(--space-lg)] shadow-sm relative overflow-hidden">
+            <!-- Status Strip -->
+            {% if participation.access_status == "pending" %}
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--color-secondary-container)]"></div>
+            {% else %}
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--color-error)]"></div>
+            {% endif %}
+
+            <div class="flex flex-col gap-[var(--space-md)]">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span class="text-[12px] leading-[16px] text-[var(--color-secondary)] uppercase tracking-wider font-semibold">
+                            Detalles del Evento
+                        </span>
+                        <h2 class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold text-[var(--color-on-surface)]">
+                            {{ event.name }}
+                        </h2>
+                    </div>
+                    <div class="bg-[var(--color-surface-container)] border border-[var(--color-gray-border)] rounded-full px-[var(--space-md)] py-1">
+                        <span class="text-[12px] leading-[16px] text-[var(--color-on-surface-variant)]">
+                            {% if participation.access_status == "pending" %}Pendiente{% else %}Rechazada{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-[var(--space-md)] pt-[var(--space-xs)]">
+                    <div class="flex items-center gap-[var(--space-sm)]">
+                        <span class="material-symbols-outlined text-[var(--color-primary)] text-[20px]">calendar_today</span>
+                        <div class="flex flex-col">
+                            <span class="text-[12px] leading-[16px] text-[var(--color-gray-muted)]">Fecha</span>
+                            <span class="text-[15px] leading-[20px] font-semibold">{{ event.event_date }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-[var(--space-sm)]">
+                        <span class="material-symbols-outlined text-[var(--color-primary)] text-[20px]">person</span>
+                        <div class="flex flex-col">
+                            <span class="text-[12px] leading-[16px] text-[var(--color-gray-muted)]">Organizador</span>
+                            <span class="text-[15px] leading-[20px] font-semibold">{{ event.owner_user.display_name }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-[var(--space-xs)] pt-[var(--space-md)] border-t border-[var(--color-gray-border)] flex items-center gap-[var(--space-sm)]">
+                    <span class="material-symbols-outlined text-[var(--color-gray-muted)] text-[20px]">lock</span>
+                    <p class="text-[12px] leading-[16px] text-[var(--color-gray-muted)]">
+                        La lista de elementos será visible una vez seas aceptado.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-[var(--space-xl)] flex flex-col gap-[var(--space-md)]">
+            <a
+                href="{% url 'events:dashboard' %}"
+                class="bg-[var(--color-primary)] text-[var(--color-on-primary)] py-[var(--space-lg)] rounded-[12px] font-semibold text-[15px] leading-[20px] text-center hover:opacity-90 active:scale-[0.98] transition-all shadow-sm block"
+            >
+                Mis eventos
+            </a>
+            <p class="text-center text-[12px] leading-[16px] text-[var(--color-gray-muted)]">
+                {% if participation.access_status == "pending" %}
+                Te notificaremos vía email cuando haya noticias.
+                {% else %}
+                Contactá al organizador si creés que fue un error.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Visual Flourish -->
+    <div class="fixed bottom-0 left-0 p-[var(--space-xl)] hidden lg:block opacity-20 pointer-events-none">
+        <div class="w-32 h-32 rounded-[12px] bg-[var(--color-coral-soft)] rotate-12"></div>
+    </div>
+</main>
+{% endblock %}

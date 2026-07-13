@@ -55,6 +55,12 @@
                     <span class="material-symbols-outlined text-lg">calendar_today</span>
                     <span class="text-[14px] leading-[20px]">{{ item.event.event_date }}</span>
                 </div>
+                {% if item.pending_count > 0 %}
+                <div class="flex items-center gap-[var(--space-xs)] text-[var(--color-primary)]">
+                    <span class="material-symbols-outlined text-lg">group_add</span>
+                    <span class="text-[12px] leading-[16px] font-bold">{{ item.pending_count }} solicitud{{ item.pending_count|pluralize:"es" }} pendiente{{ item.pending_count|pluralize:"s" }}</span>
+                </div>
+                {% endif %}
             </div>
             <div class="flex items-center justify-between mt-auto pt-[var(--space-md)]">
                 <div class="flex -space-x-2">

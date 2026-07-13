@@ -5,17 +5,26 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from apps.events.decorators import event_owner_required, participant_required
+from apps.events.decorators import (
+    event_admin_required,
+    event_owner_required,
+    participant_required,
+)
 from apps.events.forms import CreateEventForm, EditEventForm
 from apps.events.models import AccessStatus, EventParticipation
 from apps.events.services import (
+    approve_request,
     cancel_event,
     close_event,
+    correct_rejection,
     create_event,
     demote_co_admin,
+    leave_event,
     promote_to_co_admin,
+    reject_request,
     remove_participant,
     reopen_event,
+    request_to_join,
 )
 
 
@@ -33,11 +42,17 @@ def dashboard_view(request):
     )
     events_data = []
     for p in participations:
+        pending_count = 0
+        if p.role in ("owner", "co_admin"):
+            pending_count = EventParticipation.objects.filter(
+                event=p.event, access_status=AccessStatus.PENDING
+            ).count()
         events_data.append(
             {
                 "event": p.event,
                 "role": p.role,
                 "participation": p,
+                "pending_count": pending_count,
             }
         )
     return render(
@@ -85,6 +100,19 @@ def event_detail_view(request, event, participation):
         .order_by("created_at")
     )
     is_owner = request.user == event.owner_user
+    is_admin = is_owner or participation.role == "co_admin"
+    pending_count = 0
+    pending_requests = []
+    if is_admin:
+        pending_qs = (
+            EventParticipation.objects.filter(
+                event=event, access_status=AccessStatus.PENDING
+            )
+            .select_related("user")
+            .order_by("requested_at")
+        )
+        pending_requests = list(pending_qs)
+        pending_count = len(pending_requests)
     return render(
         request,
         "events/event-detail.html",
@@ -93,6 +121,9 @@ def event_detail_view(request, event, participation):
             "participation": participation,
             "participants": participants,
             "is_owner": is_owner,
+            "is_admin": is_admin,
+            "pending_count": pending_count,
+            "pending_requests": pending_requests,
         },
     )
 
@@ -262,24 +293,207 @@ def demote_participant_view(request, event, participation_id):
 @login_required
 @require_GET
 def public_card_view(request, token):
-    """Public-facing event card accessed via share link."""
-    from apps.events.models import Event
+    """Public-facing event card accessed via share link.
+
+    Handles multiple participation states:
+    - No participation / left / removed → show join button
+    - Pending / rejected → redirect to status page
+    - Accepted → redirect to event detail
+    - Closed/cancelled event → show card without join button
+    """
+    from apps.events.models import Event, EventStatus
 
     event = get_object_or_404(Event, public_share_token=token)
 
-    # If user is already an accepted participant, redirect to detail
     existing = EventParticipation.objects.filter(
         event=event,
         user=request.user,
-        access_status=AccessStatus.ACCEPTED,
     ).first()
+
     if existing:
-        return redirect("events:detail", pk=event.pk)
+        if existing.access_status == AccessStatus.ACCEPTED:
+            return redirect("events:detail", pk=event.pk)
+        if existing.access_status in (AccessStatus.PENDING, AccessStatus.REJECTED):
+            return redirect("events:participation_status", pk=event.pk)
+        # LEFT or REMOVED — allow re-request (fall through to show card)
+
+    # Determine if user can request to join
+    can_join = event.status == EventStatus.ACTIVE
 
     return render(
         request,
         "events/event-card-public.html",
         {
             "event": event,
+            "can_join": can_join,
         },
     )
+
+
+@login_required
+@require_POST
+def request_to_join_view(request, token):
+    """Handle join request submission."""
+    from apps.events.models import Event
+
+    event = get_object_or_404(Event, public_share_token=token)
+
+    try:
+        request_to_join(request.user, event)
+        messages.success(
+            request, "¡Solicitud enviada! El organizador revisará tu pedido."
+        )
+    except ValueError as e:
+        messages.error(request, str(e))
+        return redirect("events:public_card", token=token)
+
+    return redirect("events:participation_status", pk=event.pk)
+
+
+@login_required
+@require_GET
+def participation_status_view(request, pk):
+    """Show pending or rejected participation status."""
+    from apps.events.models import Event
+
+    event = get_object_or_404(Event, pk=pk)
+    participation = EventParticipation.objects.filter(
+        event=event,
+        user=request.user,
+    ).first()
+
+    if not participation or participation.access_status == AccessStatus.ACCEPTED:
+        return redirect("events:detail", pk=event.pk)
+
+    if participation.access_status in (AccessStatus.LEFT, AccessStatus.REMOVED):
+        return redirect("events:public_card", token=event.public_share_token)
+
+    return render(
+        request,
+        "events/participation-status.html",
+        {
+            "event": event,
+            "participation": participation,
+        },
+    )
+
+
+@login_required
+@event_admin_required
+@require_GET
+def manage_requests_view(request, event):
+    """List pending (and rejected) requests for Owner/Co-admin."""
+    pending = (
+        EventParticipation.objects.filter(
+            event=event,
+            access_status=AccessStatus.PENDING,
+        )
+        .select_related("user")
+        .order_by("requested_at")
+    )
+    rejected = (
+        EventParticipation.objects.filter(
+            event=event,
+            access_status=AccessStatus.REJECTED,
+        )
+        .select_related("user")
+        .order_by("-responded_at")[:10]
+    )
+    return render(
+        request,
+        "events/manage-requests.html",
+        {
+            "event": event,
+            "pending_requests": pending,
+            "rejected_requests": rejected,
+        },
+    )
+
+
+@login_required
+@event_admin_required
+@require_POST
+def approve_request_view(request, event, participation_id):
+    """Approve a pending join request."""
+    participation = get_object_or_404(
+        EventParticipation, pk=participation_id, event=event
+    )
+    try:
+        approve_request(participation)
+        messages.success(request, f"{participation.user.display_name} fue aceptado.")
+    except ValueError as e:
+        messages.error(request, str(e))
+
+    # HTMX support: return partial if HTMX request
+    if request.headers.get("HX-Request"):
+        pending_count = EventParticipation.objects.filter(
+            event=event, access_status=AccessStatus.PENDING
+        ).count()
+        return render(
+            request,
+            "events/partials/_request_row_empty.html",
+            {"pending_count": pending_count},
+        )
+    return redirect("events:manage_requests", pk=event.pk)
+
+
+@login_required
+@event_admin_required
+@require_POST
+def reject_request_view(request, event, participation_id):
+    """Reject a pending join request."""
+    participation = get_object_or_404(
+        EventParticipation, pk=participation_id, event=event
+    )
+    try:
+        reject_request(participation)
+        messages.success(request, f"{participation.user.display_name} fue rechazado.")
+    except ValueError as e:
+        messages.error(request, str(e))
+
+    # HTMX support
+    if request.headers.get("HX-Request"):
+        pending_count = EventParticipation.objects.filter(
+            event=event, access_status=AccessStatus.PENDING
+        ).count()
+        return render(
+            request,
+            "events/partials/_request_row_empty.html",
+            {"pending_count": pending_count},
+        )
+    return redirect("events:manage_requests", pk=event.pk)
+
+
+@login_required
+@event_admin_required
+@require_POST
+def correct_rejection_view(request, event, participation_id):
+    """Correct a rejected request to accepted."""
+    participation = get_object_or_404(
+        EventParticipation, pk=participation_id, event=event
+    )
+    try:
+        correct_rejection(participation)
+        messages.success(
+            request, f"{participation.user.display_name} fue aceptado (corrección)."
+        )
+    except ValueError as e:
+        messages.error(request, str(e))
+
+    if request.headers.get("HX-Request"):
+        return render(request, "events/partials/_request_row_empty.html", {})
+    return redirect("events:manage_requests", pk=event.pk)
+
+
+@login_required
+@participant_required
+@require_POST
+def leave_event_view(request, event, participation):
+    """Leave an event voluntarily."""
+    try:
+        leave_event(participation)
+        messages.success(request, "Abandonaste el evento.")
+    except ValueError as e:
+        messages.error(request, str(e))
+        return redirect("events:detail", pk=event.pk)
+    return redirect("events:dashboard")
