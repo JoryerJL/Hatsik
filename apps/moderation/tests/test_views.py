@@ -123,9 +123,7 @@ class SuggestItemViewTests(ModerationViewTestBase):
             },
         )
         self.assertEqual(response.status_code, 302)
-        suggestion = ItemSuggestion.objects.get(
-            event=self.event, name="Coca-Cola"
-        )
+        suggestion = ItemSuggestion.objects.get(event=self.event, name="Coca-Cola")
         self.assertEqual(suggestion.suggested_by_user, self.participant)
         self.assertEqual(suggestion.quantity_total, Decimal("6"))
         self.assertEqual(suggestion.unit, ItemUnit.LITERS)
@@ -139,9 +137,7 @@ class SuggestItemViewTests(ModerationViewTestBase):
             data={"name": "Mantel", "quantity_total": "", "unit": ""},
         )
         self.assertEqual(response.status_code, 302)
-        suggestion = ItemSuggestion.objects.get(
-            event=self.event, name="Mantel"
-        )
+        suggestion = ItemSuggestion.objects.get(event=self.event, name="Mantel")
         self.assertIsNone(suggestion.quantity_total)
         self.assertIsNone(suggestion.unit)
 
@@ -266,21 +262,15 @@ class DeleteSuggestionViewTests(ModerationViewTestBase):
         self.client.login(email="participant@test.com", password="testpass123")
         response = self.client.post(self.get_url())
         self.assertEqual(response.status_code, 302)
-        self.assertFalse(
-            ItemSuggestion.objects.filter(pk=self.suggestion.pk).exists()
-        )
+        self.assertFalse(ItemSuggestion.objects.filter(pk=self.suggestion.pk).exists())
 
     def test_post_htmx_returns_empty(self):
         """HTMX delete returns empty response."""
         self.client.login(email="participant@test.com", password="testpass123")
-        response = self.client.post(
-            self.get_url(), HTTP_HX_REQUEST="true"
-        )
+        response = self.client.post(self.get_url(), HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"")
-        self.assertFalse(
-            ItemSuggestion.objects.filter(pk=self.suggestion.pk).exists()
-        )
+        self.assertFalse(ItemSuggestion.objects.filter(pk=self.suggestion.pk).exists())
 
     def test_post_404_for_other_users_suggestion(self):
         """Cannot delete another user's suggestion."""
@@ -387,9 +377,7 @@ class ApproveSuggestionViewTests(ModerationViewTestBase):
             },
         )
         self.assertEqual(response.status_code, 302)
-        item = EventItem.objects.get(
-            event=self.event, name="Helado de Chocolate"
-        )
+        item = EventItem.objects.get(event=self.event, name="Helado de Chocolate")
         self.assertEqual(item.quantity_total, Decimal("5"))
 
     def test_post_co_admin_can_approve(self):

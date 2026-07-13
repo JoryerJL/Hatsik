@@ -54,9 +54,7 @@ class AddItemForm(forms.ModelForm):
         unit = cleaned_data.get("unit")
 
         if quantity_total is not None and quantity_total <= 0:
-            self.add_error(
-                "quantity_total", "La cantidad debe ser mayor a cero."
-            )
+            self.add_error("quantity_total", "La cantidad debe ser mayor a cero.")
 
         if quantity_total is not None and not unit:
             self.add_error(
@@ -134,15 +132,11 @@ class EditItemForm(forms.ModelForm):
         if self.has_assignments:
             # Only validate quantity_total
             if quantity_total is not None and quantity_total <= 0:
-                self.add_error(
-                    "quantity_total", "La cantidad debe ser mayor a cero."
-                )
+                self.add_error("quantity_total", "La cantidad debe ser mayor a cero.")
         else:
             # Full validation like AddItemForm
             if quantity_total is not None and quantity_total <= 0:
-                self.add_error(
-                    "quantity_total", "La cantidad debe ser mayor a cero."
-                )
+                self.add_error("quantity_total", "La cantidad debe ser mayor a cero.")
 
             if quantity_total is not None and not unit:
                 self.add_error(

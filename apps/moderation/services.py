@@ -14,7 +14,9 @@ class ModerationError(Exception):
     pass
 
 
-def suggest_item(event, user, *, name, quantity_total=None, unit=None) -> ItemSuggestion:
+def suggest_item(
+    event, user, *, name, quantity_total=None, unit=None
+) -> ItemSuggestion:
     """Create a new item suggestion for an event.
 
     Args:
@@ -100,9 +102,7 @@ def edit_suggestion(
     if suggestion.quantity_total is not None and not suggestion.unit:
         raise ModerationError("La unidad es obligatoria cuando se especifica cantidad.")
 
-    suggestion.save(
-        update_fields=["name", "quantity_total", "unit", "updated_at"]
-    )
+    suggestion.save(update_fields=["name", "quantity_total", "unit", "updated_at"])
     return suggestion
 
 
@@ -153,7 +153,9 @@ def approve_suggestion(
 
     # Determine final values (override or suggestion original)
     final_name = name if name is not None else suggestion.name
-    final_quantity = quantity_total if quantity_total is not None else suggestion.quantity_total
+    final_quantity = (
+        quantity_total if quantity_total is not None else suggestion.quantity_total
+    )
     final_unit = unit if unit is not None else suggestion.unit
 
     # Validate consistency
@@ -259,9 +261,7 @@ def _validate_accepted_participant(event, user) -> None:
     ).exists()
 
     if not is_participant:
-        raise ModerationError(
-            "Solo los participantes aceptados pueden sugerir ítems."
-        )
+        raise ModerationError("Solo los participantes aceptados pueden sugerir ítems.")
 
 
 def _validate_admin(event, user) -> None:

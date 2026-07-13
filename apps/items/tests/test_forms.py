@@ -106,9 +106,7 @@ class AddItemFormTests(TestCase):
             }
         )
         self.assertTrue(form.is_valid())
-        self.assertEqual(
-            form.cleaned_data["quantity_total"], Decimal("2.5")
-        )
+        self.assertEqual(form.cleaned_data["quantity_total"], Decimal("2.5"))
 
 
 class EditItemFormTests(TestCase):

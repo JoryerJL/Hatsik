@@ -273,9 +273,7 @@ class DeleteItemViewTests(ItemViewTestBase):
     def test_post_htmx_returns_empty(self):
         """HTMX delete returns empty response."""
         self.client.login(email="owner@test.com", password="testpass123")
-        response = self.client.post(
-            self.get_url(), HTTP_HX_REQUEST="true"
-        )
+        response = self.client.post(self.get_url(), HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"")
         self.assertFalse(EventItem.objects.filter(pk=self.item.pk).exists())
@@ -291,9 +289,7 @@ class DeleteItemViewTests(ItemViewTestBase):
         self.event.status = EventStatus.CLOSED
         self.event.save()
         self.client.login(email="owner@test.com", password="testpass123")
-        response = self.client.post(
-            self.get_url(), HTTP_HX_REQUEST="true"
-        )
+        response = self.client.post(self.get_url(), HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 422)
         self.assertTrue(EventItem.objects.filter(pk=self.item.pk).exists())
 

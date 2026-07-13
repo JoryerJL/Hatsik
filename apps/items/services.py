@@ -127,9 +127,7 @@ def delete_item(item, user) -> None:
     event = item.event
 
     if event.status != EventStatus.ACTIVE:
-        raise ItemError(
-            "No se pueden eliminar ítems de un evento cerrado o cancelado."
-        )
+        raise ItemError("No se pueden eliminar ítems de un evento cerrado o cancelado.")
 
     if event.owner_user != user:
         raise ItemError("Solo el organizador puede eliminar ítems.")
@@ -205,10 +203,9 @@ def compute_item_status(item) -> str:
         return STATUS_COVERED
 
     # Quantified item: compare assigned sum to total
-    assigned_sum = (
-        active_assignments.aggregate(total=Sum("quantity_assigned"))["total"]
-        or Decimal("0")
-    )
+    assigned_sum = active_assignments.aggregate(total=Sum("quantity_assigned"))[
+        "total"
+    ] or Decimal("0")
 
     if assigned_sum >= item.quantity_total:
         return STATUS_COVERED
@@ -285,9 +282,7 @@ def get_computed_status_from_annotations(item) -> str:
 
 def _has_active_assignments(item) -> bool:
     """Check if an item has any non-cancelled assignments."""
-    return ItemAssignment.objects.filter(
-        item=item, cancelled_at__isnull=True
-    ).exists()
+    return ItemAssignment.objects.filter(item=item, cancelled_at__isnull=True).exists()
 
 
 def _get_assigned_sum(item) -> Decimal:

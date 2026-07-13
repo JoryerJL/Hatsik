@@ -9,7 +9,6 @@ from apps.events.decorators import event_admin_required, participant_required
 from apps.moderation.forms import (
     ApproveSuggestionForm,
     EditSuggestionForm,
-    RejectSuggestionForm,
     SuggestItemForm,
 )
 from apps.moderation.models import ItemSuggestion, SuggestionStatus

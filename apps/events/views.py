@@ -12,8 +12,6 @@ from apps.events.decorators import (
 )
 from apps.events.forms import CreateEventForm, EditEventForm
 from apps.events.models import AccessStatus, EventParticipation
-from apps.items.services import get_items_with_status
-from apps.moderation.services import get_pending_suggestions, get_user_suggestions
 from apps.events.services import (
     approve_request,
     cancel_event,
@@ -28,6 +26,8 @@ from apps.events.services import (
     reopen_event,
     request_to_join,
 )
+from apps.items.services import get_items_with_status
+from apps.moderation.services import get_pending_suggestions, get_user_suggestions
 
 
 @login_required
