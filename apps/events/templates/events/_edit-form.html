@@ -1,0 +1,99 @@
+{% load static %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="mb-[var(--space-6)]">
+        <h1 class="font-[var(--font-heading)] text-3xl font-bold text-[var(--color-neutral-900)] mb-[var(--space-2)]">
+            Editar Evento
+        </h1>
+        <p class="text-[var(--color-neutral-500)] text-base">
+            Modifica los datos de tu evento.
+        </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-[var(--color-surface)] border border-[var(--color-neutral-200)] rounded-[var(--radius-card)] p-[var(--space-6)] shadow-sm">
+        <form method="post" action="{% url 'events:edit' pk=event.pk %}" class="space-y-[var(--space-5)]">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 rounded-[var(--radius-input)] p-[var(--space-3)]">
+                {% for error in form.non_field_errors %}
+                <p class="text-sm text-[var(--color-error)]">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Name -->
+            <div>
+                <label for="id_name" class="block text-sm font-medium text-[var(--color-neutral-700)] mb-[var(--space-1)]">
+                    {{ form.name.label }}
+                </label>
+                <input type="text"
+                       name="name"
+                       id="id_name"
+                       value="{{ form.name.value|default:'' }}"
+                       placeholder="Nombre del evento"
+                       required
+                       class="w-full px-[var(--space-4)] py-[var(--space-3)] border border-[var(--color-neutral-300)] rounded-[var(--radius-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-shadow {% if form.name.errors %}border-[var(--color-error)] ring-1 ring-[var(--color-error)]{% endif %}">
+                {% if form.name.errors %}
+                <p class="mt-[var(--space-1)] text-xs text-[var(--color-error)]">{{ form.name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Event Date -->
+            <div>
+                <label for="id_event_date" class="block text-sm font-medium text-[var(--color-neutral-700)] mb-[var(--space-1)]">
+                    {{ form.event_date.label }}
+                </label>
+                <input type="date"
+                       name="event_date"
+                       id="id_event_date"
+                       value="{{ form.event_date.value|default:'' }}"
+                       required
+                       class="w-full px-[var(--space-4)] py-[var(--space-3)] border border-[var(--color-neutral-300)] rounded-[var(--radius-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-shadow {% if form.event_date.errors %}border-[var(--color-error)] ring-1 ring-[var(--color-error)]{% endif %}">
+                {% if form.event_date.errors %}
+                <p class="mt-[var(--space-1)] text-xs text-[var(--color-error)]">{{ form.event_date.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Assignment Deadline -->
+            <div>
+                <label for="id_assignment_deadline_at" class="block text-sm font-medium text-[var(--color-neutral-700)] mb-[var(--space-1)]">
+                    {{ form.assignment_deadline_at.label }}
+                </label>
+                <input type="datetime-local"
+                       name="assignment_deadline_at"
+                       id="id_assignment_deadline_at"
+                       value="{{ form.assignment_deadline_at.value|default:'' }}"
+                       class="w-full px-[var(--space-4)] py-[var(--space-3)] border border-[var(--color-neutral-300)] rounded-[var(--radius-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-shadow">
+                <p class="mt-[var(--space-1)] text-xs text-[var(--color-neutral-400)]">
+                    Opcional. Después de esta fecha, el evento se cerrará automáticamente.
+                </p>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="id_description" class="block text-sm font-medium text-[var(--color-neutral-700)] mb-[var(--space-1)]">
+                    {{ form.description.label }}
+                </label>
+                <textarea name="description"
+                          id="id_description"
+                          rows="3"
+                          placeholder="Descripción (opcional)"
+                          class="w-full px-[var(--space-4)] py-[var(--space-3)] border border-[var(--color-neutral-300)] rounded-[var(--radius-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-shadow resize-none">{{ form.description.value|default:'' }}</textarea>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-[var(--space-3)] pt-[var(--space-3)]">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 px-[var(--space-5)] py-[var(--space-3)] bg-[var(--color-primary)] text-white text-sm font-semibold rounded-[var(--radius-button)] hover:bg-[var(--color-primary-hover)] transition-colors shadow-sm">
+                    Guardar cambios
+                </button>
+                <a href="{% url 'events:detail' pk=event.pk %}"
+                   class="px-[var(--space-5)] py-[var(--space-3)] text-sm font-medium text-[var(--color-neutral-600)] hover:text-[var(--color-neutral-800)] transition-colors">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

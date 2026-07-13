@@ -4,42 +4,44 @@
 {% block title %}Verificación Pendiente — Hatsik{% endblock %}
 
 {% block content %}
-<div class="bg-[var(--color-surface-elevated)] rounded-[var(--radius-card)] shadow-sm p-[var(--space-6)] md:p-10 text-center">
+<div class="bg-[var(--color-surface-container-lowest)] border border-[var(--color-gray-border)] rounded-[24px] p-[var(--space-xl)] md:p-[var(--space-2xl)] text-center shadow-sm">
     <!-- Logo -->
-    <div class="mb-[var(--space-5)]">
-        <img src="{% static 'img/logo.png' %}" alt="Hatsik" class="h-8 mx-auto">
+    <div class="mb-[var(--space-xl)]">
+        <img src="{% static 'img/logo.png' %}" alt="Hatsik" class="h-16 mx-auto rounded-xl">
     </div>
 
     <!-- Email icon -->
-    <div class="mb-[var(--space-5)]">
-        <span class="material-symbols-rounded text-[var(--color-primary)]" style="font-size: 56px; font-variation-settings: 'FILL' 1;">mark_email_read</span>
+    <div class="mb-[var(--space-lg)]">
+        <div class="w-20 h-20 mx-auto bg-[var(--color-coral-soft)] rounded-full flex items-center justify-center">
+            <span class="material-symbols-outlined text-[var(--color-primary)] text-4xl" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
+        </div>
     </div>
 
     <!-- Header -->
-    <h1 class="font-[var(--font-heading)] text-2xl font-bold text-[var(--color-neutral-900)] mb-[var(--space-2)]">
+    <h1 class="font-[var(--font-heading)] text-[28px] leading-[36px] font-bold text-[var(--color-on-surface)] mb-[var(--space-sm)]">
         ¡Casi listo!
     </h1>
-    <p class="text-sm text-[var(--color-neutral-500)] mb-[var(--space-5)]">
+    <p class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)] mb-[var(--space-xl)]">
         Hemos enviado un enlace de verificación a tu correo electrónico. Por favor, revisá tu bandeja de entrada (y la carpeta de spam).
     </p>
 
     <!-- Email display -->
-    <div class="inline-flex items-center gap-2 px-[var(--space-4)] py-[var(--space-2)] bg-[var(--color-surface)] border border-[var(--color-neutral-200)] rounded-[var(--radius-input)] mb-[var(--space-5)]">
-        <span class="material-symbols-rounded text-[var(--color-neutral-400)]" style="font-size: 18px;">alternate_email</span>
-        <span class="text-sm text-[var(--color-neutral-700)]">{{ user.email }}</span>
+    <div class="inline-flex items-center gap-2 px-[var(--space-lg)] py-[var(--space-md)] bg-[var(--color-surface-container-low)] border border-[var(--color-gray-border)] rounded-full mb-[var(--space-xl)]">
+        <span class="material-symbols-outlined text-[var(--color-on-surface-variant)] text-lg">alternate_email</span>
+        <span class="text-[14px] font-semibold text-[var(--color-on-surface)]">{{ user.email }}</span>
     </div>
 
     <!-- Resend section -->
-    <div id="resend-section" class="mb-[var(--space-4)]">
+    <div id="resend-section" class="mb-[var(--space-lg)]">
         {% include "accounts/partials/_resend_button.html" %}
     </div>
 
     <!-- Logout -->
-    <div class="pt-[var(--space-4)] border-t border-[var(--color-neutral-200)]">
+    <div class="pt-[var(--space-lg)] border-t border-[var(--color-gray-border)]">
         <form method="post" action="{% url 'accounts:logout' %}" class="inline">
             {% csrf_token %}
-            <button type="submit" class="inline-flex items-center gap-1 text-sm text-[var(--color-neutral-500)] hover:text-[var(--color-neutral-700)]">
-                <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
+            <button type="submit" class="inline-flex items-center gap-1 text-[14px] text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors">
+                <span class="material-symbols-outlined text-lg">logout</span>
                 ¿Ingresaste el correo equivocado? Cerrar sesión
             </button>
         </form>

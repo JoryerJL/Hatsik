@@ -28,9 +28,9 @@ Do not activate for bug fixes, hotfixes, or work outside the ROADMAP phases.
 
 ### Before implementing ANY template/UI:
 
-1. **ALWAYS fetch the Stitch screen** via MCP `get_screen` using the screen ID from `docs/ROADMAP.md`.
-2. **Download the HTML code** from the screen's `htmlCode.downloadUrl` to see the exact structure.
-3. **Match the design pixel-for-pixel** — layout, spacing, icons, text hierarchy, colors.
+1. **ALWAYS download the Stitch HTML source** via `curl` using the `htmlCode.downloadUrl` from `get_screen` MCP tool. Save to `docs/stitch-html/{screen-name}.html`.
+2. **Read the actual HTML source code** — not just the text preview from `web_fetch`. The source contains the exact Tailwind classes, layout structure, and token usage.
+3. **Match the design from the source code** — layout, spacing, icons, text hierarchy, colors, border radii, font sizes.
 4. **Respect Stitch's element decisions:**
    - If Stitch has icons in inputs → implement icons in inputs (use Material Icons or inline SVGs)
    - If Stitch has a specific button style (icon + text) → replicate exactly

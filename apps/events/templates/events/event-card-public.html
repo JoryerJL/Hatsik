@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ event.name }} — Hatsik{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Event Invitation Card -->
+    <div class="bg-[var(--color-surface-container-lowest)] rounded-[12px] border border-[var(--color-gray-border)] overflow-hidden flex flex-col md:flex-row">
+
+        <!-- Hero Section (Left) -->
+        <div class="relative w-full md:w-5/12 h-64 md:h-auto overflow-hidden bg-[var(--color-coral-soft)] flex items-center justify-center">
+            <span class="material-symbols-outlined text-[var(--color-primary)] text-7xl opacity-60">celebration</span>
+            <!-- Fade edge for desktop -->
+            <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[var(--color-surface-container-lowest)] to-transparent hidden md:block"></div>
+            <!-- Fade edge for mobile -->
+            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--color-surface-container-lowest)] to-transparent md:hidden"></div>
+        </div>
+
+        <!-- Content Area (Right) -->
+        <div class="w-full md:w-7/12 p-[var(--space-lg)] md:p-[var(--space-xl)] flex flex-col justify-between">
+            <div>
+                <!-- Organizer Badge -->
+                <div class="flex items-center gap-[var(--space-sm)] mb-[var(--space-lg)]">
+                    <div class="w-8 h-8 rounded-full bg-[var(--color-coral-soft)] flex items-center justify-center">
+                        <span class="text-[var(--color-primary)] font-bold text-sm">
+                            {{ event.owner_user.display_name|make_list|first|default:"O" }}
+                        </span>
+                    </div>
+                    <span class="text-[12px] leading-[16px] text-[var(--color-gray-muted)]">
+                        Organizado por <strong class="text-[var(--color-on-surface)]">{{ event.owner_user.display_name }}</strong>
+                    </span>
+                </div>
+
+                <!-- Event Name -->
+                <h1 class="font-[var(--font-heading)] text-[24px] leading-[32px] md:text-[28px] md:leading-[36px] font-bold text-[var(--color-on-surface)] mb-[var(--space-md)]">
+                    {{ event.name }}
+                </h1>
+
+                <!-- Event Meta -->
+                <div class="space-y-[var(--space-md)] mb-[var(--space-xl)]">
+                    <div class="flex items-center gap-[var(--space-md)] text-[var(--color-on-surface-variant)]">
+                        <span class="material-symbols-outlined text-[var(--color-primary)]">calendar_today</span>
+                        <span class="text-[14px] leading-[20px]">{{ event.event_date }}</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                {% if event.description %}
+                <p class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)] mb-[var(--space-xl)] leading-relaxed">
+                    {{ event.description }}
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Access Status Section -->
+            <div class="bg-[var(--color-coral-soft)] p-[var(--space-lg)] rounded-[12px] mb-[var(--space-xl)] border border-[var(--color-primary)]/10">
+                <div class="flex items-start gap-[var(--space-md)]">
+                    <span class="material-symbols-outlined text-[var(--color-primary)]" style="font-variation-settings: 'FILL' 1;">lock</span>
+                    <div>
+                        <h3 class="text-[15px] leading-[20px] font-semibold text-[var(--color-primary)] mb-[var(--space-xs)]">Evento Privado</h3>
+                        <p class="text-[12px] leading-[16px] text-[var(--color-on-surface-variant)]">
+                            Solicita unirte para ver la lista y organizarte con los demás.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Primary Action (disabled for Phase 3) -->
+            <button
+                type="button"
+                disabled
+                class="w-full bg-[var(--color-primary)] text-[var(--color-on-primary)] font-[var(--font-heading)] text-[20px] leading-[28px] font-bold py-[var(--space-lg)] rounded-[12px] opacity-60 cursor-not-allowed"
+                title="Disponible próximamente"
+            >
+                Solicitar entrada
+            </button>
+            <p class="text-[12px] leading-[16px] text-[var(--color-gray-muted)] text-center mt-[var(--space-sm)]">
+                Próximamente podrás solicitar unirte a eventos.
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer / Trust Badge -->
+    <div class="mt-[var(--space-xl)] text-center">
+        <p class="text-[12px] leading-[16px] text-[var(--color-gray-muted)]">
+            hatsik • Logística colaborativa para tus momentos especiales
+        </p>
+    </div>
+
+    <!-- Back to dashboard -->
+    <div class="mt-[var(--space-lg)] text-center">
+        <a
+            href="{% url 'events:dashboard' %}"
+            class="inline-flex items-center gap-1 text-[14px] leading-[20px] text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors"
+        >
+            <span class="material-symbols-outlined text-base">arrow_back</span>
+            Volver a mis eventos
+        </a>
+    </div>
+</div>
+{% endblock %}

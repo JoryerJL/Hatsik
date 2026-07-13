@@ -4,25 +4,26 @@
 {% block title %}Iniciar Sesión — Hatsik{% endblock %}
 
 {% block content %}
-<div class="bg-[var(--color-surface-elevated)] rounded-[var(--radius-card)] shadow-sm p-[var(--space-6)] md:p-10">
-    <!-- Logo -->
-    <div class="text-center mb-[var(--space-6)]">
-        <img src="{% static 'img/logo.png' %}" alt="Hatsik" class="h-8 mx-auto">
+<!-- Logo Section -->
+<div class="flex flex-col items-center gap-[var(--space-md)] mb-[var(--space-xl)]">
+    <div class="w-24 h-24 overflow-hidden rounded-xl">
+        <img src="{% static 'img/logo.png' %}" alt="Hatsik" class="w-full h-full object-cover">
     </div>
-
-    <!-- Header -->
-    <div class="text-center mb-[var(--space-6)]">
-        <h1 class="font-[var(--font-heading)] text-2xl font-bold text-[var(--color-neutral-900)] mb-[var(--space-1)]">
+    <div class="text-center">
+        <h1 class="font-[var(--font-heading)] text-[28px] leading-[36px] font-bold text-on-surface">
             Bienvenido a Hatsik
         </h1>
-        <p class="text-sm text-[var(--color-neutral-500)]">
+        <p class="font-[var(--font-body)] text-[14px] leading-[20px] text-on-surface-variant mt-[var(--space-xs)]">
             Logística colaborativa hecha fácil.
         </p>
     </div>
+</div>
 
+<!-- Card -->
+<div class="bg-surface-container-lowest rounded-[24px] p-[var(--space-xl)]">
     <!-- Form errors -->
     {% if form.non_field_errors %}
-    <div class="mb-[var(--space-4)] p-[var(--space-3)] bg-[var(--color-error-soft)] rounded-[var(--radius-sm)] text-sm text-[var(--color-error)]">
+    <div class="mb-[var(--space-lg)] p-[var(--space-md)] bg-error-container rounded-[var(--radius-md)] text-[14px] text-error">
         {% for error in form.non_field_errors %}
             <p>{{ error }}</p>
         {% endfor %}
@@ -30,86 +31,78 @@
     {% endif %}
 
     <!-- Login form -->
-    <form method="post" action="{% url 'accounts:login' %}{% if next %}?next={{ next }}{% endif %}" class="flex flex-col gap-[var(--space-4)]">
+    <form method="post" action="{% url 'accounts:login' %}{% if next %}?next={{ next }}{% endif %}" class="w-full flex flex-col gap-[var(--space-lg)]">
         {% csrf_token %}
         {% if next %}
         <input type="hidden" name="next" value="{{ next }}">
         {% endif %}
 
-        <!-- Email field with icon -->
-        <div class="flex flex-col gap-[var(--space-1)]">
-            <label for="id_email" class="text-sm font-medium text-[var(--color-neutral-700)]">Correo electrónico</label>
+        <!-- Email field -->
+        <div class="flex flex-col gap-[var(--space-sm)]">
+            <label for="id_email" class="font-[var(--font-body)] text-[15px] leading-[20px] font-semibold text-on-surface-variant px-[var(--space-sm)]">Correo electrónico</label>
             <div class="relative">
-                <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-neutral-400)]">mail</span>
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
                 <input type="email" name="email" id="id_email"
                     placeholder="nombre@ejemplo.com"
                     value="{{ form.email.value|default:'' }}"
                     required
-                    class="w-full pl-10 pr-[var(--space-3)] py-[var(--space-3)] rounded-[var(--radius-input)] border
-                        {% if form.email.errors %}border-[var(--color-error)] ring-2 ring-[var(--color-error-soft)]{% else %}border-[var(--color-neutral-300)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-soft)]{% endif %}
-                        text-sm text-[var(--color-neutral-900)] placeholder-[var(--color-neutral-400)]
-                        outline-none transition-all duration-150 bg-[var(--color-surface)]">
+                    class="hatsik-input w-full pl-12 pr-4 py-3.5 bg-surface-container-low border border-gray-border rounded-full font-[var(--font-body)] text-[14px] leading-[20px] text-on-surface focus:outline-none placeholder:text-gray-muted
+                        {% if form.email.errors %}border-error ring-2 ring-error-container{% endif %}">
             </div>
-            {% if form.email.errors %}<p class="text-xs text-[var(--color-error)]">{{ form.email.errors.0 }}</p>{% endif %}
+            {% if form.email.errors %}<p class="text-[12px] text-error px-[var(--space-sm)]">{{ form.email.errors.0 }}</p>{% endif %}
         </div>
 
-        <!-- Password field with icon + visibility toggle -->
-        <div class="flex flex-col gap-[var(--space-1)]">
-            <label for="id_password" class="text-sm font-medium text-[var(--color-neutral-700)]">Contraseña</label>
+        <!-- Password field -->
+        <div class="flex flex-col gap-[var(--space-sm)]">
+            <label for="id_password" class="font-[var(--font-body)] text-[15px] leading-[20px] font-semibold text-on-surface-variant px-[var(--space-sm)]">Contraseña</label>
             <div class="relative">
-                <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-neutral-400)]">lock</span>
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
                 <input type="password" name="password" id="id_password"
                     placeholder="••••••••"
                     required
-                    class="w-full pl-10 pr-10 py-[var(--space-3)] rounded-[var(--radius-input)] border
-                        {% if form.password.errors %}border-[var(--color-error)] ring-2 ring-[var(--color-error-soft)]{% else %}border-[var(--color-neutral-300)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-soft)]{% endif %}
-                        text-sm text-[var(--color-neutral-900)] placeholder-[var(--color-neutral-400)]
-                        outline-none transition-all duration-150 bg-[var(--color-surface)]">
-                <button type="button" onclick="togglePassword('id_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer" aria-label="Mostrar contraseña">
-                    <span class="material-symbols-rounded">visibility</span>
+                    class="hatsik-input w-full pl-12 pr-12 py-3.5 bg-surface-container-low border border-gray-border rounded-full font-[var(--font-body)] text-[14px] leading-[20px] text-on-surface focus:outline-none placeholder:text-gray-muted
+                        {% if form.password.errors %}border-error ring-2 ring-error-container{% endif %}">
+                <button type="button" onclick="togglePassword('id_password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors cursor-pointer" aria-label="Mostrar contraseña">
+                    <span class="material-symbols-outlined">visibility</span>
                 </button>
             </div>
-            {% if form.password.errors %}<p class="text-xs text-[var(--color-error)]">{{ form.password.errors.0 }}</p>{% endif %}
-        </div>
-
-        <!-- Forgot password link -->
-        <div class="text-right">
-            <a href="{% url 'accounts:password_reset_request' %}" class="text-sm text-[var(--color-primary)] font-medium hover:underline">
-                ¿Olvidaste tu contraseña?
-            </a>
+            {% if form.password.errors %}<p class="text-[12px] text-error px-[var(--space-sm)]">{{ form.password.errors.0 }}</p>{% endif %}
+            <div class="flex justify-end px-[var(--space-sm)]">
+                <a href="{% url 'accounts:password_reset_request' %}" class="font-[var(--font-body)] text-[15px] leading-[20px] font-semibold text-primary hover:underline transition-all">¿Olvidaste tu contraseña?</a>
+            </div>
         </div>
 
         <!-- Submit button -->
         <button type="submit"
-            class="w-full flex items-center justify-center gap-2 px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-button)] font-semibold text-sm bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] transition-colors duration-150 cursor-pointer">
+            class="btn-active-state w-full py-4 bg-primary text-on-primary font-[var(--font-heading)] text-[20px] leading-[28px] font-bold rounded-full shadow-sm hover:bg-primary-container transition-all flex items-center justify-center gap-[var(--space-sm)] cursor-pointer">
             Entrar
-            <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
         </button>
     </form>
-
-    <!-- Register link -->
-    <p class="mt-[var(--space-6)] text-center text-sm text-[var(--color-neutral-500)]">
-        ¿Aún no tenés cuenta?
-        <a href="{% url 'accounts:register' %}" class="text-[var(--color-primary)] font-semibold hover:underline">
-            Crear cuenta
-        </a>
-    </p>
-
-    <!-- Decorative footer -->
-    <div class="mt-[var(--space-5)] pt-[var(--space-4)] border-t border-[var(--color-neutral-200)] text-center">
-        <p class="text-xs text-[var(--color-neutral-400)] flex items-center justify-center gap-1">
-            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--color-primary);">favorite</span>
-            Organizá con cariño
-        </p>
-    </div>
 </div>
+
+<!-- Register link -->
+<p class="mt-[var(--space-xl)] text-center font-[var(--font-body)] text-[14px] leading-[20px] text-on-surface-variant">
+    ¿Aún no tenés cuenta?
+    <a href="{% url 'accounts:register' %}" class="text-primary font-bold hover:underline transition-all">
+        Crear cuenta
+    </a>
+</p>
+
+<!-- Decorative footer -->
+<footer class="mt-[var(--space-xl)] text-center">
+    <div class="flex items-center justify-center gap-[var(--space-xs)] text-on-surface-variant opacity-60">
+        <span class="material-symbols-outlined text-[18px]">favorite</span>
+        <span class="font-[var(--font-body)] text-[12px] leading-[16px]">Organizá con cariño</span>
+    </div>
+</footer>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 function togglePassword(inputId, btn) {
     const input = document.getElementById(inputId);
-    const icon = btn.querySelector('.material-symbols-rounded');
+    const icon = btn.querySelector('.material-symbols-outlined');
     if (input.type === 'password') {
         input.type = 'text';
         icon.textContent = 'visibility_off';

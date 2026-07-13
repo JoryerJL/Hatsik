@@ -1,50 +1,165 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html class="light" lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Hatsik{% endblock %}</title>
 
-    <!-- Google Fonts: Nunito (headings) + Plus Jakarta Sans (body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS (compiled) -->
-    <link rel="stylesheet" href="{% load static %}{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-pattern {
+            background-color: #fcf9f8;
+            background-image: radial-gradient(#e5e2e1 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+        .card-status-indicator {
+            height: 4px;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-radius: 0 0 16px 16px;
+        }
+    </style>
 
     {% block extra_css %}{% endblock %}
 </head>
-<body class="font-[var(--font-body)] bg-[var(--color-surface)] text-[var(--color-neutral-900)] min-h-screen">
+<body class="font-[var(--font-body)] bg-pattern text-[var(--color-on-surface)] min-h-screen flex flex-col md:flex-row">
 
-    <!-- Navigation -->
-    <header class="sticky top-0 z-50 bg-[var(--color-surface)] border-b border-[var(--color-neutral-200)]">
-        <nav class="max-w-7xl mx-auto px-[var(--space-4)] py-[var(--space-3)] flex items-center justify-between">
-            <a href="/" class="font-[var(--font-heading)] text-xl font-bold text-[var(--color-primary)]">
-                Hatsik
+    <!-- Sidebar (Desktop) -->
+    <aside class="hidden md:flex flex-col h-screen py-[var(--space-xl)] bg-[var(--color-surface-container-lowest)] fixed left-0 w-64 border-r border-[var(--color-gray-border)] z-40">
+        <!-- Logo -->
+        <div class="px-[var(--space-lg)] mb-[var(--space-xl)]">
+            <a href="{% url 'events:dashboard' %}">
+                <h1 class="font-[var(--font-heading)] text-[32px] leading-[40px] tracking-[-0.02em] font-extrabold text-[var(--color-primary)]">hatsik</h1>
+                <p class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)]">Logística colaborativa</p>
             </a>
-            <div class="flex items-center gap-[var(--space-3)]">
-                {% block nav_actions %}{% endblock %}
-            </div>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 space-y-2">
+            <a class="{% block sidebar_mis_eventos_class %}text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-highest)]{% endblock %} mx-2 px-4 py-3 flex items-center gap-3 transition-all rounded-lg" href="{% url 'events:dashboard' %}">
+                <span class="material-symbols-outlined">event_available</span>
+                <span class="text-[15px] font-semibold">Mis eventos</span>
+            </a>
+            <a class="{% block sidebar_crear_evento_class %}text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-highest)]{% endblock %} mx-2 px-4 py-3 flex items-center gap-3 transition-all rounded-lg" href="{% url 'events:create' %}">
+                <span class="material-symbols-outlined" {% block sidebar_crear_icon_style %}{% endblock %}>add_circle</span>
+                <span class="text-[15px] font-semibold">Crear evento</span>
+            </a>
         </nav>
-    </header>
 
-    <!-- Messages / Toasts -->
-    {% if messages %}
-    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2">
-        {% for message in messages %}
-            {% include "components/_toast.html" with message=message %}
-        {% endfor %}
+        <!-- Logout -->
+        <div class="px-2 mt-auto border-t border-[var(--color-gray-border)] pt-[var(--space-lg)]">
+            <a href="{% url 'accounts:logout' %}" class="w-full text-[var(--color-on-surface-variant)] px-4 py-3 flex items-center gap-3 hover:bg-[var(--color-surface-container-highest)] transition-all rounded-lg">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="text-[15px] font-semibold">Cerrar sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Mobile Drawer (overlay) -->
+    <div id="mobile-drawer-overlay" class="md:hidden fixed inset-0 bg-black/40 z-50 hidden" onclick="closeMobileDrawer()"></div>
+    <aside id="mobile-drawer" class="md:hidden fixed inset-y-0 left-0 w-64 bg-[var(--color-surface-container-lowest)] border-r border-[var(--color-gray-border)] z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col py-[var(--space-xl)]">
+        <!-- Logo -->
+        <div class="px-[var(--space-lg)] mb-[var(--space-xl)] flex items-center justify-between">
+            <a href="{% url 'events:dashboard' %}">
+                <h1 class="font-[var(--font-heading)] text-[28px] leading-[36px] tracking-[-0.02em] font-extrabold text-[var(--color-primary)]">hatsik</h1>
+            </a>
+            <button onclick="closeMobileDrawer()" class="p-1 text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 space-y-2">
+            <a class="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-highest)] mx-2 px-4 py-3 flex items-center gap-3 transition-all rounded-lg" href="{% url 'events:dashboard' %}">
+                <span class="material-symbols-outlined">event_available</span>
+                <span class="text-[15px] font-semibold">Mis eventos</span>
+            </a>
+            <a class="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-highest)] mx-2 px-4 py-3 flex items-center gap-3 transition-all rounded-lg" href="{% url 'events:create' %}">
+                <span class="material-symbols-outlined">add_circle</span>
+                <span class="text-[15px] font-semibold">Crear evento</span>
+            </a>
+        </nav>
+
+        <!-- Logout -->
+        <div class="px-2 mt-auto border-t border-[var(--color-gray-border)] pt-[var(--space-lg)]">
+            <a href="{% url 'accounts:logout' %}" class="w-full text-[var(--color-on-surface-variant)] px-4 py-3 flex items-center gap-3 hover:bg-[var(--color-surface-container-highest)] transition-all rounded-lg">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="text-[15px] font-semibold">Cerrar sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Area (offset by sidebar) -->
+    <div class="flex-1 md:ml-64 flex flex-col min-h-screen">
+        <!-- Mobile Header -->
+        <header class="md:hidden flex justify-between items-center px-[var(--space-margin-mobile)] py-[var(--space-md)] w-full bg-[var(--color-surface-container-lowest)] border-b border-[var(--color-gray-border)] sticky top-0 z-50">
+            <a href="{% url 'events:dashboard' %}" class="flex items-center gap-[var(--space-sm)]">
+                <img alt="hatsik logo" class="w-8 h-8 rounded-lg" src="{% static 'img/logo.png' %}">
+                <span class="font-[var(--font-heading)] text-xl font-extrabold text-[var(--color-primary)]">hatsik</span>
+            </a>
+            <button onclick="openMobileDrawer()" class="p-2 text-[var(--color-on-surface-variant)]">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </header>
+
+        <!-- Desktop TopBar -->
+        <header class="hidden md:flex sticky top-0 z-30 bg-[var(--color-surface-container-lowest)] border-b border-[var(--color-gray-border)] px-[var(--space-margin-desktop)] py-[var(--space-md)] items-center justify-between">
+            <nav class="flex items-center gap-[var(--space-xl)]">
+                {% block topbar_links %}
+                <a class="{% block topbar_mis_eventos_class %}text-[var(--color-on-surface-variant)] font-semibold hover:text-[var(--color-primary)] transition-colors{% endblock %} text-[15px] leading-[20px] py-1" href="{% url 'events:dashboard' %}">Mis eventos</a>
+                <a class="{% block topbar_crear_evento_class %}text-[var(--color-on-surface-variant)] font-semibold hover:text-[var(--color-primary)] transition-colors{% endblock %} text-[15px] leading-[20px] py-1" href="{% url 'events:create' %}">Crear evento</a>
+                {% endblock %}
+            </nav>
+            <div class="flex items-center gap-[var(--space-md)]">
+                <a href="{% url 'accounts:logout' %}" class="text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors text-[15px] font-semibold">Cerrar sesión</a>
+                <div class="w-10 h-10 rounded-full bg-[var(--color-surface-container-high)] border border-[var(--color-gray-border)] flex items-center justify-center overflow-hidden">
+                    <span class="material-symbols-outlined text-[var(--color-on-surface-variant)]">person</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Messages / Toasts -->
+        {% if messages %}
+        <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2">
+            {% for message in messages %}
+                {% include "components/_toast.html" with message=message %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Main Content -->
+        <main class="flex-1 px-[var(--space-margin-mobile)] md:px-[var(--space-margin-desktop)] py-[var(--space-xl)]">
+            {% block content %}{% endblock %}
+        </main>
     </div>
-    {% endif %}
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-[var(--space-4)] py-[var(--space-5)]">
-        {% block content %}{% endblock %}
-    </main>
 
     <!-- HTMX -->
     <script src="{% static 'js/htmx.min.js' %}"></script>
+
+    <script>
+    function openMobileDrawer() {
+        document.getElementById('mobile-drawer').classList.remove('-translate-x-full');
+        document.getElementById('mobile-drawer-overlay').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+    function closeMobileDrawer() {
+        document.getElementById('mobile-drawer').classList.add('-translate-x-full');
+        document.getElementById('mobile-drawer-overlay').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>

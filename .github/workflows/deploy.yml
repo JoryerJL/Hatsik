@@ -61,7 +61,7 @@ jobs:
           RESEND_API_KEY: ""
           INTERNAL_CRON_TOKEN: test-token
           DJANGO_SETTINGS_MODULE: config.settings.local
-        run: python manage.py test
+        run: python -m pytest
 
   build-and-deploy:
     needs: lint-and-test

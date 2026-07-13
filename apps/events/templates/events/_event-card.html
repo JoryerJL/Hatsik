@@ -1,0 +1,57 @@
+{% load static %}
+
+<a href="{% url 'events:detail' pk=event.pk %}"
+   class="block bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-neutral-100)] p-[var(--space-4)] shadow-sm hover:shadow-md hover:border-[var(--color-neutral-200)] transition-all group">
+    <div class="flex items-center justify-between mb-[var(--space-3)]">
+        <div class="flex items-center gap-[var(--space-2)]">
+            {% if role == "owner" %}
+            <span class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-[var(--radius-pill)] bg-[var(--color-primary-soft)] text-[var(--color-primary-dark)]">
+                Owner
+            </span>
+            {% elif role == "co_admin" %}
+            <span class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-[var(--radius-pill)] bg-[var(--color-warning-soft)] text-[var(--color-warning)]">
+                Co-admin
+            </span>
+            {% else %}
+            <span class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-[var(--radius-pill)] bg-[var(--color-neutral-100)] text-[var(--color-neutral-600)]">
+                Participante
+            </span>
+            {% endif %}
+        </div>
+        <div class="flex items-center gap-1">
+            {% if event.status == "active" %}
+            <span class="w-2 h-2 rounded-full bg-[var(--color-success)]"></span>
+            <span class="text-xs text-[var(--color-neutral-500)]">Activo</span>
+            {% elif event.status == "closed" %}
+            <span class="w-2 h-2 rounded-full bg-[var(--color-neutral-400)]"></span>
+            <span class="text-xs text-[var(--color-neutral-500)]">Cerrado</span>
+            {% elif event.status == "cancelled" %}
+            <span class="w-2 h-2 rounded-full bg-[var(--color-primary)]"></span>
+            <span class="text-xs text-[var(--color-neutral-500)]">Cancelado</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <h3 class="font-[var(--font-heading)] font-bold text-[var(--color-neutral-900)] text-base truncate mb-[var(--space-2)]">
+        {{ event.name }}
+    </h3>
+
+    <div class="flex items-center gap-[var(--space-1)] text-sm text-[var(--color-neutral-500)] mb-[var(--space-3)]">
+        <span class="material-icons-outlined text-base">calendar_today</span>
+        <time datetime="{{ event.event_date|date:'Y-m-d' }}">
+            {{ event.event_date|date:"d M, Y" }}
+        </time>
+    </div>
+
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-[var(--space-1)]">
+            <span class="material-icons-outlined text-base text-[var(--color-neutral-400)]">group</span>
+            <span class="text-xs text-[var(--color-neutral-500)]">
+                {{ event.participations.count }} participante{{ event.participations.count|pluralize:"s" }}
+            </span>
+        </div>
+        <span class="material-icons-outlined text-lg text-[var(--color-neutral-400)] group-hover:text-[var(--color-primary)] transition-colors">
+            arrow_forward
+        </span>
+    </div>
+</a>

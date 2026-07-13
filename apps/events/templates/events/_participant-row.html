@@ -1,0 +1,66 @@
+<div class="flex items-center gap-[var(--space-3)] px-[var(--space-5)] py-[var(--space-3)]" id="participant-{{ participant.pk }}">
+    <!-- Avatar -->
+    <div class="w-9 h-9 rounded-full bg-[var(--color-primary-soft)] flex items-center justify-center flex-shrink-0">
+        <span class="text-sm font-bold text-[var(--color-primary)]">
+            {{ participant.user.display_name|make_list|first|upper }}
+        </span>
+    </div>
+
+    <!-- Info -->
+    <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-[var(--color-neutral-800)] truncate">
+            {{ participant.user.display_name }}
+        </p>
+        <p class="text-xs text-[var(--color-neutral-400)] truncate">
+            {{ participant.user.email }}
+        </p>
+    </div>
+
+    <!-- Role Badge -->
+    {% if participant.role == "owner" %}
+    <span class="inline-flex items-center px-[var(--space-2)] py-0.5 text-xs font-semibold rounded-[var(--radius-pill)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+        Owner
+    </span>
+    {% elif participant.role == "co_admin" %}
+    <span class="inline-flex items-center px-[var(--space-2)] py-0.5 text-xs font-semibold rounded-[var(--radius-pill)] bg-blue-100 text-blue-700">
+        Co-admin
+    </span>
+    {% else %}
+    <span class="inline-flex items-center px-[var(--space-2)] py-0.5 text-xs font-semibold rounded-[var(--radius-pill)] bg-[var(--color-neutral-100)] text-[var(--color-neutral-600)]">
+        Participante
+    </span>
+    {% endif %}
+
+    <!-- Action Buttons (Owner only, not on self) -->
+    {% if is_owner and participant.role != "owner" %}
+    <div class="flex items-center gap-1">
+        {% if participant.role == "participant" %}
+        <button hx-post="{% url 'events:promote_participant' pk=event.pk participation_id=participant.pk %}"
+                hx-target="#participant-{{ participant.pk }}"
+                hx-swap="outerHTML"
+                hx-confirm="¿Promover a {{ participant.user.display_name }} a Co-admin?"
+                class="p-1.5 text-[var(--color-neutral-400)] hover:text-blue-600 hover:bg-blue-50 rounded-[var(--radius-button)] transition-colors"
+                title="Promover a Co-admin">
+            <span class="material-icons-outlined text-base">arrow_upward</span>
+        </button>
+        {% elif participant.role == "co_admin" %}
+        <button hx-post="{% url 'events:demote_participant' pk=event.pk participation_id=participant.pk %}"
+                hx-target="#participant-{{ participant.pk }}"
+                hx-swap="outerHTML"
+                hx-confirm="¿Quitar rol de Co-admin a {{ participant.user.display_name }}?"
+                class="p-1.5 text-[var(--color-neutral-400)] hover:text-amber-600 hover:bg-amber-50 rounded-[var(--radius-button)] transition-colors"
+                title="Quitar Co-admin">
+            <span class="material-icons-outlined text-base">arrow_downward</span>
+        </button>
+        {% endif %}
+        <button hx-post="{% url 'events:remove_participant' pk=event.pk participation_id=participant.pk %}"
+                hx-target="#participant-{{ participant.pk }}"
+                hx-swap="outerHTML"
+                hx-confirm="¿Remover a {{ participant.user.display_name }} del evento?"
+                class="p-1.5 text-[var(--color-neutral-400)] hover:text-red-600 hover:bg-red-50 rounded-[var(--radius-button)] transition-colors"
+                title="Remover participante">
+            <span class="material-icons-outlined text-base">person_remove</span>
+        </button>
+    </div>
+    {% endif %}
+</div>

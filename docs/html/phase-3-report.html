@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 3 — Events & Dashboard — Reporte de Finalización</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #b51d0c;
+            --secondary: #a93624;
+            --surface: #fcf9f8;
+            --on-surface: #1c1b1b;
+            --on-surface-variant: #5b403b;
+            --coral-soft: #FDE8E4;
+            --gray-border: #E5E7EB;
+            --success: #22C55E;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--surface); color: var(--on-surface); line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+        h1, h2, h3 { font-family: 'Nunito', sans-serif; }
+        h1 { font-size: 32px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+        h2 { font-size: 22px; font-weight: 700; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--coral-soft); }
+        h3 { font-size: 16px; font-weight: 700; margin: 16px 0 8px; }
+        p { margin-bottom: 12px; font-size: 14px; color: var(--on-surface-variant); }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-phase { background: var(--coral-soft); color: var(--primary); }
+        .card { background: white; border: 1px solid var(--gray-border); border-radius: 16px; padding: 24px; margin: 16px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 16px 0; }
+        .stat { background: white; border: 1px solid var(--gray-border); border-radius: 12px; padding: 16px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); font-family: 'Nunito'; }
+        .stat-label { font-size: 12px; color: var(--on-surface-variant); margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--gray-border); }
+        th { background: var(--coral-soft); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        tr:hover { background: #fafafa; }
+        code { background: #f3f0ef; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 8px 0; border-bottom: 1px solid #f3f0ef; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .checklist input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
+        .mermaid { margin: 16px 0; background: white; border-radius: 12px; padding: 24px; border: 1px solid var(--gray-border); }
+        .meta { font-size: 13px; color: var(--on-surface-variant); margin-bottom: 24px; }
+        @media print { .no-print { display: none; } body { background: white; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <header>
+        <span class="badge badge-phase">Fase 3</span>
+        <h1>Events & Dashboard</h1>
+        <p class="meta">
+            <strong>Fecha:</strong> 12 de Julio, 2026 &nbsp;|&nbsp;
+            <strong>Estado:</strong> <span class="badge badge-success">✓ Completada</span> &nbsp;|&nbsp;
+            <strong>Branch:</strong> <code>phase-3/events</code>
+        </p>
+    </header>
+
+    <!-- Goal -->
+    <section class="card">
+        <h3>Objetivo</h3>
+        <p>Un usuario verificado puede crear eventos, ver sus eventos en el dashboard, gestionar el ciclo de vida (cerrar, reabrir, cancelar), compartir link/QR, administrar co-admins y remover participantes.</p>
+    </section>
+
+    <!-- Metrics -->
+    <h2>📊 Métricas</h2>
+    <div class="stats-grid">
+        <div class="stat"><div class="stat-value">133</div><div class="stat-label">Tests pasando</div></div>
+        <div class="stat"><div class="stat-value">66</div><div class="stat-label">Tests nuevos (events)</div></div>
+        <div class="stat"><div class="stat-value">8</div><div class="stat-label">Commits atómicos</div></div>
+        <div class="stat"><div class="stat-value">13</div><div class="stat-label">Views implementadas</div></div>
+        <div class="stat"><div class="stat-value">8</div><div class="stat-label">Templates creados</div></div>
+        <div class="stat"><div class="stat-value">5</div><div class="stat-label">Screens de Stitch</div></div>
+    </div>
+
+    <!-- Architecture -->
+    <h2>🏗️ Arquitectura</h2>
+    <div class="mermaid">
+graph TD
+    A[Dashboard View] --> B[Event Cards Grid]
+    A --> C[Stats Bar]
+    D[Create Event View] --> E[CreateEventForm]
+    E --> F[create_event Service]
+    G[Event Detail View] --> H[Participant List]
+    G --> I[Lifecycle Buttons]
+    G --> J[Items Placeholder]
+    I --> K[close_event]
+    I --> L[reopen_event]
+    I --> M[cancel_event]
+    H --> N[promote_to_co_admin]
+    H --> O[demote_co_admin]
+    H --> P[remove_participant]
+    Q[Share View] --> R[QR Generation]
+    S[Public Card View] --> T[Token Lookup]
+    U[Internal Cron] --> V[close_expired_events]
+    </div>
+
+    <!-- Module Dependencies -->
+    <div class="mermaid">
+graph LR
+    P1[Fase 1 Foundation] --> P2[Fase 2 Auth]
+    P2 --> P3[Fase 3 Events]
+    P3 --> P4[Fase 4 Event Access]
+    P4 --> P5[Fase 5 Items]
+    P5 --> P6[Fase 6 Assignments]
+    </div>
+
+    <!-- Commits -->
+    <h2>📝 Commits</h2>
+    <table>
+        <thead><tr><th>Hash</th><th>Tipo</th><th>Scope</th><th>Descripción</th></tr></thead>
+        <tbody>
+            <tr><td><code>a49c2a7</code></td><td>feat</td><td>events</td><td>Add events app infrastructure</td></tr>
+            <tr><td><code>75de910</code></td><td>feat</td><td>events</td><td>Add views for dashboard, create, detail, lifecycle, share, public card</td></tr>
+            <tr><td><code>b61577c</code></td><td>feat</td><td>events</td><td>Add templates matching Stitch M3 design system</td></tr>
+            <tr><td><code>d4d3c96</code></td><td>feat</td><td>events</td><td>Wire auto-close service into internal endpoint</td></tr>
+            <tr><td><code>a83e820</code></td><td>test</td><td>events</td><td>Add comprehensive test suite (forms, services, views)</td></tr>
+            <tr><td><code>9a2f28c</code></td><td>style</td><td>design-system</td><td>Migrate to Material Design 3 tokens from Stitch</td></tr>
+            <tr><td><code>b98009a</code></td><td>fix</td><td>accounts</td><td>Refactor auth templates to M3 Stitch design tokens</td></tr>
+            <tr><td><code>dde8b6c</code></td><td>docs</td><td>phase-3</td><td>Add specs, testing guide, steering rules, Stitch references</td></tr>
+        </tbody>
+    </table>
+
+    <!-- Done Criteria -->
+    <h2>✅ Criterios de Finalización (ROADMAP)</h2>
+    <ul class="checklist">
+        <li><input type="checkbox" checked> Usuario puede crear un evento y verlo en el Dashboard</li>
+        <li><input type="checkbox" checked> Dashboard muestra rol y status correctos para cada evento</li>
+        <li><input type="checkbox" checked> Link compartido y QR descargable se generan correctamente</li>
+        <li><input type="checkbox" checked> Owner puede cerrar, reabrir y cancelar el evento (con confirmación)</li>
+        <li><input type="checkbox" checked> Owner puede asignar y revocar co-admins (revocación requiere confirmación)</li>
+        <li><input type="checkbox" checked> Owner puede remover participantes (bloqueado si tienen asignaciones compradas)</li>
+        <li><input type="checkbox" checked> Cierre automático se ejecuta cuando se alcanza assignment_deadline_at</li>
+        <li><input type="checkbox" checked> Los 5 screens de Stitch para esta fase coinciden con el design system</li>
+    </ul>
+
+    <!-- What was built -->
+    <h2>🔨 Lo que se construyó</h2>
+    <div class="card">
+        <h3>Archivos nuevos (events app)</h3>
+        <table>
+            <thead><tr><th>Archivo</th><th>Propósito</th></tr></thead>
+            <tbody>
+                <tr><td><code>apps/events/urls.py</code></td><td>13 URL patterns con namespace events:</td></tr>
+                <tr><td><code>apps/events/decorators.py</code></td><td>@event_owner_required, @participant_required</td></tr>
+                <tr><td><code>apps/events/forms.py</code></td><td>CreateEventForm, EditEventForm</td></tr>
+                <tr><td><code>apps/events/services.py</code></td><td>8 funciones de business logic</td></tr>
+                <tr><td><code>apps/events/views.py</code></td><td>13 function-based views</td></tr>
+                <tr><td><code>apps/events/templates/</code></td><td>5 templates + 3 partials HTMX</td></tr>
+                <tr><td><code>apps/events/tests/</code></td><td>3 archivos de tests (66 tests)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Design System Changes -->
+    <div class="card">
+        <h3>Migración del Design System</h3>
+        <p>Se migró completamente de tokens custom a <strong>Material Design 3</strong> alineado con Stitch. Esto afectó:</p>
+        <ul style="padding-left: 20px; font-size: 14px; color: var(--on-surface-variant);">
+            <li><code>input.css</code> — Paleta M3 completa (primary #b51d0c, secondary #a93624, surface-container-*, state colors)</li>
+            <li><code>base.html</code> — Sidebar + TopBar + Mobile drawer unificado</li>
+            <li><code>auth-base.html</code> — Material Symbols Outlined + focus rings</li>
+            <li>6 templates de auth refactorizados para consistencia visual</li>
+        </ul>
+    </div>
+
+    <!-- New Rule -->
+    <div class="card" style="border-left: 4px solid var(--primary);">
+        <h3>⚠️ Nueva regla establecida</h3>
+        <p><strong>Stitch Design Fidelity (MANDATORY)</strong> — Todo template/UI con screen en Stitch DEBE construirse desde el HTML source code descargado de Stitch. Nunca inventar layout ni estilos. Ver <code>.kiro/steering/tech.md</code> para el proceso completo.</p>
+    </div>
+
+    <!-- Next Phase -->
+    <h2>➡️ Siguiente Fase</h2>
+    <div class="card">
+        <h3>Fase 4 — Event Access</h3>
+        <p><strong>Objetivo:</strong> Un usuario puede unirse a un evento vía link o QR, pasar por el flujo de aprobación, y ser aceptado o rechazado por Owner/Co-admin. Los usuarios pueden irse voluntariamente.</p>
+        <p><strong>Módulo:</strong> EventAccess</p>
+        <p><strong>Depende de:</strong> Fase 3 (eventos deben existir; link compartido y roles deben funcionar)</p>
+        <p><strong>Screens de Stitch:</strong> Solicitud Pendiente, Gestión de Solicitudes</p>
+    </div>
+
+    <!-- Footer -->
+    <footer style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--gray-border); text-align: center;">
+        <p style="font-size: 12px; color: var(--on-surface-variant);">
+            Hatsik • Fase 3 completada el 12 de Julio, 2026 • 133 tests • 8 commits atómicos
+        </p>
+    </footer>
+</div>
+<script>mermaid.initialize({startOnLoad: true, theme: 'neutral'});</script>
+</body>
+</html>

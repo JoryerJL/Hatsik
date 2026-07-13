@@ -11,15 +11,14 @@ def close_expired_events(request):
     Internal endpoint called by EventBridge Scheduler every 5 minutes.
 
     Verifies the X-Internal-Token header and closes expired events.
-    Business logic will be implemented in Phase 3.
     """
     token = request.headers.get("X-Internal-Token", "")
 
     if not token or token != settings.INTERNAL_CRON_TOKEN:
         return JsonResponse({"error": "Unauthorized"}, status=401)
 
-    # TODO(Phase 3): Implement actual event closure logic
-    # UPDATE events SET status='closed' WHERE assignment_deadline_at <= NOW()
-    #   AND status = 'active'
+    from apps.events.services import close_expired_events as do_close
 
-    return JsonResponse({"status": "ok", "closed_count": 0})
+    closed_count = do_close()
+
+    return JsonResponse({"status": "ok", "closed_count": closed_count})

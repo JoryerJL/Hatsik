@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ event.name }} — Hatsik{% endblock %}
+
+{% block sidebar_mis_eventos_class %}bg-[var(--color-coral-soft)] text-[var(--color-primary)] font-bold{% endblock %}
+{% block topbar_mis_eventos_class %}text-[var(--color-primary)] font-bold border-b-2 border-[var(--color-primary)]{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<div class="mb-[var(--space-xl)]">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[var(--space-sm)]">
+        <div>
+            <!-- Status Badge -->
+            {% if event.status == "active" %}
+            <span class="inline-flex items-center gap-1 px-3 py-1 text-[12px] leading-[16px] font-semibold rounded-full bg-green-100 text-green-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                Activo
+            </span>
+            {% elif event.status == "closed" %}
+            <span class="inline-flex items-center gap-1 px-3 py-1 text-[12px] leading-[16px] font-semibold rounded-full bg-amber-100 text-amber-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Cerrado
+            </span>
+            {% elif event.status == "cancelled" %}
+            <span class="inline-flex items-center gap-1 px-3 py-1 text-[12px] leading-[16px] font-semibold rounded-full bg-red-100 text-red-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                Cancelado
+            </span>
+            {% endif %}
+
+            <!-- Event Name -->
+            <h1 class="font-[var(--font-heading)] text-[24px] leading-[32px] font-bold text-[var(--color-on-surface)] mt-[var(--space-xs)] lg:text-[28px] lg:leading-[36px]">
+                {{ event.name }}
+            </h1>
+
+            <!-- Date -->
+            <p class="flex items-center gap-[var(--space-xs)] text-[14px] leading-[20px] text-[var(--color-on-surface-variant)] mt-[var(--space-xs)]">
+                <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                {{ event.event_date|date:"d M Y" }}
+            </p>
+
+            <!-- Description -->
+            {% if event.description %}
+            <p class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)] mt-[var(--space-sm)]">
+                {{ event.description }}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Edit Button (Owner only) -->
+        {% if is_owner %}
+        <a href="{% url 'events:edit' pk=event.pk %}"
+           class="inline-flex items-center gap-1 self-start px-4 py-2 text-[15px] leading-[20px] font-semibold text-[var(--color-on-surface-variant)] border border-[var(--color-gray-border)] rounded-xl hover:bg-[var(--color-surface-container)] transition-colors">
+            <span class="material-symbols-outlined text-[18px]">edit</span>
+            Editar
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 2-Column Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-[var(--space-xl)] items-start">
+
+    <!-- Left Column: Items List -->
+    <div class="lg:col-span-8 space-y-[var(--space-xl)]">
+        <!-- Items Section (Phase 5 placeholder) -->
+        <section>
+            <div class="flex items-center justify-between mb-[var(--space-lg)]">
+                <h2 class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold text-[var(--color-on-surface)]">Lista de ítems</h2>
+            </div>
+            <div class="bg-[var(--color-surface-container-lowest)] border border-[var(--color-gray-border)] rounded-xl p-[var(--space-lg)]">
+                <div class="flex items-center gap-[var(--space-md)] py-[var(--space-lg)] text-[14px] leading-[20px] text-[var(--color-gray-muted)]">
+                    <span class="material-symbols-outlined text-[24px] text-[var(--color-gray-muted)]">hourglass_empty</span>
+                    <div>
+                        <p class="font-semibold text-[var(--color-on-surface-variant)]">Próximamente</p>
+                        <p class="text-[12px] leading-[16px]">La lista de ítems estará disponible en la siguiente fase.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Event Details Mini Card -->
+        <section>
+            <div class="bg-[var(--color-coral-soft)]/30 border border-[var(--color-secondary)]/20 rounded-xl p-[var(--space-lg)]">
+                <h4 class="text-[15px] leading-[20px] font-semibold text-[var(--color-secondary)] mb-[var(--space-md)]">Detalles del evento</h4>
+                <div class="space-y-[var(--space-md)]">
+                    <div class="flex items-start gap-[var(--space-md)]">
+                        <span class="material-symbols-outlined text-[var(--color-secondary)]">calendar_month</span>
+                        <div>
+                            <p class="text-[15px] leading-[20px] font-semibold text-[var(--color-on-surface)]">{{ event.event_date|date:"l, d \d\e F" }}</p>
+                            <p class="text-[12px] leading-[16px] text-[var(--color-gray-muted)]">{{ event.event_date|date:"Y" }}</p>
+                        </div>
+                    </div>
+                    {% if event.description %}
+                    <div class="flex items-start gap-[var(--space-md)]">
+                        <span class="material-symbols-outlined text-[var(--color-secondary)]">info</span>
+                        <p class="text-[14px] leading-[20px] text-[var(--color-on-surface-variant)]">{{ event.description }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Right Column: Participants Sidebar -->
+    <div class="lg:col-span-4 space-y-[var(--space-xl)]">
+        <!-- Participants Card -->
+        <div class="bg-[var(--color-surface-container-lowest)] border border-[var(--color-gray-border)] rounded-xl p-[var(--space-lg)] lg:sticky lg:top-[100px]">
+            <div class="flex items-center justify-between mb-[var(--space-lg)]">
+                <h3 class="font-[var(--font-heading)] text-[20px] leading-[28px] font-bold text-[var(--color-on-surface)]">Participantes</h3>
+                <span class="bg-[var(--color-surface-container-high)] text-[var(--color-on-surface-variant)] px-2 py-1 rounded-full text-[12px] leading-[16px] font-bold">{{ participants|length }}</span>
+            </div>
+
+            <!-- Participant List -->
+            <div class="space-y-[var(--space-sm)] max-h-[400px] overflow-y-auto pr-[var(--space-xs)]" id="participant-list">
+                {% for p in participants %}
+                <div class="flex items-center justify-between p-[var(--space-sm)] hover:bg-[var(--color-surface-container-low)] rounded-lg transition-colors" id="participant-{{ p.pk }}">
+                    <div class="flex items-center gap-[var(--space-md)]">
+                        <!-- Avatar Circle -->
+                        <div class="w-10 h-10 rounded-full bg-[var(--color-coral-soft)] border {% if p.role == 'owner' %}border-[var(--color-primary)]{% else %}border-[var(--color-gray-border)]{% endif %} flex items-center justify-center flex-shrink-0">
+                            <span class="text-[14px] font-bold text-[var(--color-primary)]">
+                                {{ p.user.display_name|make_list|first|upper }}
+                            </span>
+                        </div>
+                        <div>
+                            <p class="text-[15px] leading-[20px] font-semibold text-[var(--color-on-surface)]">{{ p.user.display_name }}</p>
+                            <span class="text-[12px] leading-[16px] {% if p.role == 'owner' %}text-[var(--color-primary)]{% else %}text-[var(--color-gray-muted)]{% endif %}">
+                                {% if p.role == "owner" %}Organizador{% elif p.role == "co_admin" %}Co-admin{% else %}Participante{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Role Badge for co_admin -->
+                    {% if p.role == "co_admin" %}
+                    <span class="bg-[var(--color-coral-soft)] text-[var(--color-secondary)] text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tight">Co-admin</span>
+                    {% endif %}
+
+                    <!-- Action Buttons (Owner only, not on self) -->
+                    {% if is_owner and p.role != "owner" %}
+                    <div class="flex items-center gap-1 ml-1">
+                        {% if p.role == "participant" %}
+                        <button hx-post="{% url 'events:promote_participant' pk=event.pk participation_id=p.pk %}"
+                                hx-target="#participant-{{ p.pk }}"
+                                hx-swap="outerHTML"
+                                hx-confirm="¿Promover a {{ p.user.display_name }} a Co-admin?"
+                                class="p-1.5 text-[var(--color-gray-muted)] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Promover a Co-admin">
+                            <span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+                        </button>
+                        {% elif p.role == "co_admin" %}
+                        <button hx-post="{% url 'events:demote_participant' pk=event.pk participation_id=p.pk %}"
+                                hx-target="#participant-{{ p.pk }}"
+                                hx-swap="outerHTML"
+                                hx-confirm="¿Quitar rol de Co-admin a {{ p.user.display_name }}?"
+                                class="p-1.5 text-[var(--color-gray-muted)] hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                                title="Quitar Co-admin">
+                            <span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+                        </button>
+                        {% endif %}
+                        <button hx-post="{% url 'events:remove_participant' pk=event.pk participation_id=p.pk %}"
+                                hx-target="#participant-{{ p.pk }}"
+                                hx-swap="outerHTML"
+                                hx-confirm="¿Remover a {{ p.user.display_name }} del evento?"
+                                class="p-1.5 text-[var(--color-gray-muted)] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Remover participante">
+                            <span class="material-symbols-outlined text-[18px]">person_remove</span>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-[var(--space-lg)] pt-[var(--space-lg)] border-t border-[var(--color-gray-border)]">
+                {% if participation.role == "owner" or participation.role == "co_admin" %}
+                <a href="{% url 'events:share' pk=event.pk %}"
+                   class="w-full bg-[var(--color-primary-container)] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-[var(--space-md)] hover:opacity-90 transition-opacity">
+                    <span class="material-symbols-outlined">share</span>
+                    Invitar amigos
+                </a>
+                {% endif %}
+
+                <!-- Lifecycle Buttons (Owner only) -->
+                {% if is_owner %}
+                <div class="mt-[var(--space-md)] space-y-[var(--space-sm)]">
+                    {% if event.status == "active" %}
+                    <form method="post" action="{% url 'events:close' pk=event.pk %}">
+                        {% csrf_token %}
+                        <button type="submit"
+                                hx-post="{% url 'events:close' pk=event.pk %}"
+                                hx-confirm="¿Estás seguro de que querés cerrar este evento?"
+                                class="w-full flex items-center justify-center gap-2 py-2.5 text-[14px] leading-[20px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">lock</span>
+                            Cerrar evento
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'events:cancel' pk=event.pk %}">
+                        {% csrf_token %}
+                        <button type="submit"
+                                hx-post="{% url 'events:cancel' pk=event.pk %}"
+                                hx-confirm="¿Estás seguro de que querés cancelar este evento? Esta acción no se puede deshacer."
+                                class="w-full flex items-center justify-center gap-2 py-2.5 text-[14px] leading-[20px] font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">cancel</span>
+                            Cancelar evento
+                        </button>
+                    </form>
+                    {% elif event.status == "closed" %}
+                    <form method="post" action="{% url 'events:reopen' pk=event.pk %}">
+                        {% csrf_token %}
+                        <button type="submit"
+                                hx-post="{% url 'events:reopen' pk=event.pk %}"
+                                hx-confirm="¿Querés reabrir este evento?"
+                                class="w-full flex items-center justify-center gap-2 py-2.5 text-[14px] leading-[20px] font-semibold text-green-700 bg-green-50 border border-green-200 rounded-xl hover:bg-green-100 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">lock_open</span>
+                            Reabrir evento
+                        </button>
+                    </form>
+                    {% elif event.status == "cancelled" %}
+                    <p class="text-[12px] leading-[16px] text-[var(--color-gray-muted)] flex items-center gap-[var(--space-xs)] py-2">
+                        <span class="material-symbols-outlined text-[16px] text-[var(--color-error)]">info</span>
+                        Este evento ha sido cancelado.
+                    </p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
