@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6 — Assignments: Guía de Testing Manual</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #b51d0c;
+            --color-surface: #fcf9f8;
+            --color-on-surface: #1c1b1b;
+            --color-gray-muted: #6B7280;
+            --color-gray-border: #E5E7EB;
+            --color-coral-soft: #FDE8E4;
+            --color-state-unassigned: #FCA5A5;
+            --color-state-partial: #FDBA74;
+            --color-state-covered: #86EFAC;
+            --color-state-partial-bought: #93C5FD;
+            --color-state-bought: #4ADE80;
+            --font-heading: "Nunito", sans-serif;
+            --font-body: "Plus Jakarta Sans", sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-body); background: var(--color-surface); color: var(--color-on-surface); line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1 { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--color-primary); margin-bottom: 0.5rem; }
+        h2 { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--color-coral-soft); }
+        h3 { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        p { margin-bottom: 0.75rem; }
+        code { background: #f3f0ef; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        .subtitle { color: var(--color-gray-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+        .prereqs { background: var(--color-coral-soft); border-radius: 12px; padding: 1.25rem; margin-bottom: 2rem; }
+        .prereqs h3 { margin-top: 0; }
+        .prereqs ol { padding-left: 1.5rem; }
+        .prereqs li { margin-bottom: 0.5rem; }
+        .test-flow { background: white; border: 1px solid var(--color-gray-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .test-flow h3 { margin-top: 0; display: flex; align-items: center; gap: 0.5rem; }
+        .preconditions { color: var(--color-gray-muted); font-size: 0.85rem; margin-bottom: 1rem; font-style: italic; }
+        .steps { padding-left: 1.5rem; margin-bottom: 1rem; }
+        .steps li { margin-bottom: 0.6rem; font-size: 0.95rem; }
+        .steps li strong { color: var(--color-primary); }
+        .checkbox { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 0.5rem; border-radius: 8px; transition: background 0.2s; }
+        .checkbox:hover { background: var(--color-coral-soft); }
+        .checkbox input { width: 18px; height: 18px; accent-color: var(--color-primary); }
+        .edge-case { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
+        .edge-case p { margin: 0; font-size: 0.9rem; }
+        .semaphore { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: middle; margin-right: 4px; }
+        .final-checklist { background: white; border: 2px solid var(--color-primary); border-radius: 12px; padding: 1.5rem; }
+        .final-checklist label { display: block; margin-bottom: 0.5rem; }
+        section { page-break-inside: avoid; }
+        @media print { body { padding: 1rem; } .test-flow, .final-checklist { break-inside: avoid; } }
+        @media (max-width: 640px) { body { padding: 1rem; } }
+        details { margin-bottom: 1rem; }
+        details summary { cursor: pointer; font-weight: 600; padding: 0.5rem 0; }
+    </style>
+</head>
+<body>
+<h1>🧪 Phase 6 — Assignments</h1>
+<p class="subtitle">Guía de testing manual · Hatsik MVP · Última fase</p>
+
+<div class="prereqs">
+    <h3>📋 Requisitos previos</h3>
+    <ol>
+        <li>Servidor corriendo: <code>python manage.py runserver</code></li>
+        <li>Base de datos con migraciones aplicadas: <code>python manage.py migrate</code></li>
+        <li>Al menos 2 usuarios verificados (Owner + Participant)</li>
+        <li>Un evento activo con ítems creados (al menos 1 cuantificado y 1 binario)</li>
+        <li>El Participant debe tener acceso aceptado al evento</li>
+        <li>Opcionalmente: un Co-admin para pruebas de permisos</li>
+    </ol>
+</div>
+
+<h2>1. Asignarme un ítem cuantificado</h2>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">add_shopping_cart</span> Claim de ítem con cantidad</h3>
+    <p class="preconditions">Precondiciones: Logueado como Participant. Evento activo con ítem cuantificado (ej: "Carne 5 kg").</p>
+    <ol class="steps">
+        <li>Navegar al detalle del evento</li>
+        <li>Localizar un ítem cuantificado con status "Sin asignar"</li>
+        <li>Click en el botón <strong>"Asignarme"</strong></li>
+        <li><strong>Esperado:</strong> Aparece formulario inline con input de cantidad y texto "Disponible: X kg"</li>
+        <li>Ingresar cantidad válida (ej: <code>2</code>)</li>
+        <li>Click en <strong>"Confirmar"</strong></li>
+        <li><strong>Esperado:</strong> El formulario desaparece, el ítem muestra tu asignación con tu nombre y cantidad</li>
+        <li><strong>Esperado:</strong> El badge de status cambia (ej: "Parcialmente cubierto" si no cubriste todo)</li>
+        <li><strong>Esperado:</strong> La barra de progreso del evento se actualiza</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="claim-quantified"> Verificado ✓</label>
+</section>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">check_box</span> Claim de ítem binario</h3>
+    <p class="preconditions">Precondiciones: Logueado como Participant. Ítem binario (sin cantidad, ej: "Mantel").</p>
+    <ol class="steps">
+        <li>Localizar un ítem binario con status "Sin asignar"</li>
+        <li>Click en <strong>"Asignarme"</strong></li>
+        <li><strong>Esperado:</strong> Aparece formulario con botón "Yo lo llevo" (sin input de cantidad)</li>
+        <li>Click en <strong>"Yo lo llevo"</strong></li>
+        <li><strong>Esperado:</strong> El ítem muestra tu nombre como asignado</li>
+        <li><strong>Esperado:</strong> Status cambia a "Cubierto" (verde)</li>
+        <li><strong>Esperado:</strong> El botón "Asignarme" desaparece para otros participantes</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="claim-binary"> Verificado ✓</label>
+</section>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">block</span> Claim bloqueado por cantidad excedida</h3>
+    <p class="preconditions">Precondiciones: Ítem cuantificado con disponibilidad limitada (ej: solo 1 kg disponible).</p>
+    <ol class="steps">
+        <li>Click en "Asignarme" en un ítem parcialmente asignado</li>
+        <li>Ingresar cantidad mayor a la disponible</li>
+        <li>Click en "Confirmar"</li>
+        <li><strong>Esperado:</strong> Mensaje de error "Cantidad no disponible. Máximo: X kg"</li>
+        <li><strong>Esperado:</strong> La asignación NO se crea</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="claim-exceed-blocked"> Verificado ✓</label>
+</section>
+
+<h2>2. Modificar asignación propia</h2>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">edit</span> Editar cantidad de mi asignación</h3>
+    <p class="preconditions">Precondiciones: Tenés una asignación activa (no comprada) en un ítem cuantificado.</p>
+    <ol class="steps">
+        <li>En el detalle del evento, localizar tu asignación</li>
+        <li>Click en el ícono de <strong>editar</strong> (lápiz) junto a tu asignación</li>
+        <li><strong>Esperado:</strong> Aparece formulario con tu cantidad actual pre-cargada</li>
+        <li>Cambiar cantidad a un valor válido</li>
+        <li>Click en <strong>"Guardar"</strong></li>
+        <li><strong>Esperado:</strong> La cantidad se actualiza, status del ítem recalcula</li>
+        <li><strong>Esperado:</strong> Barra de progreso se refresca</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="modify-own"> Verificado ✓</label>
+</section>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">lock</span> No se puede editar asignación de otro</h3>
+    <p class="preconditions">Precondiciones: Otro participante tiene una asignación en el mismo evento.</p>
+    <ol class="steps">
+        <li>Localizar la asignación de otro participante</li>
+        <li><strong>Esperado:</strong> NO aparece ícono de editar para asignaciones ajenas (solo para las tuyas)</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="modify-others-hidden"> Verificado ✓</label>
+</section>
+
+<h2>3. Cancelar asignación</h2>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">close</span> Cancelar mi asignación (con confirmación)</h3>
+    <p class="preconditions">Precondiciones: Tenés una asignación activa no comprada.</p>
+    <ol class="steps">
+        <li>Localizar tu asignación activa</li>
+        <li>Click en el ícono <strong>X</strong> (cancelar)</li>
+        <li><strong>Esperado:</strong> Dialog de confirmación: "¿Seguro que querés cancelar tu asignación?"</li>
+        <li>Confirmar</li>
+        <li><strong>Esperado:</strong> Tu asignación desaparece de la lista</li>
+        <li><strong>Esperado:</strong> Cantidad disponible aumenta, status del ítem recalcula</li>
+        <li><strong>Esperado:</strong> Botón "Asignarme" vuelve a aparecer si ya no tenés asignación</li>
+        <li><strong>Esperado:</strong> Podés volver a asignarte el mismo ítem</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="cancel-own"> Verificado ✓</label>
+</section>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">admin_panel_settings</span> Owner cancela asignación ajena</h3>
+    <p class="preconditions">Precondiciones: Logueado como Owner. Un Participant tiene una asignación no comprada.</p>
+    <ol class="steps">
+        <li>Localizar la asignación de otro participante</li>
+        <li><strong>Esperado:</strong> Como Owner, ves un botón de cancelar (ícono person_remove) en asignaciones ajenas</li>
+        <li>Click en el botón de cancelar</li>
+        <li><strong>Esperado:</strong> Confirmación: "¿Cancelar la asignación de [nombre]?"</li>
+        <li>Confirmar</li>
+        <li><strong>Esperado:</strong> La asignación se cancela, cantidad retorna al pool</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="owner-cancel-others"> Verificado ✓</label>
+</section>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">shield</span> Co-admin NO puede cancelar asignaciones ajenas</h3>
+    <p class="preconditions">Precondiciones: Logueado como Co-admin.</p>
+    <ol class="steps">
+        <li>Localizar una asignación de otro participante</li>
+        <li><strong>Esperado:</strong> NO aparece botón de cancelar en asignaciones ajenas para Co-admin</li>
+        <li>(Solo ve botones en sus propias asignaciones)</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="coadmin-no-cancel-others"> Verificado ✓</label>
+</section>
+
+<h2>4. Marcar como comprado</h2>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">shopping_cart_checkout</span> Marcar mi asignación como comprada</h3>
+    <p class="preconditions">Precondiciones: Tenés una asignación activa no comprada.</p>
+    <ol class="steps">
+        <li>Localizar tu asignación activa</li>
+        <li>Click en el ícono de <strong>carrito</strong> (marcar comprado)</li>
+        <li><strong>Esperado:</strong> Confirmación: "¿Marcar como comprado? Esta acción no se puede deshacer."</li>
+        <li>Confirmar</li>
+        <li><strong>Esperado:</strong> Tu asignación ahora muestra badge verde "Comprado ✓"</li>
+        <li><strong>Esperado:</strong> Los botones de editar y cancelar DESAPARECEN (inmutable)</li>
+        <li><strong>Esperado:</strong> Status del ítem cambia (parcialmente comprado o comprado)</li>
+        <li><strong>Esperado:</strong> Barra de progreso se actualiza</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="mark-purchased-self"> Verificado ✓</label>
+</section>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">verified</span> Admin marca comprado una asignación ajena</h3>
+    <p class="preconditions">Precondiciones: Logueado como Owner o Co-admin. Otro participante tiene asignación activa.</p>
+    <ol class="steps">
+        <li>Localizar asignación ajena</li>
+        <li><strong>Esperado:</strong> Como admin, ves el ícono de carrito en asignaciones ajenas</li>
+        <li>Click en el ícono de carrito</li>
+        <li>Confirmar</li>
+        <li><strong>Esperado:</strong> La asignación se marca como comprada</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="admin-mark-purchased"> Verificado ✓</label>
+</section>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">event_busy</span> Marcar comprado en evento CERRADO (permitido)</h3>
+    <p class="preconditions">Precondiciones: Evento cerrado con asignaciones activas no compradas.</p>
+    <ol class="steps">
+        <li>Cerrar el evento (como Owner)</li>
+        <li>Loguearse como Participant con asignación activa</li>
+        <li>Click en marcar como comprado</li>
+        <li><strong>Esperado:</strong> Se permite marcar como comprado (el botón funciona)</li>
+        <li><strong>Esperado:</strong> Los botones de editar y cancelar NO aparecen (evento cerrado)</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="purchase-closed-allowed"> Verificado ✓</label>
+</section>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">cancel</span> Marcar comprado en evento CANCELADO (bloqueado)</h3>
+    <p class="preconditions">Precondiciones: Evento cancelado.</p>
+    <ol class="steps">
+        <li>Cancelar el evento (como Owner)</li>
+        <li>Navegar al detalle del evento</li>
+        <li><strong>Esperado:</strong> NO aparece ningún botón de acción en las asignaciones</li>
+        <li><strong>Esperado:</strong> No se puede marcar como comprado, ni editar, ni cancelar</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="purchase-cancelled-blocked"> Verificado ✓</label>
+</section>
+
+<h2>5. Barra de progreso</h2>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">trending_up</span> Progreso refleja cobertura real</h3>
+    <p class="preconditions">Precondiciones: Evento con múltiples ítems en distintos estados.</p>
+    <ol class="steps">
+        <li>Crear un evento con 4 ítems</li>
+        <li>Verificar progreso muestra <strong>0%</strong> inicialmente</li>
+        <li>Asignar completamente 1 ítem → <strong>Esperado: 25%</strong></li>
+        <li>Asignar completamente otro → <strong>Esperado: 50%</strong></li>
+        <li>Marcar uno como comprado → Sigue contando como cubierto</li>
+        <li><strong>Esperado:</strong> La barra se actualiza sin recargar la página (HTMX)</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="progress-bar"> Verificado ✓</label>
+</section>
+
+<h2>6. Ítems sin cubrir resaltados al cerrar</h2>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">warning</span> Highlight rojo en ítems sin cubrir</h3>
+    <p class="preconditions">Precondiciones: Evento activo con ítems sin asignar o parcialmente cubiertos.</p>
+    <ol class="steps">
+        <li>Asegurar que al menos 1 ítem quede en "Sin asignar" y 1 en "Parcialmente cubierto"</li>
+        <li>Como Owner, cerrar el evento</li>
+        <li>Navegar al detalle del evento</li>
+        <li><strong>Esperado:</strong> Los ítems sin cubrir tienen un borde rojo visible (ring rojo)</li>
+        <li><strong>Esperado:</strong> Los ítems cubiertos/comprados NO tienen highlight rojo</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="uncovered-highlight"> Verificado ✓</label>
+</section>
+
+<h2>7. Semáforo de estados</h2>
+
+<section class="test-flow">
+    <h3><span class="material-symbols-outlined">palette</span> Verificar colores del semáforo</h3>
+    <p class="preconditions">Precondiciones: Crear ítems en distintos estados de asignación.</p>
+    <ol class="steps">
+        <li>Verificar colores según estado:
+            <ul style="margin-top: 0.5rem; padding-left: 1rem;">
+                <li><span class="semaphore" style="background: var(--color-state-unassigned)"></span> <strong>Sin asignar</strong> — rojo suave</li>
+                <li><span class="semaphore" style="background: var(--color-state-partial)"></span> <strong>Parcialmente cubierto</strong> — naranja</li>
+                <li><span class="semaphore" style="background: var(--color-state-covered)"></span> <strong>Cubierto</strong> — verde claro</li>
+                <li><span class="semaphore" style="background: var(--color-state-partial-bought)"></span> <strong>Parcialmente comprado</strong> — azul</li>
+                <li><span class="semaphore" style="background: var(--color-state-bought)"></span> <strong>Comprado</strong> — verde fuerte</li>
+            </ul>
+        </li>
+        <li><strong>Esperado:</strong> Cada badge muestra el color correcto y la barra inferior del ítem coincide</li>
+    </ol>
+    <label class="checkbox"><input type="checkbox" data-test="semaphore-colors"> Verificado ✓</label>
+</section>
+
+<h2>8. Casos límite</h2>
+
+<details>
+    <summary>Expandir casos límite</summary>
+
+    <div class="edge-case">
+        <p><strong>⚠️ Asignación duplicada:</strong> Intentar asignarse dos veces al mismo ítem. Esperado: error "Ya tenés una asignación activa".</p>
+    </div>
+    <div class="edge-case">
+        <p><strong>⚠️ Re-claim después de cancelar:</strong> Cancelar asignación, luego volver a asignarse al mismo ítem. Esperado: funciona correctamente.</p>
+    </div>
+    <div class="edge-case">
+        <p><strong>⚠️ Evento cerrado — claim bloqueado:</strong> Intentar asignarse en evento cerrado. Esperado: botón "Asignarme" no aparece.</p>
+    </div>
+    <div class="edge-case">
+        <p><strong>⚠️ Modificar a 0:</strong> Intentar editar cantidad a 0. Esperado: error de validación "La cantidad debe ser mayor a cero".</p>
+    </div>
+    <div class="edge-case">
+        <p><strong>⚠️ Participante regular no puede marcar compra ajena:</strong> Solo Owner, Co-admin, o el asignado mismo pueden marcar como comprado.</p>
+    </div>
+    <div class="edge-case">
+        <p><strong>⚠️ Binario ya cubierto:</strong> Si otro ya tomó un ítem binario, el botón "Asignarme" no debe aparecer.</p>
+    </div>
+</details>
+
+<label class="checkbox"><input type="checkbox" data-test="edge-cases"> Casos límite verificados ✓</label>
+
+<h2>9. Checklist final — Done Criteria del ROADMAP</h2>
+
+<div class="final-checklist">
+    <label class="checkbox"><input type="checkbox" data-test="dc-1"> Participante puede reclamar ítem cuantificado con cantidad válida</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-2"> Claim bloqueado cuando la cantidad excedería el total</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-3"> Claim binario funciona sin input de cantidad</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-4"> Participante puede modificar su asignación no comprada</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-5"> Participante puede cancelar su asignación (con confirmación)</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-6"> Marcar como comprado requiere confirmación y es irreversible</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-7"> Marcar como comprado permitido en eventos cerrados</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-8"> Marcar como comprado bloqueado en eventos cancelados</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-9"> Owner puede cancelar asignaciones ajenas (con confirmación)</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-10"> Co-admin NO puede cancelar asignaciones ajenas</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-11"> Semáforo de status se actualiza correctamente tras cada acción</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-12"> Barra de progreso refleja cobertura real del evento</label>
+    <label class="checkbox"><input type="checkbox" data-test="dc-13"> Ítems sin cubrir resaltados en rojo cuando el evento cierra</label>
+</div>
+
+<script>
+// Persist checkbox state in localStorage
+document.addEventListener('DOMContentLoaded', () => {
+    const key = 'hatsik-phase-6-testing';
+    const saved = JSON.parse(localStorage.getItem(key) || '{}');
+
+    document.querySelectorAll('input[data-test]').forEach(cb => {
+        const id = cb.dataset.test;
+        if (saved[id]) cb.checked = true;
+        cb.addEventListener('change', () => {
+            saved[id] = cb.checked;
+            localStorage.setItem(key, JSON.stringify(saved));
+        });
+    });
+});
+</script>
+
+</body>
+</html>
