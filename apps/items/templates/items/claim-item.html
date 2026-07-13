@@ -44,14 +44,10 @@
                     class="px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg active:scale-95 transition-transform">
                 {% if is_quantified %}Confirmar{% else %}Yo lo llevo{% endif %}
             </button>
-            <button type="button"
-                    hx-get="{% url 'items:progress' pk=event.pk %}"
-                    hx-target="#item-row-{{ item.pk }}"
-                    hx-swap="none"
-                    onclick="this.closest('[id^=item-row-]').outerHTML = this.closest('[id^=item-row-]').outerHTML"
-                    class="px-4 py-2 text-gray-muted text-xs font-semibold hover:text-on-surface transition-colors">
+            <a href="{% url 'events:detail' pk=event.pk %}"
+               class="px-4 py-2 text-gray-muted text-xs font-semibold hover:text-on-surface transition-colors">
                 Cancelar
-            </button>
+            </a>
         </div>
     </form>
 </div>

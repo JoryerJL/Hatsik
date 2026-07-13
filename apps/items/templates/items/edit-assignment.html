@@ -39,11 +39,10 @@
                     class="px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg active:scale-95 transition-transform">
                 Guardar
             </button>
-            <button type="button"
-                    onclick="location.reload()"
-                    class="px-4 py-2 text-gray-muted text-xs font-semibold hover:text-on-surface transition-colors">
+            <a href="{% url 'events:detail' pk=event.pk %}"
+               class="px-4 py-2 text-gray-muted text-xs font-semibold hover:text-on-surface transition-colors">
                 Cancelar
-            </button>
+            </a>
         </div>
     </form>
 </div>
