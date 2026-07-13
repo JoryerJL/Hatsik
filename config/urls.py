@@ -10,6 +10,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("internal/", include("apps.internal.urls")),
     path("events/", include("apps.events.urls")),
+    path("events/", include("apps.items.urls")),
+    path("events/", include("apps.moderation.urls")),
     path("", include("apps.accounts.urls")),
 ]
 

@@ -1,0 +1,498 @@
+<!DOCTYPE html><html class="light" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&amp;family=Plus+Jakarta+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .item-card-transition {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+        }
+        .item-card-transition:hover {
+            transform: translateY(-2px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E5E7EB;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#ffb4a6",
+                        "surface-dim": "#dcd9d9",
+                        "surface-tint": "#b8200e",
+                        "primary": "#b51d0c",
+                        "outline": "#8f706a",
+                        "surface-container": "#f0eded",
+                        "inverse-surface": "#313030",
+                        "on-background": "#1c1b1b",
+                        "outline-variant": "#e4beb7",
+                        "on-error-container": "#93000a",
+                        "coral-soft": "#FDE8E4",
+                        "on-secondary-fixed": "#3f0200",
+                        "secondary": "#a93624",
+                        "on-primary-fixed-variant": "#910900",
+                        "tertiary-container": "#007da9",
+                        "state-covered": "#86EFAC",
+                        "primary-fixed-dim": "#ffb4a7",
+                        "primary-container": "#d83823",
+                        "on-primary-fixed": "#400200",
+                        "state-partial": "#FDBA74",
+                        "state-bought": "#4ADE80",
+                        "secondary-fixed": "#ffdad4",
+                        "surface-container-highest": "#e5e2e1",
+                        "primary-fixed": "#ffdad4",
+                        "on-secondary-container": "#6f0a01",
+                        "inverse-on-surface": "#f3f0ef",
+                        "on-tertiary-fixed": "#001e2c",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#ffb4a7",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#c4e7ff",
+                        "surface-variant": "#e5e2e1",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#7cd0ff",
+                        "gray-muted": "#6B7280",
+                        "secondary-container": "#fd735c",
+                        "surface-bright": "#fcf9f8",
+                        "on-surface": "#1c1b1b",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#fcfcff",
+                        "gray-border": "#E5E7EB",
+                        "surface-container-high": "#eae7e7",
+                        "surface": "#fcf9f8",
+                        "background": "#fcf9f8",
+                        "state-unassigned": "#FCA5A5",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004c69",
+                        "on-surface-variant": "#5b403b",
+                        "on-primary-container": "#fffbff",
+                        "tertiary": "#006387",
+                        "state-partial-bought": "#93C5FD",
+                        "on-secondary-fixed-variant": "#881e0f",
+                        "surface-container-low": "#f6f3f2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "xl": "24px",
+                        "xs": "4px",
+                        "margin-desktop": "32px",
+                        "gutter": "16px",
+                        "margin-mobile": "16px",
+                        "lg": "16px",
+                        "sm": "8px",
+                        "md": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Nunito"],
+                        "caption": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "display-logo": ["Nunito"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Nunito"],
+                        "headline-lg-mobile": ["Nunito"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "display-logo": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-md": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-gray-border dark:border-outline-variant sticky top-0 z-50">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-md w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-md">
+<span class="text-display-logo font-display-logo text-on-surface dark:text-inverse-on-surface">hatsik</span>
+</div>
+<nav class="hidden md:flex items-center gap-xl">
+<a class="text-primary dark:text-inverse-primary font-bold border-b-2 border-primary py-xs text-label-md font-label-md" href="#">Mis eventos</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-primary dark:hover:text-inverse-primary transition-colors duration-200 py-xs text-label-md font-label-md" href="#">Crear evento</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors text-label-md font-label-md">Cerrar sesión</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-gray-border overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVTe1BK1vB13UgIu18cBC0_U5wlHdtktqfJb48Lz87pFi_iL7k-oRXoiyqONSngWHCPJvcAB1odvqWg7j4Eqm8rhr4SzaQ_-EF_T37-YodyD5B9HE8zyrMPdt0FPP_nvciu1h3cx12xaP8jZX6sPyVtE92DxZg30tKjG1JyQPhT3CVcWvhm9FyBi6H0AGUu-fVNnV9hqLBE2yob4XM9e_0xj7w8-MKyJRjhtmgAmGTMVABLk5bV1pzeJUTpvwz-RL7RhLGpwuYCYih">
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-xl">
+<!-- Hero Header -->
+<div class="mb-xl">
+<div class="relative h-64 md:h-80 rounded-xl overflow-hidden mb-lg">
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-angle shot of a traditional South American barbecue pit with sizzling cuts of premium beef over glowing wood embers. The atmosphere is warm and festive, captured in the golden hour light of a Saturday afternoon. The visual style is clean and modern, emphasizing the rich textures of the food and the organized preparation on a minimalist wooden table nearby." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm_lXj5sfv0UN3Y5XA5XveBRh5mUHSCgf7pCyATIOtr_2IjVrV98kkjVsiVA2Nn2poVB-u654KzxIZdmf5WWqOiMC68kwU10x2JlVeeSU9mkDzv4eLVj3sQo3D0E1_1GRWFMV7V8LjTYg4x1Na-gQpb6IECVpa2kAbzQBoBDZ8TIiZRmtLaaq9wJGe6CjUYpiuyvaIdeHmn73qqmiJ8gji71l4_kPie05Qp8ti0EQvzmFRJrWumGTaYk4p818lGuYuNN5CkSi4Cf0R">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-lg">
+<span class="inline-block px-3 py-1 bg-primary text-white text-caption font-semibold rounded-full w-fit mb-xs">Próximo sábado</span>
+<h1 class="text-white font-headline-lg text-headline-lg md:text-headline-lg">Asado del Sábado</h1>
+<p class="text-white/90 text-body-md font-body-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Quinta de la Amistad, Buenos Aires
+                    </p>
+</div>
+</div>
+<!-- Progress Card -->
+<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-lg flex flex-col md:flex-row md:items-center gap-lg">
+<div class="flex-1">
+<div class="flex justify-between items-end mb-xs">
+<span class="text-label-md font-label-md text-on-surface-variant">Progreso del evento</span>
+<span class="text-headline-md font-headline-md text-primary">65%</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: 65%"></div>
+</div>
+</div>
+<div class="flex items-center gap-md border-l-0 md:border-l border-gray-border md:pl-lg">
+<div class="flex -space-x-3">
+<img alt="Participant" class="w-10 h-10 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGUgF-2wn40K-2UAhVs9xGotoePJt2AmF7MnkVlZTgCPk5Pv2hFoTToAfi2YKSBZvzhikTn6sP2hq8NgzS9TdMrZwEj6ePXzEUpAKnkT3vgadFisv1ZL197GLRLL81y75q8z8wpB2--cUH8JF8LAsBhT87nejNWTriA3aXd4icEdhald-0UnyegVXEbcbWeWqN2IBm_cMjj-Da-OfysRM3ha28erx8jwhgfXWoYzyreOq6yfjb5rLRCXLvDhUuD_ncvNafwEpDziWH">
+<img alt="Participant" class="w-10 h-10 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1OJ0ZO_wugm9arYlj9VgodQshZjnhL5nVnKP5C5vfyJT55N3d7OQ34m0Dy5YdcdsOfC2D9ASMZEwyQssK_c7ndqlaz5sYK98S4l89j-LxeEcLTOz8DiTsUUmrNX9bHwUJdybOLvh5n4q3FVzjHYk4iWH4B-kmfK4CisfbyAqD7Nc3zkYuB0poEOuBd2PQTTKwJK0NvVvWV9DA5-SSK6ngpSNlAdQJInEoMMQrQT8NB3UZHPNqxgRVjZAuyS6hT2TeSGI2zwUVeNlG">
+<img alt="Participant" class="w-10 h-10 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC44I5-V0BbAZyowxz5cGcyBkyY1fAypKNmPjtmkpKSUFeu0QVNU2u_1bTMsVsAgael1R6MLKYkcULTgVBzJ-Nk3OJGPOoTFnm2Te4sWQ5yo8cMWVExowKR31hXZFkNGF453afG2Jlg8fQQhJ6uf2aJQZ54XqolGEqxdb38GSrwg-H5hOGddDNl6nFSuo4Ljf9hEUoUk2MG0-l6xF0EbbvmQW87IaFtVz57emxcuJXpelLCX5WDxt3L3ZzB9HYJh-leSDIJcUvBfxD7">
+<div class="w-10 h-10 rounded-full bg-surface-container-high border-2 border-white flex items-center justify-center text-caption font-bold text-on-surface-variant">+5</div>
+</div>
+<span class="text-label-md font-label-md text-on-surface-variant">8 confirmados</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-xl items-start">
+<!-- Left Column: Items List -->
+<div class="lg:col-span-8 space-y-xl">
+<section class="bg-surface-container-low border border-gray-border rounded-xl p-lg mb-xl">
+<div class="flex items-center justify-between mb-lg">
+<div class="flex items-center gap-md">
+<h2 class="text-headline-md font-headline-md text-on-surface">Solicitudes pendientes</h2>
+<span class="bg-primary text-white text-caption font-bold px-2 py-0.5 rounded-full">3</span>
+</div>
+</div>
+<div class="space-y-md">
+<!-- Request Row 1 -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-md p-md bg-surface-container-lowest rounded-lg border border-gray-border/50">
+<div class="flex items-center gap-md">
+<img alt="Mariana R." class="w-10 h-10 rounded-full border border-gray-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHXbZzW7u8K8C5X6j9v_Qv_rV_zZzW7u8K8C5X6j9v_Qv_rV_zZzW7u8K8C5X6j9v_Qv_rV_z">
+<div>
+<p class="text-label-md font-label-md text-on-surface font-headline-md">Mariana R.</p>
+<p class="text-caption font-caption text-gray-muted">mariana@email.com</p>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="px-4 py-2 bg-primary text-white font-bold text-caption rounded-lg active:scale-95 transition-transform">Aceptar</button>
+<button class="px-4 py-2 bg-surface-container text-on-surface-variant font-bold text-caption rounded-lg hover:bg-error/10 hover:text-error active:scale-95 transition-transform">Rechazar</button>
+</div>
+</div>
+<!-- Request Row 2 -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-md p-md bg-surface-container-lowest rounded-lg border border-gray-border/50">
+<div class="flex items-center gap-md">
+<img alt="Pedro G." class="w-10 h-10 rounded-full border border-gray-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDViFG1yofVoWBQ8Rhf7sOjg5DLRvyW_VPCYaw8EBCD23WLqMPT_6EZy38f8IcdAeqBa_GHUHv6lHsMC9N1hpg2TCZxlL8FRBMFd9X5ks4otMmgYpsDP2Ya8rpvOWgRCKey7koBd4zF804ltP9nMgDZjPrG9epBDQpzM57gHsmm_D_F7-JfyyEm3rh0TOpcb1JI4ZhvscAFQuKI1eKFtnCsPKUDzxK8a5UUoOdwvIN0Y5HXQhfbfI4FCOmmdxN6mR4oIPqnGPZ-TvXg">
+<div>
+<p class="text-label-md font-label-md text-on-surface font-headline-md">Pedro G.</p>
+<p class="text-caption font-caption text-gray-muted">pedro.g@email.com</p>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="px-4 py-2 bg-primary text-white font-bold text-caption rounded-lg active:scale-95 transition-transform">Aceptar</button>
+<button class="px-4 py-2 bg-surface-container text-on-surface-variant font-bold text-caption rounded-lg hover:bg-error/10 hover:text-error active:scale-95 transition-transform">Rechazar</button>
+</div>
+</div>
+<!-- Request Row 3 -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-md p-md bg-surface-container-lowest rounded-lg border border-gray-border/50">
+<div class="flex items-center gap-md">
+<img alt="Luis M." class="w-10 h-10 rounded-full border border-gray-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2Tc0ZDx55l61tZkgFbDXUkmrZqVuPRS2IM1WE-4FekBYW24kSsYvqYd480GbD8DhNW1n6YjXZOIU9eTkJQMARtUCQGZphx_d8_z3kgBVs7pQHgiIlSwN6-zwVVibWFbXLLpXH99HqWt-KTBVOeNy33gSgNEi9oAlLbDYXTVxPqOm5mywv1aYGOAbVd9jw-v5IdSa93lIBo0uDWxJEXKvb9JI0GDHLvaIlf3p370I2iae5mgg5I8x1FY5HpGQY9dSXFCzCHxI5zsxy">
+<div>
+<p class="text-label-md font-label-md text-on-surface font-headline-md">Luis M.</p>
+<p class="text-caption font-caption text-gray-muted">luis.m@email.com</p>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="px-4 py-2 bg-primary text-white font-bold text-caption rounded-lg active:scale-95 transition-transform">Aceptar</button>
+<button class="px-4 py-2 bg-surface-container text-on-surface-variant font-bold text-caption rounded-lg hover:bg-error/10 hover:text-error active:scale-95 transition-transform">Rechazar</button>
+</div>
+</div>
+</div>
+</section><section>
+<div class="flex items-center justify-between mb-lg">
+<h2 class="text-headline-md font-headline-md text-on-surface">Lista de ítems</h2>
+<button class="flex items-center gap-xs text-primary font-bold text-label-md hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">add_circle</span>
+                            Añadir ítem
+                        </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Item Card: Bought -->
+<div class="item-card-transition bg-surface-container-lowest border border-gray-border rounded-xl p-lg relative overflow-hidden">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-md text-on-surface">Carne (2kg)</h3>
+<span class="text-caption font-caption text-gray-muted">Varios cortes (Vacío, Tira)</span>
+</div>
+<span class="bg-state-bought text-on-surface text-caption font-bold px-2 py-1 rounded-full">Comprado</span>
+</div>
+<div class="flex items-center gap-sm">
+<img alt="Assignee" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCePeoG5SV3kaHh-8mv25psZ6wO6rAL4sY_RQfktIpjLGjNTdkeehjIR3LFrX6jNtKrPemlMcdRsvPAna9OgMPo3YnwM6uBTaPRG0oJKVygmGeg-jJdSX589HfcaBgtqgQFC5q9tR-EYJSqHuKVhF4UOGIgAmLms5-nY9jvfoSehSVX9jgHhPckUCSUiOGzh1bCkmpFag5UiOItQ-gY2lo7TilfyZ35CLT3Dzw037IPPfqZFh--T3Hg9ZcZCxbrZBaGK9AKCZGboZUe">
+<span class="text-body-md font-body-md text-on-surface-variant">Trae <strong>Juan M.</strong></span>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-state-bought"></div>
+</div>
+<!-- Item Card: Partial -->
+<div class="item-card-transition bg-surface-container-lowest border border-gray-border rounded-xl p-lg relative overflow-hidden">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-md text-on-surface">Refrescos (4L)</h3>
+<span class="text-caption font-caption text-gray-muted">Coca-Cola y Agua</span>
+</div>
+<span class="bg-state-partial text-on-surface text-caption font-bold px-2 py-1 rounded-full">Parcial</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<img alt="Assignee" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDViFG1yofVoWBQ8Rhf7sOjg5DLRvyW_VPCYaw8EBCD23WLqMPT_6EZy38f8IcdAeqBa_GHUHv6lHsMC9N1hpg2TCZxlL8FRBMFd9X5ks4otMmgYpsDP2Ya8rpvOWgRCKey7koBd4zF804ltP9nMgDZjPrG9epBDQpzM57gHsmm_D_F7-JfyyEm3rh0TOpcb1JI4ZhvscAFQuKI1eKFtnCsPKUDzxK8a5UUoOdwvIN0Y5HXQhfbfI4FCOmmdxN6mR4oIPqnGPZ-TvXg">
+<span class="text-body-md font-body-md text-on-surface-variant">Trae <strong>Sofía</strong></span>
+</div>
+<button class="text-primary font-bold text-caption bg-coral-soft px-3 py-1 rounded-lg active:scale-95 transition-transform">Completar</button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-state-partial"></div>
+</div>
+<!-- Item Card: Unassigned -->
+<div class="item-card-transition bg-surface-container-lowest border border-gray-border rounded-xl p-lg relative overflow-hidden">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-md text-on-surface">Carbón (1 bolsa)</h3>
+<span class="text-caption font-caption text-gray-muted">10kg quebracho blanco</span>
+</div>
+<span class="bg-state-unassigned text-on-surface text-caption font-bold px-2 py-1 rounded-full">Libre</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-body-md font-body-md italic text-gray-muted">Nadie asignado</span>
+<button class="bg-primary text-white font-bold text-caption px-4 py-2 rounded-lg active:scale-95 transition-transform">Apuntarme</button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-state-unassigned"></div>
+</div>
+<!-- Item Card: Assigned to current user -->
+<div class="item-card-transition bg-surface-container-lowest border border-gray-border rounded-xl p-lg border-primary/30 relative overflow-hidden">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-md text-on-surface">Pan (12 flautitas)</h3>
+<span class="text-caption font-caption text-gray-muted">Panadería "El Sol"</span>
+</div>
+<span class="bg-state-covered text-on-surface text-caption font-bold px-2 py-1 rounded-full">Pendiente</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<div class="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center text-[10px] text-on-primary-container font-bold border border-primary">TÚ</div>
+<span class="text-body-md font-body-md text-on-surface">Yo me encargo</span>
+</div>
+<button class="bg-state-bought text-on-surface font-bold text-caption px-3 py-2 rounded-lg flex items-center gap-xs shadow-sm hover:brightness-95 transition-all">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                                    Marcar comprado
+                                </button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-state-covered"></div>
+</div>
+</div>
+</section>
+<!-- Suggestions Section -->
+<section>
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-primary">lightbulb</span>
+<h2 class="text-headline-md font-headline-md text-on-surface">Sugerencias</h2>
+</div>
+<div class="flex flex-wrap gap-md">
+<div class="bg-surface-container-low border border-dashed border-outline-variant rounded-xl p-md flex items-center gap-md">
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-on-surface">Chimichurri casero</span>
+<span class="text-caption font-caption text-gray-muted">Sugerido por Carlos R.</span>
+</div>
+<button class="w-8 h-8 rounded-full bg-white border border-gray-border flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="bg-surface-container-low border border-dashed border-outline-variant rounded-xl p-md flex items-center gap-md">
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-on-surface">Ensalada Rusa</span>
+<span class="text-caption font-caption text-gray-muted">Sugerido por Elena</span>
+</div>
+<button class="w-8 h-8 rounded-full bg-white border border-gray-border flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Sidebar -->
+<div class="lg:col-span-4 space-y-xl">
+<!-- Participants Card -->
+<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-lg sticky top-[100px]">
+<div class="flex items-center justify-between mb-lg">
+<h3 class="text-headline-md font-headline-md text-on-surface">Participantes</h3>
+<span class="bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-full text-caption font-bold">8/12</span>
+</div>
+<div class="space-y-md max-h-[400px] overflow-y-auto custom-scrollbar pr-sm">
+<!-- Host -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors">
+<div class="flex items-center gap-md">
+<img alt="Host" class="w-10 h-10 rounded-full border border-primary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjYfed1Rhl2r8nCBhPfCzax1tzcSrFXcyiIkDaIVzrmJ1uXkd_RZFe61vPZy72x6q7Pwbjoe8Ts9QXIeivpckmzOkjiFWbOFH39aeGqpkynTmHKp1W8u_cnJNIQHYJE6PtGDHczYozMXFMTcom_YhOS47p9H0euNZEMve_EGcXmHI3SDYElmZ3jlTwlcDyta5Oj1WUoysh2HSo1JXQWGrAW9E0WSR6cryMKH9nrdF7j5aT-szIFjmkKR25d-p20MvH5gKeyrPbQmhz">
+<div>
+<p class="text-label-md font-label-md text-on-surface">Juan M.</p>
+<span class="text-caption font-caption text-primary">Organizador</span>
+</div>
+</div>
+</div>
+<!-- Participants -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors">
+<div class="flex items-center gap-md">
+<img alt="Participant" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkx-j1__X__gmlQDjmpxko-nMjG_VyI-mXEQElgll5mM3S3kcKPzn8cmeo0HNXMCWx50zJbUMG-LNHccD0sjF1s4_Z4nKQ0r6kcpCZlr1o5VrCzABK6YSUisgHFIfw6DJ_Uh-YMvxAehw1A4qHVBmLxIIk9Kmc6I0RoF9-mEVonefpx0S9Bf_aFirNey0JC5ab0Ptfe9SGYiXI7HES4EeLLx1vgylAJVkLdp0d5gw5dzp0i3oFUHTqVrk2mOqkEksjLWsfnvVhVi50">
+<div>
+<p class="text-label-md font-label-md text-on-surface">Sofía</p>
+<span class="text-caption font-caption text-gray-muted">Confirmado</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors">
+<div class="flex items-center gap-md">
+<img alt="Participant" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2Tc0ZDx55l61tZkgFbDXUkmrZqVuPRS2IM1WE-4FekBYW24kSsYvqYd480GbD8DhNW1n6YjXZOIU9eTkJQMARtUCQGZphx_d8_z3kgBVs7pQHgiIlSwN6-zwVVibWFbXLLpXH99HqWt-KTBVOeNy33gSgNEi9oAlLbDYXTVxPqOm5mywv1aYGOAbVd9jw-v5IdSa93lIBo0uDWxJEXKvb9JI0GDHLvaIlf3p370I2iae5mgg5I8x1FY5HpGQY9dSXFCzCHxI5zsxy">
+<div>
+<p class="text-label-md font-label-md text-on-surface">Carlos R.</p>
+<span class="text-caption font-caption text-gray-muted">Confirmado</span>
+</div>
+</div>
+<span class="bg-coral-soft text-secondary text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tight">Co-admin</span>
+</div>
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors">
+<div class="flex items-center gap-md">
+<img alt="Participant" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ_Mrx6HHzMrlwDF1RT5lttpLe_GE0HzZVRPEDerESGk4WKweaV3c1u2qMGYSEdhxgKqTcRnuFPefj-t-Zg3fGS4rW7Tj7wv7tRN6U-x_Mu885LeMlTsV51k6i9Yk9AUdzghtK_Hi4p1JdK6w6jft5iySZW0qNqLsXjDbRzhP6t97quYuveNanFz9ya5mmWYGhr-G6SXJ0-j6Amrc6V6Q2Yl54hgzMMowkBuVszX-MT_x_dziwKhzjxJEEzOlzMIoldPR2SWqEBIGJ">
+<div>
+<p class="text-label-md font-label-md text-on-surface">Elena</p>
+<span class="text-caption font-caption text-gray-muted">Confirmado</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-lg pt-lg border-t border-gray-border">
+<button class="w-full bg-secondary-container text-white font-bold py-3 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-md">
+<span class="material-symbols-outlined">share</span>
+                            Invitar amigos
+                        </button>
+<button class="w-full mt-md bg-surface-container-low text-error font-bold py-3 rounded-xl hover:bg-error-container/20 transition-colors text-body-md">
+                            No puedo asistir
+                        </button>
+</div>
+</div>
+<!-- Event Details Mini Card -->
+<div class="bg-coral-soft/30 border border-secondary/20 rounded-xl p-lg">
+<h4 class="text-label-md font-label-md text-secondary mb-md">Detalles del Evento</h4>
+<div class="space-y-md">
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-secondary">calendar_month</span>
+<div>
+<p class="text-label-md font-label-md">Sábado, 15 de Octubre</p>
+<p class="text-caption font-caption text-gray-muted">13:00 - 20:00</p>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-secondary">payments</span>
+<div>
+<p class="text-label-md font-label-md">Presupuesto estimado</p>
+<p class="text-caption font-caption text-gray-muted">$15.000 por persona</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (Mobile) -->
+<button class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center z-50 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+<script>
+        // Simple micro-interaction for the progress bar
+        window.addEventListener('DOMContentLoaded', () => {
+            const progress = document.querySelector('.bg-primary.rounded-full');
+            if (progress) {
+                progress.style.width = '0%';
+                setTimeout(() => {
+                    progress.style.width = '65%';
+                }, 300);
+            }
+        });
+    </script>
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-margin-mobile">
+<div class="bg-white w-full max-w-md rounded-[16px] shadow-2xl overflow-hidden flex flex-col">
+<!-- Modal Header -->
+<div class="p-lg border-b border-gray-border">
+<h3 class="text-headline-md font-headline-md text-on-surface">Editar ítem</h3>
+</div>
+<!-- Modal Body -->
+<div class="p-lg space-y-lg">
+<!-- Contextual Warning -->
+<div class="bg-coral-soft p-md rounded-lg border border-secondary/20">
+<p class="text-caption font-caption text-secondary">
+                    Este ítem tiene asignaciones. Solo puedes aumentar la cantidad total o modificar el nombre.
+                </p>
+</div>
+<div class="space-y-md">
+<!-- Item Name -->
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-label-md text-on-surface-variant">Nombre del ítem</label>
+<input class="w-full rounded-lg border-gray-border focus:ring-secondary focus:border-secondary text-body-md font-body-md py-2 px-3" type="text" value="Refrescos">
+</div>
+<div class="grid grid-cols-2 gap-md">
+<!-- Quantity -->
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-label-md text-on-surface-variant">Cantidad</label>
+<input class="w-full rounded-lg border-gray-border focus:ring-secondary focus:border-secondary text-body-md font-body-md py-2 px-3" type="number" value="4">
+</div>
+<!-- Unit -->
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-label-md text-on-surface-variant">Unidad</label>
+<select class="w-full rounded-lg border-gray-border focus:ring-secondary focus:border-secondary text-body-md font-body-md py-2 px-3">
+<option selected="" value="litros">litros</option>
+<option value="kg">kg</option>
+<option value="g">g</option>
+<option value="ml">ml</option>
+<option value="piezas">piezas</option>
+<option value="paquetes">paquetes</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="p-lg bg-surface-container-low flex flex-col sm:flex-row-reverse gap-md">
+<button class="flex-1 bg-[#E8432D] text-white font-bold py-3 rounded-xl hover:brightness-110 active:scale-[0.98] transition-all text-label-md">
+                Guardar cambios
+            </button>
+<button class="flex-1 bg-white text-[#E8432D] border border-[#E8432D] font-bold py-3 rounded-xl hover:bg-coral-soft/20 active:scale-[0.98] transition-all text-label-md">
+                Cancelar
+            </button>
+</div>
+</div>
+</div></body></html>

@@ -1,0 +1,45 @@
+{% load items_tags %}
+{% item_status item as current_status %}
+{% item_status_css_class item as status_class %}
+{% item_status_label item as status_label %}
+
+<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)] relative overflow-hidden" id="item-row-{{ item.pk }}">
+    <!-- Top row: name + status -->
+    <div class="flex justify-between items-start mb-[var(--space-md)]">
+        <div class="flex-1 min-w-0">
+            <h3 class="font-heading font-bold text-on-surface truncate">
+                {{ item.name }}{% if item.quantity_total %} <span class="text-on-surface-variant font-normal">({{ item.quantity_total }}{{ item.unit }})</span>{% endif %}
+            </h3>
+        </div>
+        <span class="bg-{{ status_class }} text-on-surface text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-[var(--space-sm)]">
+            {{ status_label }}
+        </span>
+    </div>
+
+    <!-- Owner actions -->
+    {% if is_owner %}
+    <div class="flex items-center gap-[var(--space-sm)]">
+        <button hx-get="{% url 'items:edit' pk=event.pk item_pk=item.pk %}"
+                hx-target="#modal-container" hx-swap="innerHTML"
+                class="p-1.5 text-gray-muted hover:text-primary hover:bg-coral-soft rounded-lg transition-colors"
+                title="Editar ítem">
+            <span class="material-symbols-outlined text-lg">edit</span>
+        </button>
+        <form method="post" action="{% url 'items:delete' pk=event.pk item_pk=item.pk %}"
+              hx-post="{% url 'items:delete' pk=event.pk item_pk=item.pk %}"
+              hx-target="#item-row-{{ item.pk }}"
+              hx-swap="outerHTML"
+              hx-confirm="¿Seguro que querés eliminar &quot;{{ item.name }}&quot;?">
+            {% csrf_token %}
+            <button type="submit"
+                    class="p-1.5 text-gray-muted hover:text-error hover:bg-red-50 rounded-lg transition-colors"
+                    title="Eliminar ítem">
+                <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Bottom color bar -->
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-{{ status_class }}"></div>
+</div>
