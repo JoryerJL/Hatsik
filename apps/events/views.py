@@ -12,6 +12,8 @@ from apps.events.decorators import (
 )
 from apps.events.forms import CreateEventForm, EditEventForm
 from apps.events.models import AccessStatus, EventParticipation
+from apps.items.services import get_items_with_status
+from apps.moderation.services import get_pending_suggestions, get_user_suggestions
 from apps.events.services import (
     approve_request,
     cancel_event,
@@ -113,6 +115,19 @@ def event_detail_view(request, event, participation):
         )
         pending_requests = list(pending_qs)
         pending_count = len(pending_requests)
+
+    # Items with computed status annotations
+    items = get_items_with_status(event)
+
+    # Moderation: pending suggestions (admin only) and user's own suggestions
+    pending_suggestions = []
+    pending_suggestions_count = 0
+    if is_admin:
+        pending_suggestions = list(get_pending_suggestions(event))
+        pending_suggestions_count = len(pending_suggestions)
+
+    user_suggestions = get_user_suggestions(event, request.user)
+
     return render(
         request,
         "events/event-detail.html",
@@ -124,6 +139,10 @@ def event_detail_view(request, event, participation):
             "is_admin": is_admin,
             "pending_count": pending_count,
             "pending_requests": pending_requests,
+            "items": items,
+            "pending_suggestions": pending_suggestions,
+            "pending_suggestions_count": pending_suggestions_count,
+            "user_suggestions": user_suggestions,
         },
     )
 
