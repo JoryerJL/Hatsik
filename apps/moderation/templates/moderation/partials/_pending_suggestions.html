@@ -1,0 +1,44 @@
+<section>
+    <div class="flex items-center gap-[var(--space-sm)] mb-[var(--space-lg)]">
+        <span class="material-symbols-outlined text-primary">lightbulb</span>
+        <h2 class="font-heading text-xl font-bold text-on-surface">Sugerencias pendientes</h2>
+        {% if pending_suggestions_count > 0 %}
+        <span class="bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ pending_suggestions_count }}</span>
+        {% endif %}
+    </div>
+
+    {% if pending_suggestions %}
+    <div class="space-y-[var(--space-md)]">
+        {% for suggestion in pending_suggestions %}
+        <div class="bg-surface-container-low border border-dashed border-outline-variant rounded-xl p-[var(--space-md)] flex flex-col sm:flex-row sm:items-center justify-between gap-[var(--space-md)]"
+             id="suggestion-row-{{ suggestion.pk }}">
+            <div class="flex flex-col">
+                <span class="text-sm font-semibold text-on-surface">
+                    {{ suggestion.name }}{% if suggestion.quantity_total %} ({{ suggestion.quantity_total }}{{ suggestion.unit }}){% endif %}
+                </span>
+                <span class="text-xs text-gray-muted">Sugerido por {{ suggestion.suggested_by_user.display_name }}</span>
+            </div>
+            <div class="flex items-center gap-[var(--space-sm)]">
+                <a href="{% url 'moderation:approve' pk=event.pk suggestion_pk=suggestion.pk %}"
+                   class="px-3 py-1.5 bg-primary text-white font-bold text-xs rounded-lg active:scale-95 transition-transform">
+                    Aprobar
+                </a>
+                <form method="post" action="{% url 'moderation:reject' pk=event.pk suggestion_pk=suggestion.pk %}"
+                      hx-post="{% url 'moderation:reject' pk=event.pk suggestion_pk=suggestion.pk %}"
+                      hx-target="#suggestion-row-{{ suggestion.pk }}"
+                      hx-swap="outerHTML"
+                      hx-confirm="¿Seguro que querés rechazar la sugerencia &quot;{{ suggestion.name }}&quot;?">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-3 py-1.5 bg-surface-container text-on-surface-variant font-bold text-xs rounded-lg hover:bg-error/10 hover:text-error active:scale-95 transition-all">
+                        Rechazar
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-sm text-gray-muted">No hay sugerencias pendientes.</p>
+    {% endif %}
+</section>

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Sugerir ítem — {{ event.name }} — Hatsik{% endblock %}
+
+{% block sidebar_mis_eventos_class %}bg-[var(--color-coral-soft)] text-[var(--color-primary)] font-bold{% endblock %}
+{% block topbar_mis_eventos_class %}text-[var(--color-primary)] font-bold border-b-2 border-[var(--color-primary)]{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<div class="mb-[var(--space-xl)]">
+    <div class="relative h-48 md:h-64 rounded-xl overflow-hidden mb-[var(--space-lg)]">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&h=400&fit=crop&q=80" alt="Event cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-[var(--space-lg)]">
+            <h1 class="text-white font-heading text-2xl md:text-3xl font-bold">{{ event.name }}</h1>
+        </div>
+    </div>
+</div>
+
+<!-- Form Card -->
+<div class="max-w-md mx-auto lg:mx-0">
+    <div class="bg-surface-container-lowest border border-gray-border rounded-xl p-[var(--space-lg)]">
+        <div class="flex items-center gap-[var(--space-sm)] mb-[var(--space-lg)]">
+            <span class="material-symbols-outlined text-primary">lightbulb</span>
+            <h2 class="font-heading text-xl font-bold text-on-surface">Sugerir ítem</h2>
+        </div>
+
+        <p class="text-xs text-gray-muted mb-[var(--space-lg)]">Tu sugerencia será revisada por el organizador antes de añadirse a la lista.</p>
+
+        <form method="post" class="space-y-[var(--space-lg)]">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="bg-error-container/20 border border-error/30 rounded-xl p-[var(--space-md)]">
+                {% for error in form.non_field_errors %}
+                <p class="text-error text-sm">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Item Name -->
+            <div class="space-y-[var(--space-xs)]">
+                <label for="id_name" class="block text-sm font-semibold text-on-surface-variant">Nombre</label>
+                <input type="text" name="name" id="id_name"
+                       value="{{ form.name.value|default:'' }}"
+                       placeholder="Ej: Chimichurri, Ensalada..."
+                       class="w-full px-[var(--space-md)] py-[var(--space-sm)] rounded-lg border border-gray-border focus:ring-primary focus:border-primary bg-surface-container-lowest text-sm"
+                       autofocus>
+                {% if form.name.errors %}
+                <p class="text-error text-xs mt-1">{{ form.name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-2 gap-[var(--space-md)]">
+                <!-- Quantity -->
+                <div class="space-y-[var(--space-xs)]">
+                    <label for="id_quantity_total" class="block text-sm font-semibold text-on-surface-variant">Cantidad</label>
+                    <input type="number" name="quantity_total" id="id_quantity_total"
+                           value="{{ form.quantity_total.value|default:'' }}"
+                           placeholder="Opcional"
+                           min="0.01" step="0.01"
+                           class="w-full px-[var(--space-md)] py-[var(--space-sm)] rounded-lg border border-gray-border focus:ring-primary focus:border-primary bg-surface-container-lowest text-sm">
+                    {% if form.quantity_total.errors %}
+                    <p class="text-error text-xs mt-1">{{ form.quantity_total.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <!-- Unit -->
+                <div class="space-y-[var(--space-xs)]">
+                    <label for="id_unit" class="block text-sm font-semibold text-on-surface-variant">Unidad</label>
+                    {{ form.unit }}
+                    {% if form.unit.errors %}
+                    <p class="text-error text-xs mt-1">{{ form.unit.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-[var(--space-md)] pt-[var(--space-md)]">
+                <button type="submit" class="flex-1 px-[var(--space-md)] py-3 rounded-xl bg-primary text-on-primary font-bold text-sm active:scale-95 transition-transform">
+                    Sugerir ítem
+                </button>
+                <a href="{% url 'events:detail' pk=event.pk %}" class="flex-1 px-[var(--space-md)] py-3 rounded-xl border border-outline text-on-surface font-bold text-sm text-center hover:bg-surface-container transition-colors">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
