@@ -1,14 +1,36 @@
-"""Views for item management."""
+"""Views for item management and assignments."""
+
+from decimal import Decimal
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from apps.events.decorators import event_owner_required
-from apps.items.forms import AddItemForm, EditItemForm
+from apps.events.decorators import event_owner_required, participant_required
+from apps.items.forms import (
+    AddItemForm,
+    ClaimItemForm,
+    EditAssignmentForm,
+    EditItemForm,
+)
 from apps.items.models import EventItem, ItemAssignment
-from apps.items.services import ItemError, add_item, delete_item, edit_item
+from apps.items.services import (
+    ItemError,
+    add_item,
+    cancel_assignment,
+    claim_item,
+    compute_event_progress,
+    delete_item,
+    edit_item,
+    get_available_quantity,
+    get_items_with_status,
+    mark_as_purchased,
+    modify_assignment,
+)
+
+# --- Item Management Views (Owner) ---
 
 
 @login_required
@@ -127,3 +149,200 @@ def delete_item_view(request, event, item_pk):
         return HttpResponse("")
 
     return redirect("events:detail", pk=event.pk)
+
+
+# --- Assignment Views (Participants) ---
+
+
+def _render_item_row_response(request, event, item):
+    """Render the updated item row partial with HX-Trigger for progress update."""
+    # Re-fetch item with annotations
+    items_qs = get_items_with_status(event).filter(pk=item.pk)
+    annotated_item = items_qs.first()
+
+    # Get assignments for this item
+    assignments = ItemAssignment.objects.filter(
+        item=item, cancelled_at__isnull=True
+    ).select_related("user")
+
+    is_owner = event.owner_user == request.user
+    is_admin = is_owner or event.participations.filter(
+        user=request.user, role="co_admin", access_status="accepted"
+    ).exists()
+
+    available = get_available_quantity(item)
+
+    response = render(
+        request,
+        "items/partials/_item_row.html",
+        {
+            "item": annotated_item,
+            "event": event,
+            "is_owner": is_owner,
+            "is_admin": is_admin,
+            "assignments": assignments,
+            "available_quantity": available,
+        },
+    )
+    response["HX-Trigger"] = "progress-updated"
+    return response
+
+
+@login_required
+@participant_required
+def claim_item_view(request, event, participation, item_pk):
+    """Claim an item (or portion).
+
+    GET: Return claim form fragment.
+    POST: Create the assignment.
+    """
+    item = get_object_or_404(EventItem, pk=item_pk, event=event)
+    is_quantified = item.quantity_total is not None
+
+    if request.method == "POST":
+        form = ClaimItemForm(request.POST, is_quantified=is_quantified)
+        if form.is_valid():
+            try:
+                quantity = form.cleaned_data.get("quantity_assigned")
+                claim_item(item, request.user, quantity_assigned=quantity)
+
+                if request.headers.get("HX-Request"):
+                    return _render_item_row_response(request, event, item)
+                return redirect("events:detail", pk=event.pk)
+            except ItemError as e:
+                form.add_error(None, str(e))
+    else:
+        form = ClaimItemForm(is_quantified=is_quantified)
+
+    available = get_available_quantity(item)
+    return render(
+        request,
+        "items/claim-item.html",
+        {
+            "form": form,
+            "event": event,
+            "item": item,
+            "is_quantified": is_quantified,
+            "available_quantity": available,
+        },
+    )
+
+
+@login_required
+@participant_required
+def edit_assignment_view(request, event, participation, assignment_pk):
+    """Edit own assignment quantity.
+
+    GET: Return edit form fragment.
+    POST: Modify the assignment.
+    """
+    assignment = get_object_or_404(
+        ItemAssignment, pk=assignment_pk, item__event=event
+    )
+    item = assignment.item
+
+    if request.method == "POST":
+        form = EditAssignmentForm(request.POST)
+        if form.is_valid():
+            try:
+                modify_assignment(
+                    assignment,
+                    request.user,
+                    quantity_assigned=form.cleaned_data["quantity_assigned"],
+                )
+                if request.headers.get("HX-Request"):
+                    return _render_item_row_response(request, event, item)
+                return redirect("events:detail", pk=event.pk)
+            except ItemError as e:
+                form.add_error(None, str(e))
+    else:
+        form = EditAssignmentForm(
+            initial={"quantity_assigned": assignment.quantity_assigned}
+        )
+
+    # Available = max they could set (excluding their current amount)
+    others_sum = (
+        ItemAssignment.objects.filter(item=item, cancelled_at__isnull=True)
+        .exclude(pk=assignment.pk)
+        .aggregate(total=Sum("quantity_assigned"))["total"]
+        or Decimal("0")
+    )
+    available = item.quantity_total - others_sum if item.quantity_total else None
+
+    return render(
+        request,
+        "items/edit-assignment.html",
+        {
+            "form": form,
+            "event": event,
+            "item": item,
+            "assignment": assignment,
+            "available_quantity": available,
+        },
+    )
+
+
+@login_required
+@participant_required
+def cancel_assignment_view(request, event, participation, assignment_pk):
+    """Cancel an assignment (POST only)."""
+    if request.method != "POST":
+        return redirect("events:detail", pk=event.pk)
+
+    assignment = get_object_or_404(
+        ItemAssignment, pk=assignment_pk, item__event=event
+    )
+    item = assignment.item
+
+    try:
+        cancel_assignment(assignment, request.user)
+    except ItemError as e:
+        if request.headers.get("HX-Request"):
+            return HttpResponse(
+                f'<div class="text-error text-sm p-2">{e}</div>',
+                status=422,
+            )
+        return redirect("events:detail", pk=event.pk)
+
+    if request.headers.get("HX-Request"):
+        return _render_item_row_response(request, event, item)
+    return redirect("events:detail", pk=event.pk)
+
+
+@login_required
+@participant_required
+def purchase_assignment_view(request, event, participation, assignment_pk):
+    """Mark an assignment as purchased (POST only)."""
+    if request.method != "POST":
+        return redirect("events:detail", pk=event.pk)
+
+    assignment = get_object_or_404(
+        ItemAssignment, pk=assignment_pk, item__event=event
+    )
+    item = assignment.item
+
+    try:
+        mark_as_purchased(assignment, request.user)
+    except ItemError as e:
+        if request.headers.get("HX-Request"):
+            return HttpResponse(
+                f'<div class="text-error text-sm p-2">{e}</div>',
+                status=422,
+            )
+        return redirect("events:detail", pk=event.pk)
+
+    if request.headers.get("HX-Request"):
+        return _render_item_row_response(request, event, item)
+    return redirect("events:detail", pk=event.pk)
+
+
+@login_required
+@participant_required
+def progress_bar_view(request, event, participation):
+    """Return the progress bar partial (for HTMX refresh)."""
+    progress = compute_event_progress(event)
+    return render(
+        request,
+        "items/partials/_progress_bar.html",
+        {"event": event, "progress": progress},
+    )

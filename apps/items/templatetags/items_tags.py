@@ -10,6 +10,7 @@ from apps.items.services import (
     STATUS_PARTIALLY_BOUGHT,
     STATUS_PARTIALLY_COVERED,
     STATUS_UNASSIGNED,
+    get_available_quantity,
     get_computed_status_from_annotations,
 )
 
@@ -48,3 +49,12 @@ def item_status_css_class(item):
         STATUS_BOUGHT: "state-bought",
     }
     return mapping.get(status, "surface-container")
+
+
+@register.simple_tag
+def item_available_quantity(item):
+    """Return remaining available quantity for an item.
+
+    Returns None for binary items.
+    """
+    return get_available_quantity(item)
