@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Solicitud Pendiente - Hatsik</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-highest": "#e5e2e1",
+                      "primary-fixed-dim": "#ffb4a7",
+                      "outline": "#8f706a",
+                      "on-tertiary-fixed": "#001e2c",
+                      "on-primary": "#ffffff",
+                      "on-background": "#1c1b1b",
+                      "on-tertiary": "#ffffff",
+                      "inverse-primary": "#ffb4a7",
+                      "state-partial-bought": "#93C5FD",
+                      "on-secondary-container": "#6f0a01",
+                      "on-primary-fixed": "#400200",
+                      "on-surface-variant": "#5b403b",
+                      "surface-dim": "#dcd9d9",
+                      "tertiary-container": "#007da9",
+                      "on-primary-container": "#fffbff",
+                      "error": "#ba1a1a",
+                      "surface-container-low": "#f6f3f2",
+                      "primary-fixed": "#ffdad4",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-container": "#fcfcff",
+                      "gray-border": "#E5E7EB",
+                      "on-secondary-fixed": "#3f0200",
+                      "surface-container": "#f0eded",
+                      "on-primary-fixed-variant": "#910900",
+                      "surface-bright": "#fcf9f8",
+                      "secondary-fixed": "#ffdad4",
+                      "outline-variant": "#e4beb7",
+                      "tertiary": "#006387",
+                      "surface-variant": "#e5e2e1",
+                      "gray-muted": "#6B7280",
+                      "state-covered": "#86EFAC",
+                      "primary-container": "#d83823",
+                      "background": "#fcf9f8",
+                      "inverse-surface": "#313030",
+                      "inverse-on-surface": "#f3f0ef",
+                      "tertiary-fixed": "#c4e7ff",
+                      "coral-soft": "#FDE8E4",
+                      "surface": "#fcf9f8",
+                      "state-bought": "#4ADE80",
+                      "error-container": "#ffdad6",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed-dim": "#ffb4a6",
+                      "on-tertiary-fixed-variant": "#004c69",
+                      "primary": "#b51d0c",
+                      "on-error": "#ffffff",
+                      "surface-tint": "#b8200e",
+                      "surface-container-high": "#eae7e7",
+                      "state-unassigned": "#FCA5A5",
+                      "state-partial": "#FDBA74",
+                      "on-error-container": "#93000a",
+                      "on-secondary-fixed-variant": "#881e0f",
+                      "tertiary-fixed-dim": "#7cd0ff",
+                      "on-surface": "#1c1b1b",
+                      "secondary": "#a93624",
+                      "secondary-container": "#fd735c"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "12px",
+                      "margin-mobile": "16px",
+                      "lg": "16px",
+                      "gutter": "16px",
+                      "unit": "4px",
+                      "xl": "24px",
+                      "sm": "8px",
+                      "xs": "4px",
+                      "margin-desktop": "32px"
+              },
+              "fontFamily": {
+                      "label-md": ["Plus Jakarta Sans"],
+                      "body-md": ["Plus Jakarta Sans"],
+                      "display-logo": ["Nunito"],
+                      "headline-md": ["Nunito"],
+                      "headline-lg-mobile": ["Nunito"],
+                      "body-lg": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Nunito"],
+                      "caption": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "label-md": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "display-logo": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                      "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-pattern {
+            background-color: #fcf9f8;
+            background-image: radial-gradient(#e5e2e1 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+        .kitchen-board-shadow {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+    </style>
+</head>
+<body class="bg-pattern min-h-screen text-on-surface font-body-md">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-gray-border sticky top-0 z-50">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-md w-full max-w-7xl mx-auto">
+<div class="text-display-logo font-display-logo text-on-surface">hatsik</div>
+<nav class="hidden md:flex gap-xl">
+<a class="text-primary font-bold border-b-2 border-primary text-label-md font-label-md" href="#">Mis eventos</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors text-label-md font-label-md" href="#">Crear evento</a>
+</nav>
+<button class="text-on-surface-variant hover:text-primary transition-colors text-label-md font-label-md">Cerrar sesión</button>
+</div>
+</header>
+<main class="flex flex-col items-center justify-center px-margin-mobile py-xl min-h-[calc(100vh-80px)]">
+<!-- Wait Screen Container -->
+<div class="w-full max-w-lg">
+<!-- Central Card: Reassuring Feedback -->
+<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-xl kitchen-board-shadow text-center mb-xl">
+<div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-coral-soft text-primary mb-lg">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 0;">schedule</span>
+</div>
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface mb-sm">¡Solicitud enviada!</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-xs mx-auto">
+                    Solo falta que el organizador te acepte para empezar a colaborar.
+                </p>
+</div>
+<!-- Event Context Card (The "Sticky Note") -->
+<div class="bg-surface-container-lowest border border-gray-border rounded-xl p-lg kitchen-board-shadow relative overflow-hidden">
+<!-- Status Strip -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary-container"></div>
+<div class="flex flex-col gap-md">
+<div class="flex items-start justify-between">
+<div>
+<span class="text-caption font-caption text-secondary uppercase tracking-wider">Detalles del Evento</span>
+<h2 class="text-headline-md font-headline-md text-on-surface">Asado de Bienvenida 2024</h2>
+</div>
+<div class="bg-surface-container border border-gray-border rounded-full px-md py-1">
+<span class="text-caption font-caption text-on-surface-variant">Pendiente</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md pt-xs">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">calendar_today</span>
+<div class="flex flex-col">
+<span class="text-caption font-caption text-gray-muted">Fecha</span>
+<span class="text-label-md font-label-md">15 de Junio, 2024</span>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">person</span>
+<div class="flex flex-col">
+<span class="text-caption font-caption text-gray-muted">Organizador</span>
+<span class="text-label-md font-label-md">Javier Pérez</span>
+</div>
+</div>
+</div>
+<div class="mt-xs pt-md border-t border-gray-border flex items-center gap-sm">
+<span class="material-symbols-outlined text-gray-muted text-[20px]">lock</span>
+<p class="text-caption font-caption text-gray-muted">La lista de elementos será visible una vez seas aceptado.</p>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="mt-xl flex flex-col gap-md">
+<a class="bg-primary text-on-primary py-lg rounded-xl font-label-md text-label-md text-center hover:opacity-90 active:scale-[0.98] transition-all kitchen-board-shadow" href="#">
+                    Mis eventos
+                </a>
+<p class="text-center text-caption font-caption text-gray-muted">
+                    Te notificaremos vía email cuando haya noticias.
+                </p>
+</div>
+</div>
+<!-- Visual Flourish: Soft Abstract Elements -->
+<div class="fixed bottom-0 left-0 p-xl hidden lg:block opacity-20 pointer-events-none">
+<div class="w-32 h-32 rounded-xl bg-coral-soft rotate-12"></div>
+</div>
+<div class="fixed top-24 right-0 p-xl hidden lg:block opacity-20 pointer-events-none">
+<div class="w-24 h-24 rounded-full bg-secondary-fixed rotate-45 border-2 border-dashed border-primary"></div>
+</div>
+</main>
+<!-- Simple Interaction Script -->
+<script>
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.style.transform = 'scale(0.98)';
+            });
+            el.addEventListener('mouseup', () => {
+                el.style.transform = 'scale(1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>
