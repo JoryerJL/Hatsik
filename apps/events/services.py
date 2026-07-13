@@ -92,9 +92,7 @@ def remove_participant(participation) -> None:
     ).exists()
 
     if has_purchases:
-        raise ValueError(
-            "Cannot remove participant with purchased assignments."
-        )
+        raise ValueError("Cannot remove participant with purchased assignments.")
 
     participation.access_status = AccessStatus.REMOVED
     participation.removed_at = timezone.now()

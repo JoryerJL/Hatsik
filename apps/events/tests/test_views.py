@@ -187,44 +187,54 @@ class TestCreateEventView:
         assert 'name="event_date"' in content
 
     def test_create_event_post_valid(self, auth_client, user):
-        response = auth_client.post("/events/create/", {
-            "name": "Mi Asado",
-            "event_date": "2026-12-25",
-        })
+        response = auth_client.post(
+            "/events/create/",
+            {
+                "name": "Mi Asado",
+                "event_date": "2026-12-25",
+            },
+        )
         assert response.status_code == 302
         event = Event.objects.get(name="Mi Asado")
         assert event.owner_user == user
         assert event.event_date == datetime.date(2026, 12, 25)
         # Owner participation created
-        participation = EventParticipation.objects.get(
-            event=event, user=user
-        )
+        participation = EventParticipation.objects.get(event=event, user=user)
         assert participation.role == EventRole.OWNER
         assert participation.access_status == AccessStatus.ACCEPTED
 
     def test_create_event_post_missing_name(self, auth_client):
-        response = auth_client.post("/events/create/", {
-            "name": "",
-            "event_date": "2026-12-25",
-        })
+        response = auth_client.post(
+            "/events/create/",
+            {
+                "name": "",
+                "event_date": "2026-12-25",
+            },
+        )
         assert response.status_code == 200
         assert Event.objects.count() == 0
 
     def test_create_event_post_missing_date(self, auth_client):
-        response = auth_client.post("/events/create/", {
-            "name": "Mi Asado",
-            "event_date": "",
-        })
+        response = auth_client.post(
+            "/events/create/",
+            {
+                "name": "Mi Asado",
+                "event_date": "",
+            },
+        )
         assert response.status_code == 200
         assert Event.objects.count() == 0
 
     def test_create_event_with_optional_fields(self, auth_client):
-        response = auth_client.post("/events/create/", {
-            "name": "Evento Completo",
-            "event_date": "2026-12-31",
-            "description": "Una gran fiesta",
-            "assignment_deadline_at": "2026-12-30T18:00",
-        })
+        response = auth_client.post(
+            "/events/create/",
+            {
+                "name": "Evento Completo",
+                "event_date": "2026-12-31",
+                "description": "Una gran fiesta",
+                "assignment_deadline_at": "2026-12-30T18:00",
+            },
+        )
         assert response.status_code == 302
         event = Event.objects.get(name="Evento Completo")
         assert event.description == "Una gran fiesta"
@@ -241,15 +251,21 @@ class TestEventDetailView:
         from django.utils import timezone
 
         other = User.objects.create_user(
-            email="owner2@x.com", password="p1", display_name="O",
+            email="owner2@x.com",
+            password="p1",
+            display_name="O",
         )
         other.email_verified_at = timezone.now()
         other.save()
         event = Event.objects.create(
-            owner_user=other, name="Private", event_date=datetime.date(2026, 1, 1),
+            owner_user=other,
+            name="Private",
+            event_date=datetime.date(2026, 1, 1),
         )
         EventParticipation.objects.create(
-            event=event, user=other, role=EventRole.OWNER,
+            event=event,
+            user=other,
+            role=EventRole.OWNER,
             access_status=AccessStatus.ACCEPTED,
         )
         # user is NOT a participant
@@ -273,15 +289,21 @@ class TestEditEventView:
         from django.utils import timezone
 
         other = User.objects.create_user(
-            email="owner3@x.com", password="p1", display_name="O",
+            email="owner3@x.com",
+            password="p1",
+            display_name="O",
         )
         other.email_verified_at = timezone.now()
         other.save()
         event = Event.objects.create(
-            owner_user=other, name="NotMine", event_date=datetime.date(2026, 1, 1),
+            owner_user=other,
+            name="NotMine",
+            event_date=datetime.date(2026, 1, 1),
         )
         EventParticipation.objects.create(
-            event=event, user=other, role=EventRole.OWNER,
+            event=event,
+            user=other,
+            role=EventRole.OWNER,
             access_status=AccessStatus.ACCEPTED,
         )
         response = auth_client.get(f"/events/{event.pk}/edit/")
@@ -293,10 +315,13 @@ class TestEditEventView:
         assert 'name="name"' in response.content.decode()
 
     def test_edit_post_updates_event(self, auth_client, active_event):
-        response = auth_client.post(f"/events/{active_event.pk}/edit/", {
-            "name": "Updated Name",
-            "event_date": "2026-12-31",
-        })
+        response = auth_client.post(
+            f"/events/{active_event.pk}/edit/",
+            {
+                "name": "Updated Name",
+                "event_date": "2026-12-31",
+            },
+        )
         assert response.status_code == 302
         active_event.refresh_from_db()
         assert active_event.name == "Updated Name"
@@ -428,7 +453,10 @@ class TestShareEventView:
             owner_user=other, name="Not Mine", event_date=datetime.date(2026, 6, 1)
         )
         EventParticipation.objects.create(
-            event=event, user=other, role=EventRole.OWNER, access_status=AccessStatus.ACCEPTED
+            event=event,
+            user=other,
+            role=EventRole.OWNER,
+            access_status=AccessStatus.ACCEPTED,
         )
         response = auth_client.get(f"/events/{event.pk}/share/")
         assert response.status_code == 403
@@ -469,14 +497,19 @@ class TestPublicCardView:
             event_date=datetime.date(2026, 8, 15),
         )
         EventParticipation.objects.create(
-            event=event, user=other, role=EventRole.OWNER, access_status=AccessStatus.ACCEPTED
+            event=event,
+            user=other,
+            role=EventRole.OWNER,
+            access_status=AccessStatus.ACCEPTED,
         )
         response = auth_client.get(f"/events/join/{event.public_share_token}/")
         assert response.status_code == 200
         content = response.content.decode()
         assert "Public Event" in content
 
-    def test_public_card_redirects_if_already_participant(self, auth_client, active_event):
+    def test_public_card_redirects_if_already_participant(
+        self, auth_client, active_event
+    ):
         response = auth_client.get(f"/events/join/{active_event.public_share_token}/")
         assert response.status_code == 302
         assert f"/events/{active_event.pk}/" in response.url

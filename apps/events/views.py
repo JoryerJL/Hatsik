@@ -33,14 +33,20 @@ def dashboard_view(request):
     )
     events_data = []
     for p in participations:
-        events_data.append({
-            "event": p.event,
-            "role": p.role,
-            "participation": p,
-        })
-    return render(request, "events/dashboard.html", {
-        "events_data": events_data,
-    })
+        events_data.append(
+            {
+                "event": p.event,
+                "role": p.role,
+                "participation": p,
+            }
+        )
+    return render(
+        request,
+        "events/dashboard.html",
+        {
+            "events_data": events_data,
+        },
+    )
 
 
 @login_required
@@ -55,9 +61,7 @@ def create_event_view(request):
                 name=form.cleaned_data["name"],
                 event_date=form.cleaned_data["event_date"],
                 description=form.cleaned_data.get("description"),
-                assignment_deadline_at=form.cleaned_data.get(
-                    "assignment_deadline_at"
-                ),
+                assignment_deadline_at=form.cleaned_data.get("assignment_deadline_at"),
             )
             messages.success(request, "¡Evento creado exitosamente!")
             return redirect("events:detail", pk=event.pk)
@@ -81,12 +85,16 @@ def event_detail_view(request, event, participation):
         .order_by("created_at")
     )
     is_owner = request.user == event.owner_user
-    return render(request, "events/event-detail.html", {
-        "event": event,
-        "participation": participation,
-        "participants": participants,
-        "is_owner": is_owner,
-    })
+    return render(
+        request,
+        "events/event-detail.html",
+        {
+            "event": event,
+            "participation": participation,
+            "participants": participants,
+            "is_owner": is_owner,
+        },
+    )
 
 
 @login_required
@@ -103,10 +111,14 @@ def edit_event_view(request, event):
     else:
         form = EditEventForm(instance=event)
 
-    return render(request, "events/_edit-form.html", {
-        "form": form,
-        "event": event,
-    })
+    return render(
+        request,
+        "events/_edit-form.html",
+        {
+            "form": form,
+            "event": event,
+        },
+    )
 
 
 @login_required
@@ -153,13 +165,15 @@ def cancel_event_view(request, event):
 @require_GET
 def share_event_view(request, event, participation):
     """Display the share/invite page with link and QR."""
-    share_url = request.build_absolute_uri(
-        f"/events/join/{event.public_share_token}/"
+    share_url = request.build_absolute_uri(f"/events/join/{event.public_share_token}/")
+    return render(
+        request,
+        "events/share-event.html",
+        {
+            "event": event,
+            "share_url": share_url,
+        },
     )
-    return render(request, "events/share-event.html", {
-        "event": event,
-        "share_url": share_url,
-    })
 
 
 @login_required
@@ -171,9 +185,7 @@ def share_qr_view(request, event, participation):
 
     import qrcode
 
-    share_url = request.build_absolute_uri(
-        f"/events/join/{event.public_share_token}/"
-    )
+    share_url = request.build_absolute_uri(f"/events/join/{event.public_share_token}/")
     img = qrcode.make(share_url)
     buffer = io.BytesIO()
     img.save(buffer)
@@ -264,6 +276,10 @@ def public_card_view(request, token):
     if existing:
         return redirect("events:detail", pk=event.pk)
 
-    return render(request, "events/event-card-public.html", {
-        "event": event,
-    })
+    return render(
+        request,
+        "events/event-card-public.html",
+        {
+            "event": event,
+        },
+    )

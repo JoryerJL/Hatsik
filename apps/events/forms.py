@@ -10,9 +10,7 @@ class CreateEventForm(forms.ModelForm):
         model = Event
         fields = ["name", "event_date", "description", "assignment_deadline_at"]
         widgets = {
-            "name": forms.TextInput(
-                attrs={"placeholder": "Nombre del evento"}
-            ),
+            "name": forms.TextInput(attrs={"placeholder": "Nombre del evento"}),
             "event_date": forms.DateInput(
                 attrs={"type": "date", "placeholder": "Fecha del evento"}
             ),
@@ -47,9 +45,7 @@ class EditEventForm(forms.ModelForm):
         model = Event
         fields = ["name", "event_date", "description", "assignment_deadline_at"]
         widgets = {
-            "name": forms.TextInput(
-                attrs={"placeholder": "Nombre del evento"}
-            ),
+            "name": forms.TextInput(attrs={"placeholder": "Nombre del evento"}),
             "event_date": forms.DateInput(attrs={"type": "date"}),
             "description": forms.Textarea(
                 attrs={"placeholder": "Descripción (opcional)", "rows": 3}
