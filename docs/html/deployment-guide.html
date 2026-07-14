@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Despliegue — Hatsik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #b51d0c; --primary-light: #FDE8E4; --surface: #fcf9f8; --on-surface: #1c1b1b; --gray: #6B7280; --border: #E5E7EB; --green: #4ADE80; --blue: #3B82F6; --blue-light: #EFF6FF; --yellow: #F59E0B; --yellow-light: #FFFBEB; --purple: #8B5CF6; --purple-light: #F5F3FF; --code-bg: #1e1e2e; --code-text: #cdd6f4; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Plus Jakarta Sans", sans-serif; background: var(--surface); color: var(--on-surface); line-height: 1.7; padding: 2rem; max-width: 920px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 3rem; padding: 2.5rem 2rem; background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); border-radius: 20px; color: white; }
+        .header h1 { font-family: "Nunito", sans-serif; font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem; }
+        .header .subtitle { font-size: 1rem; opacity: 0.9; }
+        .header .date { font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem; }
+        h2 { font-family: "Nunito", sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-top: 3rem; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--primary-light); }
+        h3 { font-family: "Nunito", sans-serif; font-size: 1.15rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.75rem; color: #1e3a5f; }
+        h4 { font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        p { margin-bottom: 1rem; font-size: 0.95rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; font-size: 0.93rem; }
+        pre { background: var(--code-bg); color: var(--code-text); padding: 1.25rem; border-radius: 12px; overflow-x: auto; margin: 1rem 0; font-family: "JetBrains Mono", monospace; font-size: 0.82rem; line-height: 1.6; }
+        code { font-family: "JetBrains Mono", monospace; font-size: 0.85em; background: #f3f0ef; padding: 2px 6px; border-radius: 4px; }
+        pre code { background: none; padding: 0; font-size: inherit; }
+        .alert { border-radius: 12px; padding: 1rem 1.25rem; margin: 1.25rem 0; font-size: 0.9rem; }
+        .alert-info { background: var(--blue-light); border: 1px solid #BFDBFE; }
+        .alert-info::before { content: "💡 "; }
+        .alert-warn { background: var(--yellow-light); border: 1px solid #FDE68A; }
+        .alert-warn::before { content: "⚠️ "; }
+        .alert-danger { background: #FEF2F2; border: 1px solid #FECACA; }
+        .alert-danger::before { content: "🚨 "; }
+        .concept { background: var(--purple-light); border: 1px solid #DDD6FE; border-radius: 12px; padding: 1.25rem; margin: 1.25rem 0; font-size: 0.9rem; }
+        .concept::before { content: "🧠 "; }
+        .concept strong { color: var(--purple); }
+        .analogy { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 1.25rem; margin: 1.25rem 0; font-size: 0.9rem; font-style: italic; }
+        .analogy::before { content: "🏗️ "; font-style: normal; }
+        .step-number { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; font-size: 0.8rem; font-weight: 700; margin-right: 0.5rem; flex-shrink: 0; }
+        .step-title { display: flex; align-items: center; font-weight: 700; font-size: 1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .toc { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem 2rem; margin-bottom: 2rem; }
+        .toc h3 { margin-top: 0; color: var(--on-surface); }
+        .toc ol { padding-left: 1.25rem; }
+        .toc li { margin-bottom: 0.4rem; }
+        .toc a { color: var(--blue); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        .arch-diagram { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; font-family: "JetBrains Mono", monospace; font-size: 0.78rem; line-height: 1.8; white-space: pre; overflow-x: auto; }
+        .checklist { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin: 1rem 0; }
+        .checklist label { display: block; padding: 0.4rem 0; font-size: 0.9rem; cursor: pointer; }
+        .checklist input { margin-right: 0.5rem; accent-color: var(--primary); }
+        .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; font-size: 0.8rem; color: var(--gray); }
+        @media (max-width: 640px) { body { padding: 1rem; } .header h1 { font-size: 1.6rem; } pre { font-size: 0.75rem; padding: 1rem; } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🚀 Guía de Despliegue — Hatsik</h1>
+    <p class="subtitle">De cuenta limpia de AWS a producción con Lightsail Containers</p>
+    <p class="date">Julio 2026 · Paso a paso con explicaciones para entender cada cosa</p>
+</div>
+
+<div class="toc">
+    <h3>📑 Índice</h3>
+    <ol>
+        <li><a href="#concepts">Primero lo primero — ¿qué estamos haciendo?</a></li>
+        <li><a href="#prereqs">Requisitos previos</a></li>
+        <li><a href="#step1">Paso 1: Configurar AWS CLI</a></li>
+        <li><a href="#step2">Paso 2: Crear la base de datos (Neon)</a></li>
+        <li><a href="#step3">Paso 3: Configurar email (Resend)</a></li>
+        <li><a href="#step4">Paso 4: Crear el servicio Lightsail Containers</a></li>
+        <li><a href="#step5">Paso 5: Subir tu imagen Docker y desplegar</a></li>
+        <li><a href="#step6">Paso 6: Conectar tu dominio</a></li>
+        <li><a href="#step7">Paso 7: Automatizar deploys (GitHub Actions)</a></li>
+        <li><a href="#step8">Paso 8: Crear el cron job (EventBridge + Lambda)</a></li>
+        <li><a href="#step9">Paso 9: Verificar que todo funciona</a></li>
+        <li><a href="#step10">Paso 10: Seguridad final</a></li>
+    </ol>
+</div>
+
+<!-- CONCEPTOS -->
+<h2 id="concepts">🧠 Primero lo primero — ¿qué estamos haciendo?</h2>
+
+<p>Antes de tocar un solo botón, necesitás entender el panorama. Si no entendés POR QUÉ hacés cada paso, cuando algo falle no vas a saber dónde buscar.</p>
+
+<h3>¿Qué significa "desplegar" una app?</h3>
+<p>Ahora tu app corre en tu computadora con <code>python manage.py runserver</code>. Solo vos la ves. "Desplegar" significa ponerla en una computadora conectada a internet 24/7 para que cualquiera con el link pueda usarla.</p>
+
+<div class="analogy">Pensalo como un restaurante: ahora estás cocinando en tu casa (desarrollo local). Desplegar es abrir un local: necesitás un espacio (servidor), una dirección (dominio), y servicios (base de datos, email, etc).</div>
+
+<h3>Las piezas del rompecabezas</h3>
+
+<div class="concept"><strong>Docker</strong> — Una caja de mudanza para tu app. Mete TODO lo que necesita (Python, Django, Tailwind) en una "imagen" que puede correr en cualquier computadora. Así evitás el "en mi máquina funciona".</div>
+
+<div class="concept"><strong>Lightsail Containers</strong> — El servicio de AWS que corre tu imagen Docker. Le das la caja, él la pone en un servidor, le asigna una URL, la mantiene viva 24/7, y si se cae la reinicia. Precio fijo: <strong>$7/mes</strong>. No hay sorpresas en la factura.</div>
+
+<div class="concept"><strong>Neon (PostgreSQL)</strong> — Tu base de datos: donde se guardan usuarios, eventos, ítems. Es PostgreSQL "serverless" — se apaga cuando no se usa y se prende con actividad. Gratis hasta 0.5 GB.</div>
+
+<div class="concept"><strong>Resend</strong> — Tu servicio de correo. Envía emails de verificación y recuperación de contraseña. 3,000 emails/mes gratis.</div>
+
+<div class="concept"><strong>GitHub Actions (CI/CD)</strong> — Tu empleado automático. Cada vez que pusheás a <code>main</code>: corre tests, buildea la imagen, la sube a Lightsail, y despliega. Automático, no tocás nada.</div>
+
+<div class="concept"><strong>EventBridge + Lambda</strong> — Una alarma que cada 5 minutos despierta una función que le dice a tu app "cerrá los eventos vencidos". Costo: $0.</div>
+
+<div class="concept"><strong>Dominio + DNS</strong> — El dominio es la dirección de tu local (<code>hatsik.app</code>). DNS es la guía telefónica que traduce ese nombre a la IP real del servidor.</div>
+
+<h3>¿Cómo encaja todo?</h3>
+<div class="arch-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  FLUJO: Desde tu código hasta el usuario final                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  VOS escribís código                                            │
+│       │  git push a main                                        │
+│       ▼                                                         │
+│  GITHUB ACTIONS (automático)                                    │
+│       │  ① Tests (¿algo se rompió?)                             │
+│       │  ② Build imagen Docker                                  │
+│       │  ③ Push imagen a Lightsail                              │
+│       │  ④ Despliega nueva versión                              │
+│       ▼                                                         │
+│  LIGHTSAIL CONTAINERS ($7/mes fijo)                             │
+│       │  • Corre tu imagen Docker                               │
+│       │  • HTTPS automático                                     │
+│       │  • Se reinicia sola si se cae                           │
+│       │                                                         │
+│       ├──→ NEON: guarda datos (gratis)                          │
+│       ├──→ RESEND: envía emails (gratis)                        │
+│       │                                                         │
+│  EVENTBRIDGE (cada 5 min) → LAMBDA → "cerrá eventos vencidos"  │
+│                                                                 │
+│  USUARIO escribe tudominio.com → DNS → Lightsail → 🔒 HTTPS    │
+└─────────────────────────────────────────────────────────────────┘
+</div>
+
+<div class="alert alert-info"><strong>Costo total: ~$7/mes.</strong> Lightsail $7 fijo. Neon, Resend, Lambda, GitHub Actions: todos gratis en sus tiers básicos.</div>
+
+<!-- PREREQUISITES -->
+<h2 id="prereqs">📋 Requisitos previos</h2>
+<ul>
+    <li><strong>Cuenta de AWS</strong> — <a href="https://aws.amazon.com" target="_blank">aws.amazon.com</a> (pide tarjeta, no cobra al crear)</li>
+    <li><strong>Docker Desktop</strong> — <a href="https://www.docker.com/products/docker-desktop/" target="_blank">docker.com</a> (corriendo, ballenita en tu barra)</li>
+    <li><strong>Git + GitHub</strong> — el repo Hatsik en tu cuenta de GitHub</li>
+    <li><strong>Un dominio</strong> — compralo donde quieras (~$10-15/año)</li>
+    <li><strong>Terminal</strong></li>
+</ul>
+
+<!-- PASO 1: AWS CLI -->
+<h2 id="step1">Paso 1: Configurar AWS CLI</h2>
+
+<div class="concept"><strong>AWS CLI</strong> — Un programa para hablar con AWS desde la terminal en vez de clickear botones en la web. Más rápido y reproducible.</div>
+
+<h3>1.1 — Instalar</h3>
+<pre><code>brew install awscli
+aws --version</code></pre>
+
+<h3>1.2 — Crear usuario IAM (NO uses tu cuenta root)</h3>
+
+<div class="analogy">Tu cuenta root es la llave maestra del edificio. No se la darías al repartidor. Un usuario IAM es una llave que solo abre lo que necesita.</div>
+
+<div class="step-title"><span class="step-number">1</span>Abrí IAM: <a href="https://console.aws.amazon.com/iam/" target="_blank">console.aws.amazon.com/iam</a></div>
+
+<div class="step-title"><span class="step-number">2</span>Users → Create user</div>
+<ul>
+    <li>Name: <code>hatsik-deploy</code></li>
+    <li>NO marques "Console access" — solo es para automatización</li>
+</ul>
+
+<div class="step-title"><span class="step-number">3</span>Permisos → "Attach policies directly"</div>
+<p>Buscá y tildá: <code>AmazonLightsailFullAccess</code></p>
+
+<div class="concept"><strong>¿Por qué solo esta policy?</strong> — Con Lightsail Containers no necesitás ECR ni App Runner. Todo (registro de imágenes, servidor, HTTPS) está dentro de Lightsail. Un solo permiso cubre todo.</div>
+
+<div class="step-title"><span class="step-number">4</span>Security credentials → Create access key</div>
+<ul>
+    <li>Use case: <strong>Command Line Interface (CLI)</strong></li>
+    <li><strong>Descargá el CSV</strong> — no se puede volver a ver la Secret Key</li>
+</ul>
+
+<h3>1.3 — Configurar CLI</h3>
+<pre><code>aws configure
+
+# Te pide:
+AWS Access Key ID: AKIA............  ← del CSV
+AWS Secret Access Key: wJal........  ← del CSV
+Default region name: us-east-1
+Default output format: json</code></pre>
+
+<h3>1.4 — Verificar</h3>
+<pre><code>aws sts get-caller-identity
+# Deberías ver tu Account ID (12 dígitos) — anotalo</code></pre>
+
+<!-- PASO 2: NEON -->
+<h2 id="step2">Paso 2: Crear la base de datos (Neon)</h2>
+
+<div class="concept"><strong>Base de datos</strong> — Donde se guardan los usuarios, eventos, ítems, asignaciones. PostgreSQL es el motor más confiable. Neon te lo da listo, serverless, gratis hasta 0.5 GB.</div>
+
+<div class="step-title"><span class="step-number">1</span>Creá cuenta en <a href="https://neon.tech" target="_blank">neon.tech</a> (podés usar GitHub)</div>
+
+<div class="step-title"><span class="step-number">2</span>New Project</div>
+<ul>
+    <li>Name: <code>hatsik-production</code></li>
+    <li>Region: <strong>US East (Ohio)</strong></li>
+    <li>PostgreSQL: <strong>16</strong></li>
+</ul>
+
+<div class="step-title"><span class="step-number">3</span>Copiá el connection string</div>
+<pre><code>postgres://neondb_owner:AbC123@ep-cool-name.us-east-2.aws.neon.tech/neondb?sslmode=require</code></pre>
+
+<div class="step-title"><span class="step-number">4</span>Corré las migraciones (creá las tablas)</div>
+<pre><code># Desde la carpeta del proyecto Hatsik:
+export DATABASE_URL="postgres://...tu-url-de-neon..."
+export SECRET_KEY="temporal-para-migraciones"
+export ALLOWED_HOSTS="*"
+
+python manage.py migrate --settings=config.settings.production
+python manage.py createsuperuser --settings=config.settings.production</code></pre>
+
+<div class="concept"><strong>Migraciones</strong> — Instrucciones que crean las tablas en la DB. Django las genera automáticamente desde tus modelos. <code>migrate</code> las ejecuta.</div>
+
+<!-- PASO 3: RESEND -->
+<h2 id="step3">Paso 3: Configurar email (Resend)</h2>
+
+<div class="concept"><strong>¿Por qué?</strong> — Tu app envía emails de verificación y recovery. No podés enviar directo desde tu servidor porque Gmail/Outlook lo marcarían como spam. Resend se encarga de que lleguen.</div>
+
+<div class="step-title"><span class="step-number">1</span>Creá cuenta en <a href="https://resend.com" target="_blank">resend.com</a></div>
+
+<div class="step-title"><span class="step-number">2</span>Domains → Add Domain → escribí tu dominio</div>
+<p>Resend te da registros DNS. Agregalos en tu proveedor de dominio (Namecheap, GoDaddy, Cloudflare).</p>
+
+<div class="concept"><strong>Registros DNS para email</strong> — Le dicen al mundo "Resend tiene permiso de enviar emails en nombre de mi dominio". Es para probar que sos el dueño y evitar suplantación.</div>
+
+<div class="step-title"><span class="step-number">3</span>API Keys → Create API Key</div>
+<ul>
+    <li>Name: <code>hatsik-production</code></li>
+    <li>Permission: <strong>Sending access</strong></li>
+    <li>Guardá la key (empieza con <code>re_</code>)</li>
+</ul>
+
+<!-- PASO 4: LIGHTSAIL CONTAINERS -->
+<h2 id="step4">Paso 4: Crear el servicio Lightsail Containers</h2>
+
+<div class="concept"><strong>¿Qué es Lightsail Containers?</strong> — El servicio más simple de AWS para correr Docker. Le das una imagen, él la corre, te da una URL con HTTPS, y la mantiene viva 24/7. Precio fijo de $7/mes (plan Nano: 0.25 vCPU, 512 MB RAM). No hay cargos extra por ALB, ni sorpresas. Incluye 500 GB de transfer.</div>
+
+<div class="analogy">Si App Runner era "alquilar un local llave en mano" (pero lo descontinuaron), Lightsail Containers es "alquilar el local de al lado" — mismo concepto, más barato, y sigue abierto.</div>
+
+<div class="step-title"><span class="step-number">1</span>Abrí Lightsail en la consola de AWS</div>
+<p>URL: <a href="https://lightsail.aws.amazon.com/" target="_blank">lightsail.aws.amazon.com</a></p>
+
+<div class="step-title"><span class="step-number">2</span>Containers → Create container service</div>
+
+<h4>Configuración del servicio</h4>
+<ul>
+    <li>Region: <strong>Virginia (us-east-1)</strong></li>
+    <li>Capacity: <strong>Nano</strong> ($7/month) — 0.25 vCPU, 512 MB RAM</li>
+    <li>Scale: <strong>1</strong> (un nodo es suficiente para MVP)</li>
+    <li>Service name: <code>hatsik</code></li>
+</ul>
+
+<div class="concept"><strong>¿Plan Nano alcanza?</strong> — Sí. Django con Gunicorn (2 workers) corre cómodo en 512 MB para un MVP con pocos usuarios. Si eventualmente necesitás más, subís a Micro ($10, 1 GB RAM) con un click.</div>
+
+<div class="alert alert-info"><strong>NO configures el deployment todavía.</strong> Primero creá el servicio vacío (sin imagen). En el siguiente paso vamos a subir la imagen y deployar.</div>
+
+<div class="step-title"><span class="step-number">3</span>Click "Create container service"</div>
+<p>El servicio se crea en ~1 minuto. Vas a verlo en estado "Ready" sin ningún deployment activo. Esto es normal — ahora vamos a subir tu app.</p>
+
+<!-- PASO 5: DEPLOY -->
+<h2 id="step5">Paso 5: Subir tu imagen Docker y desplegar</h2>
+
+<div class="concept"><strong>¿Cómo funciona Lightsail Containers?</strong> — A diferencia de App Runner (que usaba ECR), Lightsail tiene su PROPIO registro de imágenes integrado. No necesitás ECR. El flujo es: (1) buildeás la imagen en tu máquina, (2) la subís directo a Lightsail con un comando, (3) le decís "usá esta imagen".</div>
+
+<h3>5.1 — Instalar el plugin de Lightsail para Docker</h3>
+<pre><code># Este plugin permite que AWS CLI suba imágenes a Lightsail:
+curl -s "https://s3.us-west-2.amazonaws.com/lightsailctl/latest/darwin-amd64/lightsailctl" \
+    -o /usr/local/bin/lightsailctl
+chmod +x /usr/local/bin/lightsailctl</code></pre>
+
+<div class="concept"><strong>¿Qué es <code>lightsailctl</code>?</strong> — Es un plugin que le agrega a AWS CLI la capacidad de subir imágenes Docker directamente a tu servicio de Lightsail. Sin este plugin, el comando <code>aws lightsail push-container-image</code> no funciona.</div>
+
+<h3>5.2 — Buildear tu imagen Docker</h3>
+<pre><code># Desde la carpeta raíz del proyecto Hatsik:
+docker build -t hatsik .</code></pre>
+
+<div class="alert alert-info"><strong>Esto tarda 2-5 minutos la primera vez.</strong> Docker descarga Python, instala dependencias, compila Tailwind CSS, y deja todo listo. Las siguientes veces es más rápido (cachea lo que no cambió).</div>
+
+<h3>5.3 — Subir la imagen a Lightsail</h3>
+<pre><code># Sube la imagen directamente al servicio (no necesitás ECR):
+aws lightsail push-container-image \
+    --region us-east-1 \
+    --service-name hatsik \
+    --label latest \
+    --image hatsik:latest</code></pre>
+
+<p>Cuando termine, te muestra algo así:</p>
+<pre><code>Refer to this image as ":hatsik.hatsik.1" in deployments.</code></pre>
+
+<div class="alert alert-warn"><strong>Anotá ese nombre de imagen</strong> (ej: <code>:hatsik.hatsik.1</code>). Lo necesitás para el siguiente paso. El número al final incrementa cada vez que subís una nueva versión.</div>
+
+<h3>5.4 — Deployar la imagen (ponerla a correr)</h3>
+<p>Ahora le decís a Lightsail "usá esta imagen, con estas variables de entorno":</p>
+
+<pre><code># Primero generá tus secretos:
+python3 -c "
+import secrets
+print('SECRET_KEY:', secrets.token_urlsafe(50))
+print('INTERNAL_CRON_TOKEN:', secrets.token_urlsafe(32))
+"</code></pre>
+
+<p>Ahora creá el deployment (reemplazá los valores con los tuyos):</p>
+
+<pre><code>aws lightsail create-container-service-deployment \
+    --region us-east-1 \
+    --service-name hatsik \
+    --containers '{
+      "hatsik": {
+        "image": ":hatsik.hatsik.1",
+        "ports": {"8000": "HTTP"},
+        "environment": {
+          "DJANGO_SETTINGS_MODULE": "config.settings.production",
+          "SECRET_KEY": "TU_SECRET_KEY_GENERADA",
+          "DEBUG": "False",
+          "ALLOWED_HOSTS": "*.amazonaws.com,tudominio.com",
+          "DATABASE_URL": "postgres://...tu-url-de-neon...",
+          "RESEND_API_KEY": "re_tu_api_key",
+          "RESEND_FROM_DOMAIN": "tudominio.com",
+          "INTERNAL_CRON_TOKEN": "TU_CRON_TOKEN_GENERADO"
+        }
+      }
+    }' \
+    --public-endpoint '{
+      "containerName": "hatsik",
+      "containerPort": 8000,
+      "healthCheck": {
+        "path": "/login/",
+        "intervalSeconds": 15,
+        "timeoutSeconds": 5,
+        "healthyThreshold": 2,
+        "unhealthyThreshold": 3
+      }
+    }'</code></pre>
+
+<div class="concept"><strong>¿Qué hace este comando?</strong>
+<br>• <code>containers</code> — define qué imagen correr y con qué variables de entorno
+<br>• <code>ports</code> — el puerto donde tu app escucha (Gunicorn en 8000)
+<br>• <code>public-endpoint</code> — le dice a Lightsail "exponé este container a internet"
+<br>• <code>healthCheck</code> — cada 15 seg, Lightsail visita <code>/login/</code> para verificar que la app está viva
+</div>
+
+<div class="step-title"><span class="step-number">5</span>Esperá el deploy (3-5 minutos)</div>
+<p>Podés ver el estado con:</p>
+<pre><code>aws lightsail get-container-services \
+    --service-name hatsik \
+    --region us-east-1 \
+    --query 'containerServices[0].state'</code></pre>
+<p>Cuando diga <code>"RUNNING"</code>, tu app está en el aire. 🎉</p>
+
+<div class="step-title"><span class="step-number">6</span>Obtené tu URL</div>
+<pre><code>aws lightsail get-container-services \
+    --service-name hatsik \
+    --region us-east-1 \
+    --query 'containerServices[0].url' \
+    --output text</code></pre>
+<p>Te da algo como:</p>
+<pre><code>https://hatsik.xxxxxxxx.us-east-1.cs.amazonlightsail.com</code></pre>
+<p>Abrila en tu navegador — deberías ver la pantalla de login de Hatsik con HTTPS. 🔒</p>
+
+<!-- PASO 6: DOMINIO -->
+<h2 id="step6">Paso 6: Conectar tu dominio</h2>
+
+<div class="concept"><strong>Dominio</strong> — La URL que te da Lightsail funciona pero es larga y fea. Con un dominio propio (<code>tudominio.com</code>) tus usuarios tienen una dirección profesional. Lightsail maneja el HTTPS automáticamente.</div>
+
+<div class="step-title"><span class="step-number">1</span>Habilitá el dominio custom en Lightsail</div>
+<p>En la consola de Lightsail → tu servicio → pestaña <strong>"Custom domains"</strong> → <strong>"Enable custom domains"</strong>.</p>
+
+<div class="alert alert-info"><strong>Lightsail va a crear un certificado SSL automáticamente.</strong> Te va a pedir que valides la propiedad del dominio agregando un registro CNAME.</div>
+
+<div class="step-title"><span class="step-number">2</span>Agregá tu dominio</div>
+<p>Click <strong>"Create certificate"</strong> → escribí tu dominio (ej: <code>tudominio.com</code>).</p>
+<p>Lightsail te da un registro DNS de validación:</p>
+<pre><code># Para validar que sos el dueño:
+Tipo:   CNAME
+Nombre: _abc123.tudominio.com
+Valor:  _xyz789.acm-validations.aws.</code></pre>
+
+<div class="step-title"><span class="step-number">3</span>Agregá los registros DNS en tu proveedor de dominio</div>
+<p>Necesitás DOS registros: uno de validación (el de arriba) y uno para apuntar el tráfico:</p>
+<pre><code># Para apuntar tu dominio a Lightsail:
+Tipo:   CNAME
+Nombre: tudominio.com  (o @ según tu proveedor)
+Valor:  hatsik.xxxxxxxx.us-east-1.cs.amazonlightsail.com</code></pre>
+
+<div class="concept"><strong>CNAME</strong> — Un alias de DNS. Dice "cuando alguien busque mi dominio, mandalo a esta dirección de Lightsail". Como poner un cartel en una calle que dice "el restaurante está a 2 cuadras →".</div>
+
+<div class="alert alert-warn"><strong>Cloudflare:</strong> Desactivá el proxy (nube gris, no naranja) para que la validación funcione.</div>
+
+<div class="step-title"><span class="step-number">4</span>Esperá la validación (5-30 min normalmente)</div>
+<p>Cuando el certificado esté "Valid", habilitá el dominio en tu servicio. Listo — <code>https://tudominio.com</code> ahora muestra Hatsik. 🔒</p>
+
+<!-- PASO 7: GITHUB ACTIONS -->
+<h2 id="step7">Paso 7: Automatizar deploys (GitHub Actions)</h2>
+
+<div class="concept"><strong>CI/CD</strong> — Cada vez que pusheás a <code>main</code>, un robot corre tests, buildea la imagen, la sube a Lightsail, y despliega. No hacés nada manual. Ya tenés el archivo <code>.github/workflows/deploy.yml</code> configurado — solo falta darle las credenciales.</div>
+
+<h3>7.1 — Agregar Secrets en GitHub</h3>
+<p>GitHub → tu repo → Settings → Secrets and variables → Actions → <strong>"New repository secret"</strong></p>
+
+<table style="width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.83rem;">
+    <thead><tr style="background: var(--primary-light);"><th style="border:1px solid var(--border); padding:0.5rem;">Secret</th><th style="border:1px solid var(--border); padding:0.5rem;">Valor</th><th style="border:1px solid var(--border); padding:0.5rem;">¿De dónde?</th></tr></thead>
+    <tbody>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>AWS_ACCESS_KEY_ID</code></td><td style="border:1px solid var(--border); padding:0.5rem;"><code>AKIA...</code></td><td style="border:1px solid var(--border); padding:0.5rem;">CSV del Paso 1</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>AWS_SECRET_ACCESS_KEY</code></td><td style="border:1px solid var(--border); padding:0.5rem;"><code>wJal...</code></td><td style="border:1px solid var(--border); padding:0.5rem;">CSV del Paso 1</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>AWS_REGION</code></td><td style="border:1px solid var(--border); padding:0.5rem;"><code>us-east-1</code></td><td style="border:1px solid var(--border); padding:0.5rem;">Siempre us-east-1</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>LIGHTSAIL_SERVICE</code></td><td style="border:1px solid var(--border); padding:0.5rem;"><code>hatsik</code></td><td style="border:1px solid var(--border); padding:0.5rem;">El nombre que le pusiste al servicio</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>SECRET_KEY</code></td><td style="border:1px solid var(--border); padding:0.5rem;">(el que generaste)</td><td style="border:1px solid var(--border); padding:0.5rem;">Paso 5.4</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>DATABASE_URL</code></td><td style="border:1px solid var(--border); padding:0.5rem;">(URL de Neon)</td><td style="border:1px solid var(--border); padding:0.5rem;">Paso 2</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>ALLOWED_HOSTS</code></td><td style="border:1px solid var(--border); padding:0.5rem;"><code>tudominio.com,*.amazonlightsail.com</code></td><td style="border:1px solid var(--border); padding:0.5rem;">Tu dominio + wildcard Lightsail</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>RESEND_API_KEY</code></td><td style="border:1px solid var(--border); padding:0.5rem;"><code>re_...</code></td><td style="border:1px solid var(--border); padding:0.5rem;">Paso 3</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>RESEND_FROM_DOMAIN</code></td><td style="border:1px solid var(--border); padding:0.5rem;"><code>tudominio.com</code></td><td style="border:1px solid var(--border); padding:0.5rem;">Tu dominio verificado en Resend</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.5rem;"><code>INTERNAL_CRON_TOKEN</code></td><td style="border:1px solid var(--border); padding:0.5rem;">(el que generaste)</td><td style="border:1px solid var(--border); padding:0.5rem;">Paso 5.4</td></tr>
+    </tbody>
+</table>
+
+<h3>7.2 — Probá el pipeline</h3>
+<pre><code>git commit --allow-empty -m "ci: test deploy pipeline"
+git push origin main</code></pre>
+<p>GitHub → Actions → deberías ver el pipeline correr y deployar en ~5 min.</p>
+
+<div class="alert alert-info"><strong>A partir de ahora, cada push a main despliega automáticamente.</strong> Escribís código → push → 5 min después está en producción.</div>
+
+<!-- PASO 8: CRON -->
+<h2 id="step8">Paso 8: Crear el cron job (EventBridge + Lambda)</h2>
+
+<div class="concept"><strong>¿Para qué?</strong> — Hatsik necesita cerrar automáticamente los eventos cuyo deadline ya pasó. Cada 5 minutos, una alarma despierta una función que le dice a tu app "revisá y cerrá lo que haya vencido".</div>
+
+<div class="step-title"><span class="step-number">1</span>Creá la función Lambda</div>
+<p><a href="https://console.aws.amazon.com/lambda/" target="_blank">Lambda console</a> → Create function:</p>
+<ul>
+    <li>Name: <code>hatsik-cron-trigger</code></li>
+    <li>Runtime: <strong>Python 3.12</strong></li>
+    <li>Architecture: <strong>arm64</strong></li>
+</ul>
+
+<div class="step-title"><span class="step-number">2</span>Pegá este código:</div>
+<pre><code>import json
+import urllib.request
+import os
+
+def lambda_handler(event, context):
+    url = os.environ["APP_URL"]
+    token = os.environ["CRON_TOKEN"]
+
+    req = urllib.request.Request(
+        f"{url}/internal/close-expired-events/",
+        method="POST",
+        headers={"X-Internal-Token": token, "Content-Type": "application/json"},
+        data=b"{}",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            body = json.loads(resp.read())
+            print(f"OK — cerrados: {body.get('closed_count', 0)}")
+            return {"statusCode": 200, "body": body}
+    except Exception as e:
+        print(f"Error: {e}")
+        return {"statusCode": 500, "body": str(e)}</code></pre>
+
+<div class="step-title"><span class="step-number">3</span>Variables de entorno de Lambda</div>
+<ul>
+    <li><code>APP_URL</code> = <code>https://tudominio.com</code></li>
+    <li><code>CRON_TOKEN</code> = (mismo valor que INTERNAL_CRON_TOKEN)</li>
+</ul>
+
+<div class="step-title"><span class="step-number">4</span>Creá el Schedule en EventBridge</div>
+<p><a href="https://console.aws.amazon.com/scheduler/" target="_blank">EventBridge Scheduler</a> → Create schedule:</p>
+<ul>
+    <li>Name: <code>hatsik-close-expired-events</code></li>
+    <li>Type: <strong>Recurring</strong> → Rate: <strong>5 minutes</strong></li>
+    <li>Target: <strong>AWS Lambda → Invoke</strong> → <code>hatsik-cron-trigger</code></li>
+</ul>
+
+<div class="alert alert-info"><strong>Costo: $0.</strong> Lambda tiene 1 millón de ejecuciones gratis/mes. Vos usás ~8,640.</div>
+
+<!-- PASO 9: VERIFICACIÓN -->
+<h2 id="step9">Paso 9: Verificar que todo funciona</h2>
+
+<div class="checklist">
+    <label><input type="checkbox"> <code>https://tudominio.com</code> muestra login con HTTPS</label>
+    <label><input type="checkbox"> Te registrás y recibís email de verificación</label>
+    <label><input type="checkbox"> Verificás y entrás al dashboard</label>
+    <label><input type="checkbox"> Creás un evento con deadline en 10 min → se cierra solo</label>
+    <label><input type="checkbox"> "Recuperar contraseña" envía el email</label>
+    <label><input type="checkbox"> <code>/admin/</code> funciona con el superuser</label>
+    <label><input type="checkbox"> Push a main → GitHub Actions despliega automáticamente</label>
+</div>
+
+<h3>Si algo no funciona</h3>
+<h4>🔴 App no carga</h4>
+<ul>
+    <li>Lightsail → tu servicio → "Logs" → mirá los errores</li>
+    <li>Causas comunes: <code>SECRET_KEY</code> faltante, <code>DATABASE_URL</code> mal escrita</li>
+</ul>
+<h4>🔴 Emails no llegan</h4>
+<ul>
+    <li>Dominio en Resend debe estar "Verified"</li>
+    <li><code>RESEND_FROM_DOMAIN</code> debe coincidir exactamente</li>
+</ul>
+<h4>🔴 Dominio no funciona</h4>
+<ul>
+    <li><code>dig tudominio.com CNAME</code> — ¿apunta a Lightsail?</li>
+    <li>Certificado debe estar "Valid" en Lightsail</li>
+</ul>
+<h4>🔴 Cron no cierra eventos</h4>
+<ul>
+    <li>Lambda → Monitor → CloudWatch logs</li>
+    <li>Error 401 = CRON_TOKEN no coincide con INTERNAL_CRON_TOKEN</li>
+</ul>
+
+<!-- PASO 10: SEGURIDAD -->
+<h2 id="step10">Paso 10: Seguridad final</h2>
+
+<div class="checklist">
+    <label><input type="checkbox"> <code>DEBUG=False</code> en Lightsail</label>
+    <label><input type="checkbox"> SECRET_KEY es random largo (no "change-me")</label>
+    <label><input type="checkbox"> ALLOWED_HOSTS solo tiene tu dominio (no <code>*</code>)</label>
+    <label><input type="checkbox"> DATABASE_URL tiene <code>?sslmode=require</code></label>
+    <label><input type="checkbox"> <code>.env</code> NO está en git</label>
+    <label><input type="checkbox"> MFA activado en cuenta root de AWS (IAM → Activate MFA)</label>
+    <label><input type="checkbox"> HTTPS funciona (candadito verde)</label>
+</div>
+
+<div class="alert alert-danger"><strong>Activá MFA en tu cuenta root de AWS AHORA.</strong> Es lo más importante. Si alguien te roba la contraseña, sin MFA tiene acceso total a todo.</div>
+
+<!-- COSTOS -->
+<h2>💰 Resumen de costos</h2>
+<table style="width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.9rem;">
+    <thead><tr style="background: var(--primary-light);"><th style="border:1px solid var(--border); padding:0.6rem;">Servicio</th><th style="border:1px solid var(--border); padding:0.6rem;">Qué hace</th><th style="border:1px solid var(--border); padding:0.6rem;">Costo/mes</th></tr></thead>
+    <tbody>
+        <tr><td style="border:1px solid var(--border); padding:0.6rem;">Lightsail Containers (Nano)</td><td style="border:1px solid var(--border); padding:0.6rem;">Corre tu app 24/7</td><td style="border:1px solid var(--border); padding:0.6rem;"><strong>$7</strong></td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.6rem;">Neon PostgreSQL</td><td style="border:1px solid var(--border); padding:0.6rem;">Base de datos</td><td style="border:1px solid var(--border); padding:0.6rem;">$0 (free tier)</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.6rem;">Resend</td><td style="border:1px solid var(--border); padding:0.6rem;">Emails</td><td style="border:1px solid var(--border); padding:0.6rem;">$0 (3k/mes gratis)</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.6rem;">Lambda + EventBridge</td><td style="border:1px solid var(--border); padding:0.6rem;">Cron cada 5 min</td><td style="border:1px solid var(--border); padding:0.6rem;">$0</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.6rem;">GitHub Actions</td><td style="border:1px solid var(--border); padding:0.6rem;">CI/CD</td><td style="border:1px solid var(--border); padding:0.6rem;">$0 (2k min gratis)</td></tr>
+        <tr style="font-weight:700; background:var(--primary-light);"><td style="border:1px solid var(--border); padding:0.6rem;" colspan="2">TOTAL</td><td style="border:1px solid var(--border); padding:0.6rem; color:var(--primary);">$7 USD/mes</td></tr>
+    </tbody>
+</table>
+
+<!-- WORKFLOW DIARIO -->
+<h2>🔄 Tu día a día</h2>
+<pre><code># Escribís código, commiteás, pusheás:
+git add .
+git commit -m "feat: nueva funcionalidad"
+git push origin main
+
+# Eso es todo. GitHub Actions hace el resto.
+# En ~5 min está en producción. ✨</code></pre>
+
+<!-- REFERENCIA RÁPIDA -->
+<h2>🔑 Referencia rápida — Todas las variables</h2>
+<pre><code># ═══ LIGHTSAIL (variables de entorno del deployment) ═══
+SECRET_KEY=           ← python3 -c "import secrets; print(secrets.token_urlsafe(50))"
+DEBUG=False
+ALLOWED_HOSTS=        ← tudominio.com,*.amazonlightsail.com
+DATABASE_URL=         ← URL de Neon con ?sslmode=require
+RESEND_API_KEY=       ← re_...
+RESEND_FROM_DOMAIN=   ← tudominio.com
+INTERNAL_CRON_TOKEN=  ← python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+DJANGO_SETTINGS_MODULE=config.settings.production
+
+# ═══ GITHUB SECRETS ═══
+AWS_ACCESS_KEY_ID=    ← CSV de IAM
+AWS_SECRET_ACCESS_KEY=← CSV de IAM
+AWS_REGION=us-east-1
+LIGHTSAIL_SERVICE=hatsik
+SECRET_KEY=           ← mismo que arriba
+DATABASE_URL=         ← mismo que arriba
+ALLOWED_HOSTS=        ← mismo que arriba
+RESEND_API_KEY=       ← mismo que arriba
+RESEND_FROM_DOMAIN=   ← mismo que arriba
+INTERNAL_CRON_TOKEN=  ← mismo que arriba
+
+# ═══ LAMBDA ═══
+APP_URL=              ← https://tudominio.com
+CRON_TOKEN=           ← mismo que INTERNAL_CRON_TOKEN</code></pre>
+
+<div class="footer">
+    <p>🍖 Hatsik — Guía de Despliegue con Lightsail Containers · Julio 2026</p>
+    <p style="margin-top:0.5rem; font-size:0.75rem;">Si algo no funciona: Lightsail → tu servicio → Logs</p>
+</div>
+
+</body>
+</html>
