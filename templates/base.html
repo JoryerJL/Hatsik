@@ -33,6 +33,10 @@
     </style>
 
     {% block extra_css %}{% endblock %}
+<style>
+    @keyframes slide-in { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .animate-slide-in { animation: slide-in 0.3s ease-out; }
+</style>
 </head>
 <body class="font-[var(--font-body)] bg-pattern text-[var(--color-on-surface)] min-h-screen flex flex-col md:flex-row">
 
@@ -141,11 +145,24 @@
 
         <!-- Messages / Toasts -->
         {% if messages %}
-        <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2">
+        <div id="toast-container" class="fixed top-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none">
             {% for message in messages %}
+            <div class="pointer-events-auto">
                 {% include "components/_toast.html" with message=message %}
+            </div>
             {% endfor %}
         </div>
+        <script>
+            // Auto-dismiss toasts after 5 seconds
+            setTimeout(function() {
+                var container = document.getElementById('toast-container');
+                if (container) {
+                    container.style.transition = 'opacity 0.3s ease';
+                    container.style.opacity = '0';
+                    setTimeout(function() { container.remove(); }, 300);
+                }
+            }, 5000);
+        </script>
         {% endif %}
 
         <!-- Main Content -->
