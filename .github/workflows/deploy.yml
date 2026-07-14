@@ -1,7 +1,7 @@
 # ==============================================================
 # Hatsik — CI/CD Pipeline
 # ==============================================================
-# Lint → Test → Build Docker → Push ECR → Deploy App Runner
+# Lint → Test → Build Docker → Push to Lightsail → Deploy
 # ==============================================================
 
 name: Deploy
@@ -14,7 +14,7 @@ on:
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  LIGHTSAIL_SERVICE: ${{ secrets.LIGHTSAIL_SERVICE }}
 
 jobs:
   lint-and-test:
@@ -78,22 +78,61 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag, and push image to ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Install Lightsail plugin
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          curl -s "https://s3.us-west-2.amazonaws.com/lightsailctl/latest/linux-amd64/lightsailctl" -o /usr/local/bin/lightsailctl
+          chmod +x /usr/local/bin/lightsailctl
 
-      - name: Deploy to App Runner
-        env:
-          APPRUNNER_SERVICE_ARN: ${{ secrets.APPRUNNER_SERVICE_ARN }}
+      - name: Build Docker image
+        run: docker build --platform linux/amd64 --provenance=false -t hatsik:latest .
+
+      - name: Push image to Lightsail
         run: |
-          aws apprunner start-deployment --service-arn $APPRUNNER_SERVICE_ARN
+          aws lightsail push-container-image \
+            --region ${{ env.AWS_REGION }} \
+            --service-name ${{ env.LIGHTSAIL_SERVICE }} \
+            --label latest \
+            --image hatsik:latest
+
+      - name: Get pushed image name
+        id: image
+        run: |
+          IMAGE=$(aws lightsail get-container-images \
+            --service-name ${{ env.LIGHTSAIL_SERVICE }} \
+            --region ${{ env.AWS_REGION }} \
+            --query 'containerImages[0].image' \
+            --output text)
+          echo "name=$IMAGE" >> $GITHUB_OUTPUT
+
+      - name: Deploy to Lightsail
+        run: |
+          aws lightsail create-container-service-deployment \
+            --region ${{ env.AWS_REGION }} \
+            --service-name ${{ env.LIGHTSAIL_SERVICE }} \
+            --containers "{
+              \"hatsik\": {
+                \"image\": \"${{ steps.image.outputs.name }}\",
+                \"ports\": {\"8000\": \"HTTP\"},
+                \"environment\": {
+                  \"DJANGO_SETTINGS_MODULE\": \"config.settings.production\",
+                  \"SECRET_KEY\": \"${{ secrets.SECRET_KEY }}\",
+                  \"DEBUG\": \"False\",
+                  \"ALLOWED_HOSTS\": \"${{ secrets.ALLOWED_HOSTS }}\",
+                  \"DATABASE_URL\": \"${{ secrets.DATABASE_URL }}\",
+                  \"RESEND_API_KEY\": \"${{ secrets.RESEND_API_KEY }}\",
+                  \"RESEND_FROM_DOMAIN\": \"${{ secrets.RESEND_FROM_DOMAIN }}\",
+                  \"INTERNAL_CRON_TOKEN\": \"${{ secrets.INTERNAL_CRON_TOKEN }}\"
+                }
+              }
+            }" \
+            --public-endpoint "{
+              \"containerName\": \"hatsik\",
+              \"containerPort\": 8000,
+              \"healthCheck\": {
+                \"path\": \"/login/\",
+                \"intervalSeconds\": 15,
+                \"timeoutSeconds\": 5,
+                \"healthyThreshold\": 2,
+                \"unhealthyThreshold\": 3
+              }
+            }"
