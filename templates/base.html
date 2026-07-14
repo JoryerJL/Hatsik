@@ -60,10 +60,13 @@
 
         <!-- Logout -->
         <div class="px-2 mt-auto border-t border-[var(--color-gray-border)] pt-[var(--space-lg)]">
-            <a href="{% url 'accounts:logout' %}" class="w-full text-[var(--color-on-surface-variant)] px-4 py-3 flex items-center gap-3 hover:bg-[var(--color-surface-container-highest)] transition-all rounded-lg">
-                <span class="material-symbols-outlined">logout</span>
-                <span class="text-[15px] font-semibold">Cerrar sesión</span>
-            </a>
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="w-full text-[var(--color-on-surface-variant)] px-4 py-3 flex items-center gap-3 hover:bg-[var(--color-surface-container-highest)] transition-all rounded-lg">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="text-[15px] font-semibold">Cerrar sesión</span>
+                </button>
+            </form>
         </div>
     </aside>
 
@@ -94,10 +97,13 @@
 
         <!-- Logout -->
         <div class="px-2 mt-auto border-t border-[var(--color-gray-border)] pt-[var(--space-lg)]">
-            <a href="{% url 'accounts:logout' %}" class="w-full text-[var(--color-on-surface-variant)] px-4 py-3 flex items-center gap-3 hover:bg-[var(--color-surface-container-highest)] transition-all rounded-lg">
-                <span class="material-symbols-outlined">logout</span>
-                <span class="text-[15px] font-semibold">Cerrar sesión</span>
-            </a>
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="w-full text-[var(--color-on-surface-variant)] px-4 py-3 flex items-center gap-3 hover:bg-[var(--color-surface-container-highest)] transition-all rounded-lg">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="text-[15px] font-semibold">Cerrar sesión</span>
+                </button>
+            </form>
         </div>
     </aside>
 
@@ -123,7 +129,10 @@
                 {% endblock %}
             </nav>
             <div class="flex items-center gap-[var(--space-md)]">
-                <a href="{% url 'accounts:logout' %}" class="text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors text-[15px] font-semibold">Cerrar sesión</a>
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors text-[15px] font-semibold">Cerrar sesión</button>
+                </form>
                 <div class="w-10 h-10 rounded-full bg-[var(--color-surface-container-high)] border border-[var(--color-gray-border)] flex items-center justify-center overflow-hidden">
                     <span class="material-symbols-outlined text-[var(--color-on-surface-variant)]">person</span>
                 </div>

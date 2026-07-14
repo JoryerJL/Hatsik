@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Proyecto — Hatsik MVP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #b51d0c;
+            --primary-light: #FDE8E4;
+            --surface: #fcf9f8;
+            --on-surface: #1c1b1b;
+            --gray: #6B7280;
+            --border: #E5E7EB;
+            --green: #4ADE80;
+            --green-dark: #064e3b;
+            --blue: #93C5FD;
+            --yellow: #FDBA74;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            background: var(--surface);
+            color: var(--on-surface);
+            line-height: 1.7;
+            padding: 2rem;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2.5rem 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #d4392a 100%);
+            border-radius: 20px;
+            color: white;
+        }
+        .header h1 {
+            font-family: "Nunito", sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .header .date {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-top: 0.75rem;
+        }
+
+        /* Status badge */
+        .status-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            background: #ecfdf5;
+            border: 2px solid var(--green);
+            border-radius: 16px;
+            padding: 1.25rem 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .status-banner .icon {
+            font-size: 2.5rem;
+            color: #16a34a;
+        }
+        .status-banner .text {
+            font-family: "Nunito", sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #16a34a;
+        }
+        .status-banner .text small {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray);
+        }
+
+        /* Sections */
+        h2 {
+            font-family: "Nunito", sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary-light);
+        }
+        h3 {
+            font-family: "Nunito", sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        p { margin-bottom: 1rem; }
+
+        /* Metrics grid */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .metric {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .metric:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .metric .value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary);
+            font-family: "Nunito", sans-serif;
+        }
+        .metric .label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            margin: 2rem 0;
+            padding-left: 2rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary-light);
+            border-radius: 2px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 1.5rem;
+            width: 14px;
+            height: 14px;
+            background: var(--green);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px var(--green);
+        }
+        .timeline-item .phase-title {
+            font-family: "Nunito", sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        .timeline-item .phase-desc {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        .timeline-item .phase-meta {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 0.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .timeline-item .phase-meta span {
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+
+        /* Features list */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .feature-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+        .feature-card .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .feature-card .feature-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+        .feature-card .feature-desc {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        /* Stack table */
+        .stack-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .stack-table th, .stack-table td {
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            text-align: left;
+        }
+        .stack-table th {
+            background: var(--primary-light);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .stack-table tr:nth-child(even) { background: #fafafa; }
+
+        /* Next steps */
+        .next-steps {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .next-steps h3 {
+            color: #92400e;
+            margin-top: 0;
+        }
+        .next-steps ul {
+            list-style: none;
+            padding: 0;
+        }
+        .next-steps li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.9rem;
+        }
+        .next-steps li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #d97706;
+            font-weight: 700;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1rem; }
+            .header h1 { font-size: 1.8rem; }
+            .metric-grid { grid-template-columns: repeat(2, 1fr); }
+            .features { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h1>🍖 Hatsik</h1>
+    <p class="subtitle">Reporte de Estado del Proyecto</p>
+    <p class="date">Generado el 13 de julio de 2026</p>
+</div>
+
+<!-- STATUS -->
+<div class="status-banner">
+    <span class="icon">✅</span>
+    <span class="text">
+        MVP COMPLETO
+        <small>Las 6 fases de implementación se completaron exitosamente</small>
+    </span>
+</div>
+
+<!-- ¿QUÉ ES HATSIK? -->
+<h2>🎯 ¿Qué es Hatsik?</h2>
+<p>
+    <strong>Hatsik</strong> (del maya: "dividir, compartir") es una app web para organizar eventos colectivos — asados, posadas, cumpleaños, picnics. Resuelve el caos de "¿qué llevo?" que normalmente se coordina en hilos de WhatsApp.
+</p>
+<p>
+    Un <strong>organizador</strong> crea un evento, arma la lista de cosas que se necesitan, y comparte un link o QR. Los invitados piden acceso, se les aprueba, y luego pueden reclamar qué van a llevar. La lista se actualiza para que nadie repita ni se olvide nada.
+</p>
+
+<!-- NÚMEROS CLAVE -->
+<h2>📊 El proyecto en números</h2>
+<div class="metric-grid">
+    <div class="metric">
+        <div class="value">6/6</div>
+        <div class="label">Fases completadas</div>
+    </div>
+    <div class="metric">
+        <div class="value">385</div>
+        <div class="label">Tests pasando</div>
+    </div>
+    <div class="metric">
+        <div class="value">91</div>
+        <div class="label">Commits</div>
+    </div>
+    <div class="metric">
+        <div class="value">6</div>
+        <div class="label">Pull Requests</div>
+    </div>
+    <div class="metric">
+        <div class="value">~10k</div>
+        <div class="label">Líneas Python</div>
+    </div>
+    <div class="metric">
+        <div class="value">39</div>
+        <div class="label">Templates HTML</div>
+    </div>
+    <div class="metric">
+        <div class="value">5</div>
+        <div class="label">Apps Django</div>
+    </div>
+    <div class="metric">
+        <div class="value">51 días</div>
+        <div class="label">Duración total</div>
+    </div>
+</div>
+
+<!-- TIMELINE -->
+<h2>📅 Línea de tiempo — Fases completadas</h2>
+<div class="timeline">
+    <div class="timeline-item">
+        <div class="phase-title">Fase 1 — Foundation</div>
+        <div class="phase-desc">Esqueleto del proyecto: Django + PostgreSQL + Docker + CI/CD + Tailwind + componentes base del design system</div>
+        <div class="phase-meta">
+            <span>PR #1</span>
+            <span>DB + Modelos + Docker + GitHub Actions</span>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="phase-title">Fase 2 — Auth (Autenticación)</div>
+        <div class="phase-desc">Registro, login, logout, verificación de email con Resend, recuperación de contraseña, protección de rutas</div>
+        <div class="phase-meta">
+            <span>PR #2</span>
+            <span>4 pantallas Stitch</span>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="phase-title">Fase 3 — Events & Dashboard</div>
+        <div class="phase-desc">Crear eventos, dashboard "Mis Eventos", ciclo de vida (cerrar/reabrir/cancelar), compartir link + QR, co-admins</div>
+        <div class="phase-meta">
+            <span>PR #3</span>
+            <span>5 pantallas Stitch</span>
+            <span>Cierre automático con cron</span>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="phase-title">Fase 4 — Event Access</div>
+        <div class="phase-desc">Flujo de unirse a un evento: solicitud → aprobación/rechazo → acceso. Dejar eventos voluntariamente.</div>
+        <div class="phase-meta">
+            <span>PR #4</span>
+            <span>2 pantallas Stitch</span>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="phase-title">Fase 5 — Items & Moderation</div>
+        <div class="phase-desc">Lista de ítems del evento, agregar/editar/eliminar, sistema de sugerencias por participantes, moderación por Owner/Co-admin</div>
+        <div class="phase-meta">
+            <span>PR #5</span>
+            <span>3 pantallas Stitch</span>
+            <span>Semáforo de estados</span>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="phase-title">Fase 6 — Assignments (Final)</div>
+        <div class="phase-desc">Reclamar ítems parcial/totalmente, modificar, cancelar, marcar como comprado. Barra de progreso del evento.</div>
+        <div class="phase-meta">
+            <span>PR #6</span>
+            <span>Última fase del MVP</span>
+        </div>
+    </div>
+</div>
+
+<!-- FUNCIONALIDADES -->
+<h2>✨ Funcionalidades implementadas</h2>
+<div class="features">
+    <div class="feature-card">
+        <div class="feature-icon">👤</div>
+        <div class="feature-title">Cuentas y autenticación</div>
+        <div class="feature-desc">Registro con verificación de email, login seguro con cookies, recuperación de contraseña</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🎉</div>
+        <div class="feature-title">Crear y gestionar eventos</div>
+        <div class="feature-desc">Nombre, fecha, descripción, deadline. Cerrar, reabrir, cancelar con confirmación</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <div class="feature-title">Compartir por link y QR</div>
+        <div class="feature-desc">Link privado único por evento + código QR descargable como PNG</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🚪</div>
+        <div class="feature-title">Flujo de acceso controlado</div>
+        <div class="feature-desc">Solicitar entrada → Owner aprueba/rechaza → participante accede a la lista</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <div class="feature-title">Lista de ítems con cantidades</div>
+        <div class="feature-desc">Ítems con unidades controladas (kg, piezas, litros...) o binarios ("alguien lo trae")</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">💡</div>
+        <div class="feature-title">Sugerencias de participantes</div>
+        <div class="feature-desc">Proponer ítems nuevos que el Owner aprueba o rechaza antes de sumarse a la lista</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🛒</div>
+        <div class="feature-title">Reclamar y marcar como comprado</div>
+        <div class="feature-desc">Asignarse ítems, modificar cantidad, y marcar como comprado (irreversible)</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🤝</div>
+        <div class="feature-title">Roles: Owner, Co-admin, Participante</div>
+        <div class="feature-desc">Permisos granulares por evento — delegar administración sin perder control</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🚦</div>
+        <div class="feature-title">Semáforo visual de estado</div>
+        <div class="feature-desc">Colores para cada estado: sin asignar, parcial, cubierto, comprando, comprado</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">⏰</div>
+        <div class="feature-title">Cierre automático</div>
+        <div class="feature-desc">Cuando llega el deadline, el evento se cierra solo (vía AWS EventBridge cada 5 min)</div>
+    </div>
+</div>
+
+<!-- STACK -->
+<h2>🛠️ Stack tecnológico</h2>
+<table class="stack-table">
+    <thead>
+        <tr><th>Capa</th><th>Tecnología</th><th>Para qué sirve</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Backend</td><td>Django 5.2 + Python 3.12</td><td>Toda la lógica del servidor, templates, autenticación</td></tr>
+        <tr><td>Interactividad</td><td>HTMX 2.x</td><td>Actualizaciones parciales sin escribir JavaScript</td></tr>
+        <tr><td>Estilos</td><td>Tailwind CSS 4.x</td><td>Diseño visual con clases utilitarias</td></tr>
+        <tr><td>Base de datos</td><td>PostgreSQL 16 (Neon)</td><td>Almacenamiento de datos — serverless, sin administración</td></tr>
+        <tr><td>Email</td><td>Resend</td><td>Emails de verificación y recuperación de contraseña</td></tr>
+        <tr><td>Deploy</td><td>AWS App Runner</td><td>La app corre en la nube sin administrar servidores</td></tr>
+        <tr><td>CI/CD</td><td>GitHub Actions</td><td>Tests automáticos + deploy en cada push a main</td></tr>
+        <tr><td>Cron</td><td>AWS EventBridge</td><td>Cierra eventos vencidos cada 5 minutos</td></tr>
+        <tr><td>Diseño</td><td>Stitch (Google)</td><td>Diseño de pantallas con AI, exportado como HTML</td></tr>
+    </tbody>
+</table>
+
+<!-- CALIDAD -->
+<h2>🧪 Calidad del código</h2>
+<div class="metric-grid">
+    <div class="metric">
+        <div class="value">385</div>
+        <div class="label">Tests automatizados</div>
+    </div>
+    <div class="metric">
+        <div class="value">0</div>
+        <div class="label">Tests fallidos</div>
+    </div>
+    <div class="metric">
+        <div class="value">5,436</div>
+        <div class="label">Líneas de tests</div>
+    </div>
+    <div class="metric">
+        <div class="value">4,611</div>
+        <div class="label">Líneas producción</div>
+    </div>
+</div>
+<p style="font-size: 0.9rem; color: var(--gray);">
+    La relación tests/producción es <strong>1.18:1</strong> — hay más líneas de test que de código de producción, lo cual indica una cobertura sólida. Se testean validadores, formularios, servicios, vistas, permisos y reglas de negocio.
+</p>
+
+<!-- ¿QUÉ SIGUE? -->
+<h2>🚀 ¿Y ahora qué?</h2>
+<p>
+    El <strong>MVP está completo</strong>. Todas las 6 fases planificadas en el ROADMAP se implementaron, testearon, y mergearon a <code>main</code>. No hay fase siguiente en el alcance original — el proyecto llegó a su meta.
+</p>
+
+<div class="next-steps">
+    <h3>Posibles próximos pasos (Post-MVP)</h3>
+    <ul>
+        <li><strong>Deploy a producción:</strong> Configurar App Runner + dominio real + SSL para que usuarios reales puedan usar la app</li>
+        <li><strong>OAuth con Google:</strong> Login más rápido sin tener que crear cuenta con email/contraseña</li>
+        <li><strong>Notificaciones por email:</strong> Avisar al Owner cuando alguien pide acceso, avisar a participantes de cambios</li>
+        <li><strong>Templates de listas:</strong> Presets como "Kit asado básico", "Posada", "Picnic" para crear eventos más rápido</li>
+        <li><strong>Fotos de ítems:</strong> Referencia visual de lo que se necesita</li>
+        <li><strong>PWA (Progressive Web App):</strong> Instalar la app en el celular sin tienda</li>
+        <li><strong>Historial y estadísticas:</strong> Ver eventos pasados y resúmenes de participación</li>
+    </ul>
+</div>
+
+<!-- RESUMEN -->
+<h2>📝 Resumen ejecutivo</h2>
+<p>
+    Hatsik se desarrolló del 24 de mayo al 13 de julio de 2026 (51 días). Se construyó como un monolito Django con templates renderizados en servidor e interactividad vía HTMX — sin SPA, sin JavaScript complejo, sin API REST separada.
+</p>
+<p>
+    El proyecto siguió un roadmap de 6 fases secuenciales, cada una con su propio branch, PR, y suite de tests. Cada fase se diseñó primero en <strong>Stitch</strong> (herramienta de diseño con AI de Google) y luego se implementó replicando fielmente el HTML generado.
+</p>
+<p>
+    El resultado es una app funcional y testeada que resuelve el problema de coordinación de listas compartidas para eventos sociales, lista para ser desplegada a producción.
+</p>
+
+<div class="footer">
+    <p>Hatsik — "dividir, compartir" en Maya · MVP completado julio 2026</p>
+</div>
+
+</body>
+</html>

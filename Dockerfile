@@ -2,11 +2,12 @@
 # Hatsik — Production Dockerfile
 # ==============================================================
 # Python 3.12 slim + Tailwind CLI standalone + Gunicorn
+#
+# BUILD:  docker build --platform linux/amd64 --provenance=false -t hatsik .
 # ==============================================================
 
-FROM python:3.12-slim AS base
+FROM python:3.12-slim
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.production
@@ -34,11 +35,13 @@ COPY . .
 # Compile Tailwind CSS (minified for production)
 RUN tailwindcss -i static/css/input.css -o static/css/main.css --minify
 
-# Collect static files (WhiteNoise serves them)
-RUN python manage.py collectstatic --noinput --settings=config.settings.production || true
+# Create staticfiles directory for WhiteNoise
+RUN mkdir -p /app/staticfiles
 
-# Expose port
+# Startup script: collectstatic then gunicorn
+RUN printf '#!/bin/sh\npython manage.py collectstatic --noinput\nexec gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120\n' > /app/start.sh \
+    && chmod +x /app/start.sh
+
 EXPOSE 8000
 
-# Run with Gunicorn
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]
+CMD ["/app/start.sh"]
