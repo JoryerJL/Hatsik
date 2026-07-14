@@ -17,9 +17,9 @@ Django monolith with template-driven views, not an SPA and no public REST API. T
 | Auth | Django auth + sessions | — | HTTP-only cookie, no JWT |
 | QR generation | `qrcode` | 7.x | Generated on-demand, not persisted |
 | Static files | whitenoise | 6.x | Served from container, no S3/CDN in MVP |
-| Env config | python-decouple | 3.x | Reads `.env` locally, App Runner console in prod |
-| Deploy | AWS App Runner | — | Docker image from ECR, zero-downtime deploys |
-| CI/CD | GitHub Actions | — | lint → test → build → push ECR → deploy |
+| Env config | python-decouple | 3.x | Reads `.env` locally, Lightsail deployment config in prod |
+| Deploy | AWS Lightsail Containers | — | Docker image, $7/mo Nano plan, HTTPS included |
+| CI/CD | GitHub Actions | — | lint → test → build → push Lightsail → deploy |
 | Cron | AWS EventBridge Scheduler | — | Hits internal endpoint every 5 min for event auto-close |
 | Python | 3.12.x | — | Pinned in `.python-version` and `Dockerfile` |
 
@@ -79,7 +79,7 @@ Split requirements files, pinned to minor version with `.*`:
 
 - **No SPA/REST API**: avoids CORS/cross-origin auth complexity; one container, one deploy.
 - **Session cookies, no JWT**: simpler, safer by default (not exposed to XSS), no refresh-token logic needed.
-- **App Runner over EC2**: zero server administration, comparable MVP cost.
+- **Lightsail Containers over ECS/EC2**: $7/mo fixed price, zero server administration, HTTPS included, no ALB needed.
 - **Neon over RDS**: real free tier, swap is just changing `DATABASE_URL`.
 - **Resend over SES**: fast setup, generous free tier, no sandbox approval needed.
 - **EventBridge Scheduler over Celery+Redis**: no extra workers/containers, near-zero cost for a simple 5-minute cron.
