@@ -1,7 +1,7 @@
 # ARCHITECTURE_AND_STACK.md — Hatsik
 
-> **Version:** 1.0
-> **Date:** 2026-07-12
+> **Version:** 1.1
+> **Date:** 2026-07-14
 > **Status:** Active
 > **Project:** Hatsik Unified Web System
 
@@ -21,12 +21,12 @@ Este documento es la fuente de verdad para el stack tecnológico, la arquitectur
 | Email transaccional | Resend | SDK Python latest | Verificación de cuenta y recuperación de contraseña. |
 | Autenticación | Django auth + sesiones | (incluido en Django) | HTTP-only cookie. Sin JWT en MVP. |
 | Generación de QR | `qrcode` (lib Python) | 7.x | Generado on-demand. No se persiste en DB. |
-| Deploy | AWS App Runner | — | Imagen Docker desde ECR. SSL + dominio custom vía ACM. |
-| Contenedor | Docker | 27.x | Un solo `Dockerfile` para la app. |
-| Container registry | AWS ECR | — | Almacena las imágenes Docker. |
-| CI/CD | GitHub Actions | — | Build → push ECR → deploy App Runner. |
-| Cron jobs | AWS EventBridge Scheduler | — | Dispara endpoint protegido de Django cada 5 min para cierre automático de eventos. |
-| Variables de entorno | App Runner console + `.env` local | — | En producción: AWS console. En local: archivo `.env` (nunca commiteado). |
+| Deploy | AWS Lightsail Containers | — | Servicio de containers con HTTPS incluido (plan Nano, costo fijo). Health check contra `/login/`. |
+| Contenedor | Docker | 27.x | Un solo `Dockerfile` para la app. Build `linux/amd64`. |
+| Container registry | Lightsail (integrado) | — | Push directo con `aws lightsail push-container-image`. Sin ECR. |
+| CI/CD | GitHub Actions | — | Lint + tests → build Docker → push a Lightsail → `create-container-service-deployment`. |
+| Cron jobs | AWS EventBridge Scheduler + Lambda | — | Scheduler dispara la Lambda `hatsik-cron-trigger` cada 5 min; esta llama al endpoint protegido de Django para cierre automático de eventos. Logs en CloudWatch. |
+| Variables de entorno | Lightsail deployment + `.env` local | — | En producción: inyectadas en cada deployment desde GitHub Secrets (ver `deploy.yml`). En local: archivo `.env` (nunca commiteado). |
 | Python runtime | Python | 3.12.x | Versión fija en `Dockerfile` y `.python-version`. |
 
 ---
@@ -58,21 +58,25 @@ Django (Gunicorn)
 GitHub (push a main)
   ↓
 GitHub Actions
-  ├── Corre tests + linting
-  ├── Buildea imagen Docker
-  └── Push a AWS ECR
+  ├── Job 1: lint (ruff check + format) + tests (pytest vs postgres:16-alpine)
+  └── Job 2 (solo push a main):
+        ├── Buildea imagen Docker (linux/amd64)
+        ├── aws lightsail push-container-image
+        └── aws lightsail create-container-service-deployment
+              (env vars desde GitHub Secrets + public endpoint con health check /login/)
           ↓
-    AWS App Runner detecta nueva imagen
+    Lightsail levanta la versión nueva y enruta tráfico
+    solo cuando el health check pasa (zero-downtime)
           ↓
-    Despliega automáticamente (zero-downtime)
-          ↓
-    App en producción (tudominio.com, HTTPS, SSL via ACM)
+    App en producción (HTTPS incluido por Lightsail)
 ```
 
 ### Cron job — Cierre automático de eventos
 
 ```
 AWS EventBridge Scheduler (cada 5 min)
+  ↓
+AWS Lambda (hatsik-cron-trigger) — logs en CloudWatch
   ↓
 POST /internal/close-expired-events/
   Headers: X-Internal-Token: <secret>
@@ -91,13 +95,13 @@ hatsik/                          ← raíz del proyecto
 │
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml           ← CI/CD: test → build → push ECR → deploy App Runner
+│       └── deploy.yml           ← CI/CD: lint + test → build → push a Lightsail → deploy
 │
 ├── config/                      ← configuración de Django (settings, urls, wsgi)
 │   ├── settings/
 │   │   ├── base.py              ← settings compartidos
 │   │   ├── local.py             ← overrides para desarrollo local
-│   │   └── production.py        ← overrides para producción (App Runner)
+│   │   └── production.py        ← overrides para producción (Lightsail)
 │   ├── urls.py                  ← URL root del proyecto
 │   └── wsgi.py
 │
@@ -250,7 +254,7 @@ hatsik/                          ← raíz del proyecto
 
 ## Variables de entorno
 
-Todas las variables se definen en `.env` (local) o en la consola de App Runner (producción). El archivo `.env.example` documenta todas las claves necesarias **sin valores reales**.
+Todas las variables se definen en `.env` (local) o como GitHub Secrets que el pipeline inyecta al contenedor de Lightsail en cada deployment (producción). El archivo `.env.example` documenta todas las claves necesarias **sin valores reales**.
 
 ```bash
 # Django
@@ -263,14 +267,16 @@ DATABASE_URL=postgres://user:password@host/dbname
 
 # Email (Resend)
 RESEND_API_KEY=
+RESEND_FROM_DOMAIN=
 
 # Internal endpoints
 INTERNAL_CRON_TOKEN=
 
-# AWS (solo para CI/CD — no va en App Runner)
+# AWS (solo GitHub Secrets para CI/CD — no van al contenedor)
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
 AWS_REGION=
-ECR_REPOSITORY=
-APPRUNNER_SERVICE_ARN=
+LIGHTSAIL_SERVICE=
 ```
 
 **Regla estricta:** ningún valor real de secretos se commitea al repositorio. Si se commitea accidentalmente, rotar el secreto inmediatamente.
@@ -305,30 +311,39 @@ django-debug-toolbar==4.*
 ```dockerfile
 FROM python:3.12-slim
 
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DJANGO_SETTINGS_MODULE=config.settings.production
+
 WORKDIR /app
 
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev gcc \
+    libpq-dev curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Instalar dependencias Python
-COPY requirements/production.txt .
-RUN pip install --no-cache-dir -r production.txt
+COPY requirements/production.txt requirements/base.txt requirements/
+RUN pip install --no-cache-dir -r requirements/production.txt
+
+# Descargar Tailwind CSS standalone (sin Node.js)
+RUN curl -sLo /usr/local/bin/tailwindcss \
+    https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 \
+    && chmod +x /usr/local/bin/tailwindcss
 
 # Copiar código
 COPY . .
 
-# Compilar Tailwind CSS (build estático)
-RUN python manage.py tailwind build --settings=config.settings.production
+# Compilar Tailwind CSS (minificado)
+RUN tailwindcss -i static/css/input.css -o static/css/main.css --minify
 
-# Collectstatic
-RUN python manage.py collectstatic --no-input --settings=config.settings.production
-
+# collectstatic corre al arrancar el contenedor (start.sh), antes de gunicorn
 EXPOSE 8000
 
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2"]
+CMD ["/app/start.sh"]  # → collectstatic --noinput && gunicorn :8000 --workers 2 --timeout 120
 ```
+
+Ver el [`Dockerfile`](../Dockerfile) real para el detalle completo (esta es una referencia condensada).
 
 ---
 
@@ -338,11 +353,11 @@ CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers
 |---|---|---|
 | Django templates + HTMX en lugar de SPA | Astro + API REST | Un solo container, un solo deploy, cero complejidad de CORS/auth cross-origin. Suficiente para el MVP. |
 | Sin JWT — sesiones Django con cookie HTTP-only | JWT en localStorage | Las sesiones Django son más simples, más seguras por defecto (no expuestas a XSS), y no requieren refresh token logic. |
-| App Runner en lugar de EC2 | EC2 t3.micro | App Runner elimina toda administración de servidor. Costo comparable para MVP y cero overhead operativo. |
+| Lightsail Containers en lugar de App Runner | App Runner + ECR (stack original), EC2 t3.micro | Costo fijo y predecible (plan Nano, ~$7/mes) con HTTPS incluido, sin ECR aparte. Se migró desde App Runner manteniendo el mismo Dockerfile. Cero administración de servidor. |
 | Neon en lugar de RDS | RDS PostgreSQL | Neon tiene tier gratuito real. Migración a RDS es cambiar solo `DATABASE_URL`. Sin lock-in. |
 | Resend en lugar de SES | AWS SES | Resend tiene 3000 emails/mes gratis y se integra en minutos. SES requiere aprobación para salir del sandbox. |
-| EventBridge Scheduler para cron | Celery + Redis | Sin workers adicionales. Sin segundo container. Sin Redis. Costo prácticamente $0. |
-| Un solo `Dockerfile` — sin Docker Compose en producción | Docker Compose en prod | App Runner no usa Compose. Compose es solo para desarrollo local (Django + Postgres local). |
+| EventBridge Scheduler + Lambda para cron | Celery + Redis | Sin workers adicionales. Sin segundo container. Sin Redis. Costo prácticamente $0. |
+| Un solo `Dockerfile` — sin Docker Compose en producción | Docker Compose en prod | Lightsail Containers no usa Compose. Compose es solo para desarrollo local (Django + Postgres local). |
 | `whitenoise` para static files | S3 + CloudFront | Suficiente para MVP. Sin configuración extra de buckets, permisos ni CDN. Migrable después. |
 
 ---
@@ -372,9 +387,9 @@ CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers
 - [ ] Migraciones iniciales corren limpias contra Neon
 - [ ] `RESEND_API_KEY` configurada — envía un email de prueba
 - [ ] GitHub Actions: pipeline corre lint + tests en cada push a `main`
-- [ ] App Runner service creado — despliega la imagen correctamente
-- [ ] Dominio custom configurado con SSL en App Runner
-- [ ] EventBridge Scheduler creado — llama al endpoint interno cada 5 minutos
+- [ ] Lightsail container service creado — despliega la imagen correctamente
+- [ ] Dominio custom configurado con SSL en Lightsail
+- [ ] EventBridge Scheduler + Lambda creados — llaman al endpoint interno cada 5 minutos
 
 ---
 
