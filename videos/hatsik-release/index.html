@@ -1,0 +1,358 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+    @font-face {
+        font-family: 'Plus Jakarta Sans';
+        src: url('capture/assets/fonts/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_qU7NSg.ttf');
+        font-weight: 400;
+    }
+    @font-face {
+        font-family: 'Plus Jakarta Sans';
+        src: url('capture/assets/fonts/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_d0nNSg.ttf');
+        font-weight: 600 700;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    [data-composition-id="root"] {
+        width: 1080px; height: 1920px; position: relative; overflow: hidden;
+        background: #FCF9F8;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #1C1B1B;
+    }
+    /* ── background layers (always present) ─────────────────── */
+    .bg-dots {
+        position: absolute; inset: 0;
+        background-image: radial-gradient(rgba(91,64,59,.13) 2.5px, rgba(91,64,59,0) 2.5px);
+        background-size: 44px 44px;
+    }
+    .bg-glow-top {
+        position: absolute; top: -420px; left: -320px; width: 1100px; height: 1100px;
+        background: radial-gradient(circle, rgba(181,29,12,.16) 0%, rgba(181,29,12,0) 68%);
+        border-radius: 50%;
+    }
+    .bg-glow-bottom {
+        position: absolute; bottom: -460px; right: -360px; width: 1150px; height: 1150px;
+        background: radial-gradient(circle, rgba(75,220,130,.13) 0%, rgba(75,220,130,0) 66%);
+        border-radius: 50%;
+    }
+    .bg-rule {
+        position: absolute; left: 70px; right: 70px; top: 96px; height: 3px;
+        background: rgba(181,29,12,.22); transform-origin: left center;
+    }
+    .bg-meta {
+        position: absolute; top: 52px; left: 70px;
+        font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;
+        font-size: 22px; letter-spacing: .22em; color: rgba(91,64,59,.65);
+    }
+    .bg-meta-right {
+        position: absolute; top: 52px; right: 70px;
+        font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;
+        font-size: 22px; letter-spacing: .12em; color: #B51D0C;
+    }
+
+    /* ── phone (persistent wrapper, animated by timeline) ───── */
+    .phone-wrap {
+        position: absolute; left: 50%; top: 400px; width: 795px; height: 1392px;
+        margin-left: -397.5px; z-index: 5;
+    }
+    .phone {
+        width: 100%; height: 100%;
+        background: #1C1B1B; border-radius: 64px; padding: 14px;
+        box-shadow: 0 40px 90px rgba(28,27,27,.30), 0 8px 24px rgba(28,27,27,.18);
+    }
+    .screen {
+        width: 767px; height: 1364px; border-radius: 50px; overflow: hidden;
+        background: #FCF9F8; position: relative;
+    }
+    .zoom-wrap { width: 100%; height: 100%; position: relative; }
+    .zoom-wrap video {
+        position: absolute; inset: 0; width: 767px; height: 1364px;
+        object-fit: cover; display: block;
+    }
+
+    /* ── captions ────────────────────────────────────────────── */
+    .caption {
+        position: absolute; top: 138px; left: 70px; right: 70px; z-index: 8;
+        display: flex; flex-direction: column; align-items: center; gap: 14px;
+        text-align: center;
+    }
+    .caption .head-row { display: flex; align-items: center; gap: 22px; justify-content: center; }
+    .step-chip {
+        width: 74px; height: 74px; border-radius: 50%; background: #B51D0C; color: #FFFFFF;
+        font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 40px;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        box-shadow: 0 10px 24px rgba(181,29,12,.35);
+    }
+    .caption h2 {
+        font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 60px;
+        line-height: 1.12; letter-spacing: -0.02em; color: #1C1B1B;
+    }
+    .caption p {
+        font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600;
+        font-size: 31px; color: #5B403B;
+    }
+
+    /* ── intro ───────────────────────────────────────────────── */
+    .intro {
+        position: absolute; inset: 0; z-index: 8;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 44px; padding: 0 90px; text-align: center;
+    }
+    .intro .brand {
+        font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 92px;
+        color: #B51D0C; letter-spacing: -0.03em;
+    }
+    .intro h1 {
+        font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 88px;
+        line-height: 1.14; letter-spacing: -0.02em; color: #1C1B1B;
+    }
+    .intro h1 .mark {
+        color: #B51D0C; white-space: nowrap;
+        background: linear-gradient(rgba(253,232,228,1), rgba(253,232,228,1)) no-repeat left 78%;
+        background-size: 0% 46%;
+        padding: 0 10px; border-radius: 12px;
+    }
+    .intro .sub {
+        font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600;
+        font-size: 36px; color: #5B403B; max-width: 780px; line-height: 1.5;
+    }
+    .intro .chips { display: flex; gap: 26px; margin-top: 10px; }
+    .intro .chip {
+        background: #FFFFFF; border: 3px solid #EAE7E7; border-radius: 999px;
+        padding: 18px 34px; font-size: 40px;
+        box-shadow: 0 12px 28px rgba(28,27,27,.10);
+    }
+
+    /* ── floating accents during demo ────────────────────────── */
+    .float-toast {
+        position: absolute; z-index: 9; left: 48px; top: 1690px;
+        background: #FFFFFF; border-radius: 999px; padding: 20px 34px;
+        display: flex; align-items: center; gap: 16px;
+        font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 30px;
+        color: #1C1B1B; box-shadow: 0 18px 40px rgba(28,27,27,.18);
+        border: 3px solid #DCFCE7; transform: rotate(-3deg);
+    }
+    .float-toast .tick {
+        width: 46px; height: 46px; border-radius: 50%; background: #4BDC82; color: #fff;
+        display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800;
+    }
+    .fast-chip {
+        position: absolute; z-index: 9; right: 60px; top: 1700px;
+        background: #1C1B1B; color: #FCF9F8; border-radius: 999px; padding: 18px 34px;
+        font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 30px;
+        letter-spacing: .06em; transform: rotate(2deg);
+        box-shadow: 0 16px 36px rgba(28,27,27,.25);
+    }
+    .scanline {
+        position: absolute; z-index: 7; left: 190px; width: 415px; height: 8px; top: 880px;
+        background: #B51D0C; border-radius: 4px; opacity: .85;
+        box-shadow: 0 0 26px rgba(181,29,12,.65);
+    }
+
+    /* ── cierre ──────────────────────────────────────────────── */
+    .cierre {
+        position: absolute; inset: 0; z-index: 8;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 40px; padding: 0 90px; text-align: center;
+    }
+    .cierre .head-row { display: flex; align-items: center; gap: 26px; }
+    .cierre h1 {
+        font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 120px;
+        letter-spacing: -0.02em; color: #1C1B1B;
+    }
+    .cierre .sub {
+        font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600;
+        font-size: 38px; color: #5B403B;
+    }
+    .cierre .url-pill {
+        background: #B51D0C; color: #FFFFFF; border-radius: 999px; padding: 30px 64px;
+        font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 52px;
+        letter-spacing: .01em; box-shadow: 0 22px 48px rgba(181,29,12,.38);
+        margin-top: 12px;
+    }
+    .cierre .brand-mini {
+        font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 46px;
+        color: #B51D0C; margin-top: 26px;
+    }
+</style>
+</head>
+<body>
+<div data-composition-id="root" data-start="0" data-duration="56.2" data-width="1080" data-height="1920">
+
+    <!-- background (persistent) -->
+    <div class="bg-dots"></div>
+    <div class="bg-glow-top" id="glow-top"></div>
+    <div class="bg-glow-bottom" id="glow-bottom"></div>
+    <div class="bg-meta" id="bg-meta">HATSIK · DEMO</div>
+    <div class="bg-meta-right" id="bg-meta-right">hatsik.jjjl.dev</div>
+    <div class="bg-rule" id="bg-rule"></div>
+
+    <!-- phone (persistent wrapper; timeline animates it in/out) -->
+    <div class="phone-wrap" id="phone-wrap">
+        <div class="phone">
+            <div class="screen" id="screen">
+                <div class="zoom-wrap" id="zoom-wrap" data-layout-allow-overflow>
+                    <video id="v1" data-start="4.4"  data-track-index="1" src="beats/b1-crear.mp4" muted playsinline></video>
+                    <video id="v2" data-start="15.4" data-track-index="1" src="beats/b2-items.mp4" muted playsinline></video>
+                    <video id="v3" data-start="26.9" data-track-index="1" src="beats/b3-compartir.mp4" muted playsinline></video>
+                    <video id="v4" data-start="33.7" data-track-index="1" src="beats/b4-tomar.mp4" muted playsinline></video>
+                    <video id="v5" data-start="42.0" data-track-index="1" src="beats/b5-comprado.mp4" muted playsinline></video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- intro -->
+    <div class="intro clip" id="intro" data-start="0" data-duration="4.2" data-track-index="2" data-layout-allow-overflow>
+      <div class="intro-inner" id="intro-inner" style="display:flex; flex-direction:column; align-items:center; gap:44px;">
+        <div class="brand" id="intro-brand">hatsik</div>
+        <h1><span id="intro-l1" style="display:block">Organiza tus convivios</span>
+            <span id="intro-l2" style="display:block">sin el caos del <span class="mark" id="intro-mark">"¿qué llevo?"</span></span></h1>
+        <div class="sub" id="intro-sub">Divide la lista, comparte el link y relájate.</div>
+        <div class="chips" id="intro-chips">
+            <div class="chip" id="chip-a">🥩</div>
+            <div class="chip" id="chip-b">🔥</div>
+            <div class="chip" id="chip-c">🍺</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- captions per beat -->
+    <div class="caption clip" id="cap1" data-start="4.2" data-duration="11.2" data-track-index="2">
+        <div class="head-row"><div class="step-chip">1</div><h2>Crea tu evento</h2></div>
+        <p>Nombre, fecha y listo</p>
+    </div>
+    <div class="caption clip" id="cap2" data-start="15.4" data-duration="11.5" data-track-index="2">
+        <div class="head-row"><h2>Añade lo que hace falta</h2></div>
+        <p>Carne, carbón, bebidas…</p>
+    </div>
+    <div class="caption clip" id="cap3" data-start="26.9" data-duration="6.8" data-track-index="2">
+        <div class="head-row"><div class="step-chip">2</div><h2>Comparte el link</h2></div>
+        <p>O deja que escaneen el QR</p>
+    </div>
+    <div class="caption clip" id="cap4" data-start="33.7" data-duration="8.3" data-track-index="2">
+        <div class="head-row"><h2>Cada quien elige qué llevar</h2></div>
+        <p>Un clic y el ítem es tuyo</p>
+    </div>
+    <div class="caption clip" id="cap5" data-start="42.0" data-duration="8.2" data-track-index="2">
+        <div class="head-row"><h2>¿Ya lo compraste? Márcalo</h2></div>
+        <p id="cap5-sub-a">Todos ven el progreso en tiempo real</p>
+    </div>
+    <div class="caption clip" id="cap5b" data-start="47.7" data-duration="2.5" data-track-index="3" style="top: 300px;">
+        <p style="color:#1C1B1B; font-weight:700; font-size:34px;" id="cap5b-line">✓ 3 de 3 ítems cubiertos</p>
+    </div>
+
+    <!-- floating accents -->
+    <div class="float-toast clip" id="toast" data-start="22.0" data-duration="4.6" data-track-index="4">
+        <div class="tick">✓</div> ¡La lista se arma sola!
+    </div>
+    <div class="fast-chip clip" id="fast-chip" data-start="21.0" data-duration="5.6" data-track-index="5">⏩ CÁMARA RÁPIDA</div>
+    <div class="scanline clip" id="scanline" data-start="32.3" data-duration="1.1" data-track-index="4"></div>
+
+    <!-- cierre -->
+    <div class="cierre clip" id="cierre" data-start="50.2" data-duration="6.0" data-track-index="2">
+        <div class="head-row"><div class="step-chip" id="cierre-chip">3</div><h1 id="cierre-title">¡Y listo!</h1></div>
+        <div class="sub" id="cierre-sub">Organiza tu próximo convivio</div>
+        <div class="url-pill" id="cierre-url">hatsik.jjjl.dev</div>
+        <div class="brand-mini" id="cierre-brand">hatsik</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+
+        // Map a recorded click coordinate (540x960 CSS px) to zoom-wrap display px.
+        const F = 767 / 540;
+        const origin = (x, y) => `${Math.round(x * F)}px ${Math.round(y * F)}px`;
+
+        // ── ambient background (full duration, finite repeats) ──
+        tl.to('#glow-top', { scale: 1.07, duration: 7, ease: 'sine.inOut', yoyo: true, repeat: 7 }, 0);
+        tl.to('#glow-bottom', { scale: 1.09, x: -30, duration: 9, ease: 'sine.inOut', yoyo: true, repeat: 5 }, 0);
+
+        // ── intro (0 – 4.2) ──────────────────────────────────────
+        tl.fromTo('#bg-rule', { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: 'expo.out' }, 0.15);
+        tl.fromTo('#bg-meta', { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }, 0.3);
+        tl.fromTo('#bg-meta-right', { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }, 0.4);
+        tl.fromTo('#intro-brand', { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: 'back.out(1.8)' }, 0.2);
+        tl.fromTo('#intro-l1', { y: 70, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, 0.55);
+        tl.fromTo('#intro-l2', { y: 70, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, 0.75);
+        tl.to('#intro-mark', { backgroundSize: '100% 46%', duration: 0.6, ease: 'power2.inOut' }, 1.5);
+        tl.fromTo('#intro-sub', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'sine.out' }, 1.3);
+        tl.fromTo('#chip-a', { y: 90, opacity: 0, rotation: -14 }, { y: 0, opacity: 1, rotation: -6, duration: 0.6, ease: 'back.out(2)' }, 1.6);
+        tl.fromTo('#chip-b', { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(2.4)' }, 1.75);
+        tl.fromTo('#chip-c', { y: 90, opacity: 0, rotation: 14 }, { y: 0, opacity: 1, rotation: 6, duration: 0.6, ease: 'back.out(2)' }, 1.9);
+        tl.to('#intro-chips', { y: -14, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 2.3);
+        // velocity-matched hand-off: intro lifts as the phone rises
+        tl.to('#intro-inner', { y: -160, opacity: 0, filter: 'blur(14px)', duration: 0.35, ease: 'power2.in' }, 3.85);
+        tl.set('#intro-inner', { opacity: 0 }, 4.2);
+
+        // ── phone entrance ───────────────────────────────────────
+        tl.fromTo('#phone-wrap', { y: 1650, rotation: 4 }, { y: 0, rotation: 0, duration: 1.0, ease: 'power3.out' }, 3.95);
+
+        // ── caption entrances (each timed clip animates in) ─────
+        const capIn = (sel, t) => {
+            tl.fromTo(`${sel} .head-row`, { y: 56, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, t);
+            tl.fromTo(`${sel} p`, { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, t + 0.16);
+        };
+        capIn('#cap1', 4.35);
+        capIn('#cap2', 15.5);
+        capIn('#cap3', 27.0);
+        capIn('#cap4', 33.8);
+        capIn('#cap5', 42.1);
+        tl.fromTo('#cap5b-line', { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(2)' }, 47.8);
+
+        // ── blur cuts at clip boundaries ─────────────────────────
+        [15.4, 26.9, 33.7, 42.0].forEach(b => {
+            tl.to('#screen', { filter: 'blur(9px)', duration: 0.18, ease: 'power2.in' }, b - 0.18);
+            tl.to('#screen', { filter: 'blur(0px)', duration: 0.24, ease: 'power2.out' }, b);
+        });
+
+        // ── zoom choreography (origin per recorded click) ────────
+        const zoom = (t, ox, oy, scale, inDur, outAt, outDur) => {
+            tl.set('#zoom-wrap', { transformOrigin: origin(ox, oy) }, t - 0.05);
+            tl.to('#zoom-wrap', { scale, duration: inDur, ease: 'power2.out' }, t);
+            tl.to('#zoom-wrap', { scale: 1, duration: outDur, ease: 'power2.inOut' }, outAt);
+        };
+        // B1 crear evento — form + submit in one held zoom (origin left-biased so labels stay visible)
+        zoom(6.6, 60, 430, 1.32, 0.6, 12.6, 0.7);
+        // B2 añadir ítems — gentle push on the centered modal
+        zoom(16.4, 270, 500, 1.15, 0.55, 20.2, 0.6);
+        // B3 compartir — copiar link, then QR hold
+        zoom(30.0, 270, 316, 1.45, 0.5, 31.55, 0.45);
+        zoom(32.15, 270, 515, 1.5, 0.55, 33.25, 0.35);
+        // B4 tomar — two claims
+        zoom(34.35, 170, 860, 1.42, 0.55, 36.9, 0.5);
+        zoom(37.85, 170, 500, 1.42, 0.55, 40.3, 0.5);
+        // B5 comprado — two purchases + 100% progress finale
+        zoom(42.8, 411, 848, 1.45, 0.5, 44.4, 0.45);
+        zoom(45.0, 411, 480, 1.45, 0.5, 46.5, 0.45);
+        zoom(47.55, 270, 430, 1.08, 0.6, 49.55, 0.5); // subtle push: keep "100%" fully in frame
+
+        // ── floating accents ─────────────────────────────────────
+        tl.fromTo('#toast', { x: -420, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'back.out(1.6)' }, 22.1);
+        tl.to('#toast', { y: -12, duration: 1.1, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 22.8);
+        tl.fromTo('#fast-chip', { scale: 0, opacity: 0, rotation: 14 }, { scale: 1, opacity: 1, rotation: 2, duration: 0.45, ease: 'back.out(2.2)' }, 21.1);
+        tl.to('#fast-chip', { scale: 1.05, duration: 0.5, ease: 'sine.inOut', yoyo: true, repeat: 7 }, 21.6);
+        // QR scan-line sweep (positioned over the zoomed QR)
+        tl.fromTo('#scanline', { y: -170, opacity: 0 }, { y: 0, opacity: 0.85, duration: 0.2, ease: 'power1.out' }, 32.35);
+        tl.to('#scanline', { y: 330, duration: 0.72, ease: 'power1.inOut' }, 32.58);
+
+        // ── phone exit → cierre (velocity-matched hand-off) ─────
+        tl.to('#phone-wrap', { y: 1750, rotation: -3, duration: 0.65, ease: 'power2.in' }, 49.85);
+        tl.set('#phone-wrap', { visibility: 'hidden' }, 50.55);
+
+        // ── cierre (50.2 – 56.2, final scene) ────────────────────
+        tl.fromTo('#cierre-chip', { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.55, ease: 'back.out(2.4)' }, 50.35);
+        tl.fromTo('#cierre-title', { y: 120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'back.out(1.6)' }, 50.45);
+        tl.fromTo('#cierre-sub', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'sine.out' }, 51.1);
+        tl.fromTo('#cierre-url', { y: 90, opacity: 0, scale: 0.85 }, { y: 0, opacity: 1, scale: 1, duration: 0.65, ease: 'power3.out' }, 51.4);
+        tl.to('#cierre-url', { scale: 1.06, duration: 0.4, ease: 'sine.inOut', yoyo: true, repeat: 3 }, 52.6);
+        tl.fromTo('#cierre-brand', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'sine.out' }, 52.0);
+
+        window.__timelines['root'] = tl;
+    </script>
+</div>
+</body>
+</html>
