@@ -28,6 +28,70 @@
             background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
             background-size: 20px 20px;
         }
+        .how-it-works-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(8px);
+        }
+        .how-it-works-modal.is-open {
+            display: flex;
+        }
+        .how-it-works-dialog {
+            position: relative;
+            width: fit-content;
+            max-width: min(960px, 100%);
+            max-height: min(86vh, 820px);
+            border-radius: 28px;
+            overflow: hidden;
+            background: #0b0b0b;
+            box-shadow: 0 28px 90px rgba(0, 0, 0, 0.45);
+        }
+        .how-it-works-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 1;
+            width: 44px;
+            height: 44px;
+            border-radius: 9999px;
+            background: rgba(252, 249, 248, 0.94);
+            color: var(--color-on-surface);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        .how-it-works-close:hover {
+            transform: scale(1.04);
+            background: #ffffff;
+        }
+        .how-it-works-video {
+            display: block;
+            width: auto;
+            max-width: min(960px, calc(100vw - 40px));
+            max-height: min(86vh, 820px);
+            object-fit: contain;
+            background: #000;
+        }
+        @media (max-width: 640px) {
+            .how-it-works-modal {
+                padding: 12px;
+            }
+            .how-it-works-dialog {
+                border-radius: 20px;
+            }
+            .how-it-works-video {
+                max-width: calc(100vw - 24px);
+                max-height: 82vh;
+            }
+        }
     </style>
 </head>
 <body class="bg-background text-on-surface font-body">
@@ -66,7 +130,7 @@
                 <a href="{% url 'accounts:register' %}" class="bg-primary text-on-primary px-[var(--space-xl)] py-[var(--space-lg)] rounded-xl font-heading text-[20px] leading-[28px] font-bold shadow-lg hover:shadow-primary/20 transition-all text-center">
                     Crear mi primer evento
                 </a>
-                <button class="bg-surface text-on-surface border border-gray-border px-[var(--space-xl)] py-[var(--space-lg)] rounded-xl font-heading text-[20px] leading-[28px] font-bold hover:bg-surface-container-low transition-all flex items-center justify-center gap-2">
+                <button id="how-it-works-btn" type="button" aria-haspopup="dialog" aria-controls="how-it-works-modal" class="bg-surface text-on-surface border border-gray-border px-[var(--space-xl)] py-[var(--space-lg)] rounded-xl font-heading text-[20px] leading-[28px] font-bold hover:bg-surface-container-low transition-all flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined">play_circle</span> Ver cómo funciona
                 </button>
             </div>
@@ -317,8 +381,56 @@
     </div>
 </footer>
 
+<!-- Modal: Ver cómo funciona -->
+<div id="how-it-works-modal" class="how-it-works-modal" role="dialog" aria-modal="true" aria-label="Video: cómo funciona Hatsik" aria-hidden="true">
+    <div class="how-it-works-dialog">
+        <button id="how-it-works-close" type="button" aria-label="Cerrar video" class="how-it-works-close">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <video id="how-it-works-video" class="how-it-works-video" src="{% static 'video/como-funciona.mp4' %}" playsinline controls preload="metadata"></video>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('how-it-works-modal');
+        const video = document.getElementById('how-it-works-video');
+        const openBtn = document.getElementById('how-it-works-btn');
+        const closeBtn = document.getElementById('how-it-works-close');
+        const openModal = () => {
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('overflow-hidden');
+            video.currentTime = 0;
+            video.muted = false;
+            video.volume = 1;
+            video.play().catch(() => {});
+            closeBtn.focus();
+        };
+        const closeModal = () => {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('overflow-hidden');
+            video.pause();
+            video.currentTime = 0;
+            openBtn.focus();
+        };
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', (e) => {
+            if (!modal.classList.contains('is-open')) return;
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'Tab') {
+                // keep focus inside the dialog (close button <-> video controls)
+                const focusables = [closeBtn, video];
+                const idx = focusables.indexOf(document.activeElement);
+                const next = e.shiftKey ? (idx <= 0 ? focusables.length - 1 : idx - 1)
+                                        : (idx === focusables.length - 1 ? 0 : idx + 1);
+                focusables[next].focus();
+                e.preventDefault();
+            }
+        });
         const observerOptions = { threshold: 0.1 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
