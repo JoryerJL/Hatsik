@@ -1,0 +1,80 @@
+[a] Iniciar sesión
+[a] Registrarse
+[a] Empezar gratis
+[h1] Organiza tus convivios sin el caos del
+[span] "¿qué llevo?"
+[p] La app que hace logística colaborativa para que tú solo disfrutes el convivio. Divide la lista, comparte el link y relájate.
+[a] Crear mi primer evento
+[span] play_circle
+[button] Ver cómo funciona
+[span] check_circle
+[span] ¡Juan trajo el carbón!
+[h2] El caos vs La claridad
+[p] Compara la frustración de los grupos de chat con la organización de Hatsik.
+[span] forum
+[h3] Caos en WhatsApp
+[div] ¿Quién lleva las tortillas?
+[div] Yo llevo, creo...
+[div] Yo también traje!!
+[div] 50 mensajes nuevos...
+[span] close
+[div] Confusión y duplicados
+[span] fact_check
+[h3] Claridad en Hatsik
+[span] check_box
+[span] Tortillas (2kg)
+[span] Cubierto
+[span] pending
+[span] Refrescos (6L)
+[span] Pendiente
+[span] add_circle
+[span] Agregar algo más...
+[span] check
+[div] Todo bajo control
+[h2] En solo 3 pasos
+[span] edit_note
+[h3] 1. Crea tu evento
+[p] Define el nombre del convivio y arma la lista de lo que se necesita.
+[span] qr_code_2
+[h3] 2. Comparte el link
+[p] Manda el enlace o el QR por WhatsApp. Sin que nadie tenga que registrarse.
+[span] volunteer_activism
+[h3] 3. ¡Y listo!
+[p] Cada quien se anota a lo que traerá. Verás en tiempo real quién ya cumplió.
+[span] bolt
+[h3] Listas en tiempo real
+[p] Olvídate de refrescar la página. Si alguien se anota para las cervezas, todos lo ven al instante. Cero duplicados, cero confusiones.
+[div] Ana trajo Hielo
+[div] Carlos se anotó
+[span] no_accounts
+[h3] Sin registros
+[p] Tus invitados entran, ven la lista y se anotan. Tan simple como eso. La barrera de entrada es cero.
+[span] admin_panel_settings
+[h3] Control total
+[p] Como organizador, puedes editar cantidades, agregar items de último minuto o reasignar tareas.
+[span] bar_chart
+[h3] Visualización clara
+[p] Un tablero visual que te dice qué falta por cubrir de un solo vistazo. El semáforo de tu evento.
+[div] 85%
+[div] Cubierto
+[h2] Como la nota en el refrigerador, pero mejor.
+[p] "Hatsik nació en una cocina, entre amigos que querían compartir sin pelearse por quién trajo el carbón."
+[p] "Ya no pierdo 20 min en el chat buscando la lista"
+[span] — Mariana
+[p] "El QR en la entrada fue un éxito total. ¡Nadie se olvidó nada!"
+[span] — Roberto
+[p] "Hatsik = Paz mental para el parrillero."
+[span] — El Chef
+[h2] Haz que tu próxima reunión sea un éxito.
+[p] Empieza gratis hoy y olvida el caos para siempre.
+[a] Crear mi primer evento ahora
+[p] Dividir, compartir. Logística colaborativa para seres sociales que aman sus convivios.
+[h4] Producto
+[a] Funciones
+[a] Historias
+[h4] Compañía
+[a] Nosotros
+[a] Contacto
+[a] Privacidad
+[a] Términos
+[span] © 2024 Hatsik. Hecho con ❤️ para la comunidad.
